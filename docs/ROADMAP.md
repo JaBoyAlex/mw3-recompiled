@@ -18,3 +18,9 @@ Start three independent lanes after the foundation: toolchain (006), reference c
 Every phase gate records case IDs, exact builds/content, machines, actual results and unresolved defects. It is not passed by a high recompilation percentage, compilation success, an attractive screenshot or a mocked service. Full-product delivery is a substantial research project for 2–3 developers; no defensible finish date exists before first playable-scene and mode-completion measurements. Re-estimate remaining work and blocked dependencies at each integration checkpoint.
 
 If the bakeoff shows MW2 adaptation costs more than a shared runtime, choose the shared runtime. If a native rendering seam yields no net quality/performance/maintenance benefit, keep the compatibility backend. If vendor/Steam rights cannot be obtained, state the gap and seek an owner decision on product scope instead of mislabeling a substitute as the requested feature.
+
+## Deferred community interoperability consideration
+
+The owner identified possible long-term interoperability with existing MW3 multiplayer communities, particularly **Plutonium IW5** and **XLink Kai**, with **Open-IW5** as a potential technical reference. This is future product context, not a change to current priorities or an added release requirement.
+
+Compatibility, feasibility and permitted reuse have not been investigated or promised. Revisit the idea only after the underlying original multiplayer functionality and secure networking are sufficiently stable. Do not spend current development or research resources on these projects, and do not alter present architecture or task dependencies to accommodate speculative interoperability.
