@@ -18,6 +18,16 @@ from verify_inputs import verify, DEFAULT
 from prepare_toolchain import verify_sources, sha256, text_sha256
 
 
+def observed_loader(source, license_text):
+    anchor = "    auto* imports = reinterpret_cast<const Xex2ImportHeader*>(getOptHeaderPtr(data, XEX_HEADER_IMPORT_LIBRARIES));"
+    if source.count(anchor) != 1:
+        raise ValueError("pinned loader observer insertion point differs")
+    # Only a read-only call is inserted before normalization. Keep crypto,
+    # decompression and existing normalization logic unchanged and private.
+    return ("/*\n" + license_text + "\n*/\n#include \"import_hook.h\"\n" +
+            source.replace(anchor, "    mw3_observe_imports(image, data, dataSize);\n" + anchor))
+
+
 def validate_switches(metadata, switches):
     code = [row for row in metadata["sections"] if row["code"]]
 
@@ -66,11 +76,69 @@ def summarize_mapping(metadata):
                 unresolved_indirect_sites=len(flow["unresolved_indirect_sites"]))
 
 
+def summarize_imports(metadata):
+    audit = metadata["import_audit"]
+    if audit["observed_before_normalization"] is not True or audit["runtime_implemented"] is not False:
+        raise ValueError("invalid import observation stage/runtime claim")
+    functions = variables = unknown = malformed = unknown_types = total_records = 0
+    expected_symbols = set()
+    libraries = []
+    for lib in audit["libraries"]:
+        ordinals = {}
+        for record in lib["records"]:
+            total_records += 1
+            unknown_types += record["type"] not in (0, 1)
+            ordinals.setdefault(record["ordinal"], []).append(record)
+            if record["type"] and record["export_name"] is not None:
+                expected_symbols.add((record["address"], "__imp__" + record["export_name"]))
+        for records in ordinals.values():
+            kinds = {row["export_kind"] for row in records}
+            names = {row["export_name"] for row in records}
+            if len(kinds) != 1 or len(names) != 1:
+                raise ValueError("inconsistent export identity for import ordinal")
+            types = sorted(row["type"] for row in records)
+            kind = next(iter(kinds))
+            if kind is None:
+                unknown += 1
+            elif kind == "kFunction" and types == [0, 1]:
+                functions += 1
+            elif kind == "kVariable" and types == [0]:
+                variables += 1
+            else:
+                malformed += 1
+        libraries.append(dict(name=lib["name"], id=lib["id"], version_raw=lib["version_raw"],
+                              minimum_version_raw=lib["minimum_version_raw"], records=len(lib["records"]),
+                              unique_ordinals=len(ordinals)))
+    actual_symbols = {(row["address"], row["name"]) for row in metadata["resolved_import_symbols"]}
+    if expected_symbols != actual_symbols:
+        raise ValueError("pre-normalization imports disagree with loader symbols")
+    return dict(import_libraries=libraries, import_records=total_records, import_function_pairs=functions,
+                import_data_variables=variables, unknown_import_ordinals=unknown, unknown_import_record_types=unknown_types,
+                malformed_known_import_ordinals=malformed)
+
+
+def nonlocal_inventory(metadata):
+    services = []
+    wanted = {"__imp__RtlUnwind", "__imp__RtlUnwind2", "__imp__RtlCaptureContext", "__imp__RtlRestoreContext"}
+    for symbol in metadata["resolved_import_symbols"]:
+        if symbol["name"] not in wanted:
+            continue
+        calls = [row["site"] for row in metadata["flow_scan"]["immediate_calls"] if row["target"] == symbol["address"]]
+        # A containing .pdata range is a navigation hint, not a proof that a
+        # direct-call word is reachable or that the function is longjmp.
+        containing = sorted({row["address"] for site in calls for row in metadata["pdata"]["functions"]
+                             if row["address"] <= site < row["address"] + row["size"]})
+        services.append(dict(name=symbol["name"], address=symbol["address"], direct_call_word_sites=calls,
+                             containing_pdata_entries=containing))
+    return dict(setjmp_longjmp_status="unverified", exception_paths_resolved=False, services=services)
+
+
 def compare_reports(current, previous):
     # Compare complete private metadata via its digests, not just headline counts.
     # Binary bit identity across build-directory paths is not asserted here.
     for key in ("schema_version", "identity", "analyzer_sha256", "analysis_source_sha256",
-                "loader_static_library_sha256", "decoder_static_library_sha256", "compiler", "probe_sanitizers", "titles"):
+                "loader_static_library_sha256", "decoder_static_library_sha256", "observed_loader_source_sha256",
+                "export_tables_sha256", "compiler", "probe_sanitizers", "titles"):
         if current[key] != previous[key]:
             raise ValueError(f"repeat analysis differs: {key}")
 
@@ -99,6 +167,10 @@ def main():
             raise ValueError("output already exists; use a fresh private directory")
         args.output.mkdir(parents=True)
         output = args.output.resolve()
+        loader_root = args.sources / "XenonRecomp"
+        loader_source = output / "observed-xex.cpp"
+        loader_source.write_text(observed_loader((loader_root / "XenonUtils/xex.cpp").read_text(),
+                                                (loader_root / "LICENSE.md").read_text()))
 
         def run(command, name):
             result = subprocess.run(list(map(str, command)), stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=180)
@@ -110,6 +182,7 @@ def main():
         run(["cmake", "-S", ROOT / "config/analysis/probe", "-B", output / "build", "-G", "Ninja",
              "-DCMAKE_CXX_COMPILER=clang++-18", "-DCMAKE_BUILD_TYPE=Release",
              f"-DMW3_SCAN_SANITIZERS={'ON' if args.sanitizers else 'OFF'}",
+             f"-DMW3_OBSERVED_LOADER={loader_source}",
              f"-DMW3_CPU_SOURCE={(args.sources / 'XenonRecomp').resolve()}",
              f"-DMW3_CPU_BUILD={(args.toolchain / 'cpu').resolve()}"], "configure")
         run(["cmake", "--build", output / "build", "--parallel", "2"], "build")
@@ -121,6 +194,7 @@ def main():
         summaries = []
         for role, filename in (("sp", "default.xex"), ("mp", "default_mp.xex")):
             metadata = json.loads(run([probe, (args.owned / filename).resolve()], role + "-image"))
+            metadata["nonlocal_flow"] = nonlocal_inventory(metadata)
             table_file = output / f"{role}-switches.toml"
             run([analyzer, (args.owned / filename).resolve(), table_file], role + "-switches")
             switches = tomllib.loads(table_file.read_text())
@@ -130,15 +204,20 @@ def main():
                                   base=metadata["base"], entry_point=metadata["entry_point"], image_size=metadata["size"],
                                   section_count=len(metadata["sections"]), resolved_import_symbols=len(metadata["resolved_import_symbols"]),
                                   switches_sha256=sha256(table_file), metadata_sha256=sha256(output / f"{role}-image.json"),
-                                  **checked, **summarize_mapping(metadata)))
-        report = dict(schema_version=2, identity=identity["manifest_id"], analyzer_sha256=sha256(analyzer), probe_sha256=sha256(probe),
+                                  **checked, **summarize_mapping(metadata), **summarize_imports(metadata)))
+        report = dict(schema_version=3, identity=identity["manifest_id"], analyzer_sha256=sha256(analyzer), probe_sha256=sha256(probe),
                       compiler=lock["compilers"]["linux"], probe_sanitizers=args.sanitizers,
                       probe_source_sha256=text_sha256(ROOT / "config/analysis/probe/image_probe.cpp"),
                       analysis_source_sha256={name: text_sha256(ROOT / "config/analysis" / name) for name in
-                                             ("analyze.py", "probe/image_probe.cpp", "probe/scan.h", "probe/CMakeLists.txt", "probe/scan_tests.cpp")},
+                                             ("analyze.py", "probe/image_probe.cpp", "probe/scan.h", "probe/imports.h", "probe/import_hook.h",
+                                              "probe/CMakeLists.txt", "probe/scan_tests.cpp")},
+                      observed_loader_source_sha256=text_sha256(loader_source),
+                      export_tables_sha256={name: text_sha256(loader_root / "XenonUtils/xbox" / name)
+                                            for name in ("xam_table.inc", "xboxkrnl_table.inc")},
                       loader_static_library_sha256=sha256(args.toolchain / "cpu/XenonUtils/libXenonUtils.a"),
                       decoder_static_library_sha256=sha256(args.toolchain / "cpu/thirdparty/disasm/libdisasm.a"),
-                      titles=summaries, guest_executed=False, control_flow_complete=False, unknown_import_coverage="not-established")
+                      titles=summaries, guest_executed=False, control_flow_complete=False,
+                      unknown_import_coverage="records-audited-runtime-unverified", import_runtime_implemented=False)
         if args.compare:
             compare_reports(report, json.loads(args.compare.read_text()))
             report["compared_to_report_sha256"] = sha256(args.compare)

@@ -10,7 +10,7 @@ python3 config/analysis/analyze.py --owned '<private SP/MP directory>' --sources
 
 Add `--sanitizers` to instrument the maintained adapter and synthetic scan tests with ASan/UBSan. Ubuntu's Clang 18 instrumentation needs `libclang-rt-18-dev`. The prepared upstream archives are not rebuilt/instrumented by this option. Repeat into a fresh directory with the same options and `--compare '<first directory>/report.json'`. Comparison requires identical input, analyzer, loader/decoder library, compiler, maintained analysis-source and complete metadata digests. It does not assert cross-directory binary bit identity or independent algorithm coverage.
 
-The directory containing the two root executables can remain on the Windows drive under WSL; files are read-only. The script checks their exact hashes, the tool source/submodule revisions, preparation lock and analyzer binary hash. It then compiles a small metadata adapter against the prepared XenonUtils static library, records that library/probe identity, and captures image/import/switch observations. No guest code executes, decrypted image is dumped, key is logged, game data is uploaded, or original input is changed.
+The directory containing the two root executables can remain on the Windows drive under WSL; files are read-only. The script checks their exact hashes, the tool source/submodule revisions, preparation lock and analyzer binary hash. It compiles a metadata adapter with a privately observed copy of the pinned XEX loader and the remaining prepared XenonUtils/decoder archive objects, recording their identities. No guest code executes, decrypted image is dumped, key is logged, game data is uploaded, or original input is changed.
 
 Use a new output directory each time. Logs, generated build files and full address inventories remain private; only sanitized observations and hashes belong in docs. The pinned upstream loader is not a hardened generic untrusted-file parser. Directly invoking `mw3-image-probe` bypasses the Python fingerprint guard and is unsupported for unknown files.
 
@@ -33,3 +33,13 @@ ctest --test-dir out/scan-tests --output-on-failure
 Use `-C Debug` for CTest with a Windows multi-configuration build. The sanitizer option is supported on Linux; Windows scan tests use MSVC without it.
 
 For full repository checks in WSL, use a separate Linux clone. Linux Git cannot resolve the drive-letter metadata of a worktree created by Windows Git. The owned-title analysis command itself may run from the mounted Windows project because source verification uses the separate Linux upstream checkouts.
+
+## Original import-record audit
+
+The pinned loader normalizes function thunks and endian-swaps value records. Its symbol list alone therefore omits variable imports and cannot preserve original record types/ordinals. The driver creates a **private build-only copy** of the pinned `xex.cpp`, retaining its MIT license and inserting one read-only observer call immediately before the import loop. The exact insertion anchor must occur once. Cryptography, decompression and normalization logic are unchanged. No upstream checkout is modified. This is analysis instrumentation, not a production loader fork or a runtime choice.
+
+The observer bounds-checks the XEX optional/import headers, padded string table, declared library sizes, name indices, version fields and every record address. It reads original words from mapped sections before normalization; no word/image dump is written. Type 0 denotes a value slot, which can belong to a function pair **or** a variable. Type 1 denotes a function thunk. Grouping by library/ordinal and consulting the pinned export tables distinguishes function pairs from variable imports. Unknown ordinals/types and malformed known groups remain explicit counters; they never become successful stubs. Known function identities/addresses must agree with the normalizing loader's separate symbol list.
+
+The manifest records the observed loader source and export-table digests. `--sanitizers` instruments this loader copy as well as maintained code; prepared archive objects remain uninstrumented. Header/record inventories remain private. Raw version fields document requested identities, not proven runtime compatibility.
+
+The nonlocal-flow inventory records direct-call words targeting imported unwind/context services and containing `.pdata` entries as navigation hints. It keeps `setjmp_longjmp_status=unverified` and `exception_paths_resolved=false`; neither a call to `RtlUnwind` nor its absence establishes a `longjmp` identity.

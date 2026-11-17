@@ -17,8 +17,13 @@ if(WIN32)
   message(FATAL_ERROR "This probe currently uses the canonical Ubuntu/WSL toolchain")
 endif()
 add_executable(mw3-image-probe image_probe.cpp)
+if(NOT EXISTS "${MW3_OBSERVED_LOADER}")
+  message(FATAL_ERROR "Use identity-guarded analyze.py to prepare the observed loader")
+endif()
+target_sources(mw3-image-probe PRIVATE "${MW3_OBSERVED_LOADER}")
 target_compile_features(mw3-image-probe PRIVATE cxx_std_20)
 target_include_directories(mw3-image-probe PRIVATE "${MW3_CPU_SOURCE}/XenonUtils"
+  "${CMAKE_CURRENT_SOURCE_DIR}" "${MW3_CPU_SOURCE}/thirdparty/tiny-AES-c" "${MW3_CPU_SOURCE}/thirdparty/TinySHA1"
   "${MW3_CPU_SOURCE}/thirdparty/simde" "${MW3_CPU_SOURCE}/thirdparty/disasm")
 target_link_libraries(mw3-image-probe PRIVATE
   "${MW3_CPU_BUILD}/XenonUtils/libXenonUtils.a"

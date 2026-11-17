@@ -55,13 +55,56 @@ class AnalysisTests(unittest.TestCase):
 
     def test_repeat_compares_full_metadata_identity(self):
         report = {key: "original" for key in ("schema_version", "identity", "analyzer_sha256", "analysis_source_sha256",
-                  "loader_static_library_sha256", "decoder_static_library_sha256", "compiler", "probe_sanitizers", "titles")}
+                  "loader_static_library_sha256", "decoder_static_library_sha256", "compiler", "probe_sanitizers", "titles",
+                  "observed_loader_source_sha256", "export_tables_sha256")}
         analysis.compare_reports(report, copy.deepcopy(report))
         for key in report:
             changed = copy.deepcopy(report)
             changed[key] = "mutated"
             with self.assertRaisesRegex(ValueError, key):
                 analysis.compare_reports(report, changed)
+
+    def test_observer_insertion_preserves_loader_and_requires_exact_anchor(self):
+        anchor = "    auto* imports = reinterpret_cast<const Xex2ImportHeader*>(getOptHeaderPtr(data, XEX_HEADER_IMPORT_LIBRARIES));"
+        source = "before\n" + anchor + "\nafter\n"
+        patched = analysis.observed_loader(source, "Original synthetic license")
+        self.assertIn("Original synthetic license", patched)
+        self.assertTrue(patched.endswith(source.replace(anchor, "    mw3_observe_imports(image, data, dataSize);\n" + anchor)))
+        for changed in ("missing", source + source):
+            with self.assertRaisesRegex(ValueError, "insertion point"):
+                analysis.observed_loader(changed, "license")
+
+    def test_import_pairs_variables_unknowns_and_loader_disagreement(self):
+        def record(address, ordinal, kind, name, export_kind):
+            return dict(address=address, ordinal=ordinal, type=kind, export_name=name, export_kind=export_kind)
+        records = [record(0x1000, 3, 0, "Function", "kFunction"), record(0x1010, 3, 1, "Function", "kFunction"),
+                   record(0x2000, 7, 0, "Variable", "kVariable")]
+        lib = dict(name="synthetic.xex", id=0, version_raw=0x10000001, minimum_version_raw=0x10000000, records=records)
+        metadata = dict(import_audit=dict(observed_before_normalization=True, runtime_implemented=False, libraries=[lib]),
+                        resolved_import_symbols=[dict(address=0x1010, name="__imp__Function")])
+        summary = analysis.summarize_imports(metadata)
+        self.assertEqual((summary["import_records"], summary["import_function_pairs"], summary["import_data_variables"]), (3, 1, 1))
+        # A type-0 pointer slot is not automatically a variable export.
+        records.pop(1); metadata["resolved_import_symbols"] = []
+        self.assertEqual(analysis.summarize_imports(metadata)["malformed_known_import_ordinals"], 1)
+        records.append(record(0x3000, 8, 2, None, None))
+        summary = analysis.summarize_imports(metadata)
+        self.assertEqual((summary["unknown_import_ordinals"], summary["unknown_import_record_types"]), (1, 1))
+        metadata["resolved_import_symbols"] = [dict(address=0x1010, name="__imp__Wrong")]
+        with self.assertRaisesRegex(ValueError, "disagree"):
+            analysis.summarize_imports(metadata)
+
+    def test_unwind_xrefs_do_not_claim_longjmp_identification(self):
+        metadata = dict(resolved_import_symbols=[dict(name="__imp__RtlUnwind", address=0x3000)],
+                        flow_scan=dict(immediate_calls=[dict(site=0x1010, target=0x3000), dict(site=0x2010, target=0x4000)]),
+                        pdata=dict(functions=[dict(address=0x1000, size=0x40)]))
+        flow = analysis.nonlocal_inventory(metadata)
+        self.assertEqual(flow["setjmp_longjmp_status"], "unverified")
+        self.assertFalse(flow["exception_paths_resolved"])
+        self.assertEqual(flow["services"][0]["direct_call_word_sites"], [0x1010])
+        self.assertEqual(flow["services"][0]["containing_pdata_entries"], [0x1000])
+        metadata["resolved_import_symbols"] = []
+        self.assertEqual(analysis.nonlocal_inventory(metadata)["setjmp_longjmp_status"], "unverified")
 
 
 class NativeScanTests(unittest.TestCase):

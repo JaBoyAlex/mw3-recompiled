@@ -4,13 +4,27 @@
 #include <image.h>
 #include <disasm.h>
 #include "scan.h"
+#include "imports.h"
+#include "import_hook.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <optional>
 #include <vector>
 
 namespace {
 using namespace mw3::analysis;
+std::optional<std::vector<ImportLibrary>> original_imports;
+struct ExportName { const char* name; const char* kind; };
+#define XE_EXPORT(MODULE, ORDINAL, NAME, TYPE) {ORDINAL, {#NAME, #TYPE}}
+const std::map<uint32_t,ExportName> audit_xam_exports{
+#include <xbox/xam_table.inc>
+};
+const std::map<uint32_t,ExportName> audit_kernel_exports{
+#include <xbox/xboxkrnl_table.inc>
+};
+#undef XE_EXPORT
 void write_json_string(std::string_view value) {
     static constexpr char hex[] = "0123456789abcdef";
     std::cout << '"';
@@ -128,6 +142,48 @@ void write_analysis(const Image& image) {
     }
     std::cout << "],\"exception_paths_resolved\":false,\"scan_is_reachable_code_proof\":false}";
 }
+
+void write_imports() {
+    if (!original_imports) throw std::runtime_error("pre-normalization observer did not run");
+    std::cout << ",\"import_audit\":{\"observed_before_normalization\":true,\"runtime_implemented\":false,\"libraries\":[";
+    bool first_lib=true;
+    for (const auto& lib : *original_imports) {
+        if (!first_lib) std::cout << ',';
+        first_lib=false;
+        std::cout << "{\"name\":"; write_json_string(lib.name);
+        std::cout << ",\"id\":" << lib.id << ",\"version_raw\":" << lib.version
+                  << ",\"minimum_version_raw\":" << lib.minimum_version << ",\"name_index_raw\":" << lib.name_index
+                  << ",\"records\":[";
+        const auto* exports=lib.name=="xam.xex" ? &audit_xam_exports : lib.name=="xboxkrnl.exe" ? &audit_kernel_exports : nullptr;
+        bool first=true;
+        for (const auto& r : lib.records) {
+            if (!first) std::cout << ',';
+            first=false;
+            std::cout << "{\"address\":" << r.address << ",\"ordinal\":" << r.ordinal
+                      << ",\"type\":" << r.type << ",\"hint\":" << r.hint << ",\"export_name\":";
+            const auto* found=exports && exports->contains(r.ordinal) ? &exports->at(r.ordinal) : nullptr;
+            if (found) write_json_string(found->name); else std::cout << "null";
+            std::cout << ",\"export_kind\":";
+            if (found) write_json_string(found->kind); else std::cout << "null";
+            std::cout << '}';
+        }
+        std::cout << "]}";
+    }
+    std::cout << "]}";
+}
+}
+
+void mw3_observe_imports(const Image& image,const uint8_t* input,std::size_t size) {
+    if (original_imports) throw std::runtime_error("import observer invoked twice");
+    auto imports=mw3::analysis::import_header({input,size});
+    std::vector<mw3::analysis::Region> regions;
+    for (const auto& s : image.sections) {
+        if (s.base>UINT32_MAX || s.base<image.base || uint64_t(s.base)-image.base+s.size>image.size)
+            throw std::runtime_error("import section outside image");
+        regions.push_back({uint32_t(s.base),{s.data,s.size},bool(s.flags&SectionFlags_Code)});
+    }
+    mw3::analysis::read_import_records(imports,regions);
+    original_imports=std::move(imports);
 }
 
 int main(int argc, char** argv) {
@@ -168,7 +224,8 @@ int main(int argc, char** argv) {
         }
         std::cout << ']';
         write_analysis(image);
-        std::cout << ",\"unknown_import_coverage\":\"not-established\",\"guest_executed\":false}\n";
+        write_imports();
+        std::cout << ",\"unknown_import_coverage\":\"records-observed-runtime-unverified\",\"guest_executed\":false}\n";
         return 0;
     } catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; }
 }
