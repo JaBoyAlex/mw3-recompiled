@@ -11,6 +11,10 @@ HERE = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("runtime_prepare", HERE / "prepare.py")
 prepare = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(prepare)
+sys.path.insert(0, str(HERE))
+mw2_spec = importlib.util.spec_from_file_location("runtime_mw2_tools", HERE / "mw2_tools.py")
+mw2_tools = importlib.util.module_from_spec(mw2_spec)
+mw2_spec.loader.exec_module(mw2_tools)
 
 
 class PreparationTests(unittest.TestCase):
@@ -18,7 +22,8 @@ class PreparationTests(unittest.TestCase):
         def git(*args):
             return subprocess.check_output(["git", "-C", str(root), *args], stderr=subprocess.STDOUT, text=True)
         git("init")
-        (root / "original.txt").write_text("original fixture\n")
+        git("config", "core.autocrlf", "false")
+        (root / "original.txt").write_text("original fixture\n", newline="\n")
         git("add", "original.txt")
         git("-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid", "commit", "-m", "original fixture")
         return dict(name="original-fixture", commit=git("rev-parse", "HEAD").strip())
@@ -52,6 +57,31 @@ class PreparationTests(unittest.TestCase):
             result = subprocess.run([sys.executable, str(HERE / "prepare.py"), "--root", temp, "--jobs", "0"], capture_output=True)
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(list(Path(temp).iterdir()), [])
+
+    def test_reviewed_derivative_handles_added_files_and_preserves_other_edits(self):
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp); root = parent / "source"; root.mkdir()
+            pin = self.make_repo(root)
+            patch = parent / "original.patch"
+            patch.write_text("diff --git a/original.txt b/original.txt\n--- a/original.txt\n+++ b/original.txt\n@@ -1 +1 @@\n-original fixture\n+updated original fixture\n"
+                             "diff --git a/added.cpp b/added.cpp\nnew file mode 100644\n--- /dev/null\n+++ b/added.cpp\n@@ -0,0 +1 @@\n+// original added fixture\n", newline="\n")
+            pin["patch_sha256"] = prepare.sha(patch)
+            first = mw2_tools.derive(root, patch, pin)
+            self.assertEqual(mw2_tools.derive(root, patch, pin)["derived_tree"], first["derived_tree"])
+            self.assertEqual((root / "added.cpp").read_text(), "// original added fixture\n")
+            (root / "added.cpp").write_text("// contributor edit\n")
+            with self.assertRaisesRegex(ValueError, "edits preserved"):
+                mw2_tools.derive(root, patch, pin)
+            self.assertEqual((root / "added.cpp").read_text(), "// contributor edit\n")
+
+    def test_wrong_patch_hash_is_refused_before_mutating_source(self):
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp); root = parent / "source"; root.mkdir()
+            pin = self.make_repo(root); pin["patch_sha256"] = "0"*64
+            patch = parent / "original.patch"; patch.write_text("original invalid patch fixture\n")
+            with self.assertRaisesRegex(ValueError, "identity"):
+                mw2_tools.derive(root, patch, pin)
+            self.assertEqual((root / "original.txt").read_text(), "original fixture\n")
 
 
 if __name__ == "__main__":

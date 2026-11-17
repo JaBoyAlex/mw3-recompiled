@@ -23,6 +23,12 @@ def sha(path):
     return digest.hexdigest()
 
 
+def outside_owned(output, owned):
+    """Private outputs must never be created in the owner's read-only tree."""
+    if Path(output).resolve().is_relative_to(Path(owned).resolve()):
+        raise ValueError("experiment output overlaps the read-only owned input tree")
+
+
 def run(command, *, cwd=None, log=None, timeout=1800):
     start = time.monotonic()
     if log:

@@ -4,6 +4,12 @@
   "stdlib_release": 13,
   "common_cxx_flags": "-march=x86-64-v2",
   "common_release_flags": "-O2 -DNDEBUG",
+  "mw2_generator": {
+    "url": "https://github.com/hedge-dev/XenonRecomp.git",
+    "commit": "ddd128bcca99fe8bfbb99bea583c972351fa6ace",
+    "patch_path": "patches/xenonrecomp-mw2.patch",
+    "patch_sha256": "e0f45d89ed7a5c8afc3b3c71e73a79c9d58c297ad5e6e7e37108ed83520e004d"
+  },
   "sources": [
     {
       "name": "rexglue-sdk",
