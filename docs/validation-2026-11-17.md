@@ -13,7 +13,9 @@ Date: 2026-11-17. These observations concern public tools and metadata only; **n
 | Synthetic benchmark self-comparison | PASS: 0% p95 change; not a game measurement |
 | Owner ISO/executable inspection | PASS for read-only metadata/hash capture, not ownership or gameplay verification |
 | Initial upstream XenonRecomp MSVC tool build | FAILED: pinned source uses Clang builtins; native MSVC is not the chosen upstream host-tool compiler |
-| Remote GitHub Windows/Linux/sanitizer workflows | Pending publication/run; update status from actual workflow evidence |
+| Remote GitHub Windows/Linux/sanitizer workflows | PASS: all five jobs in run 44049711442 |
+| GitHub task publication | PASS: task-admin run 44049774225 created 35 labeled issues |
+| Upstream CPU tool link, ClangCL 19.1.5 + C++20 override | PASS for linking; XenonAnalyse was subsequently quarantined before launch; no title analysis ran |
 | Real title boot/gameplay/Steam/renderer enhancements | NOT RUN; no runtime exists yet |
 
 Reproduce public checks with `python tools/check.py` and `python tools/check.py --config Release`, passing installed CMake/CTest paths if not on PATH. Synthetic comparator command: `python tools/benchmark.py qa/benchmarks/synthetic.json qa/benchmarks/synthetic.json`. Skill validation uses the host-provided validator; no nonstandard Python package is required by the project's own test tools.
