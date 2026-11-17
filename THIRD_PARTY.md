@@ -10,3 +10,5 @@ Pinned research revisions/license digests are in `config/upstreams.lock.json`. R
 | Other upstreams | Source/documentation research only | No incorporation yet; adopting any code requires its notices and transitive audit |
 
 The lock records top-level license evidence, not a completed transitive license audit. See docs/LEGAL.md before runtime/SDK adoption or distribution.
+
+The [MW3-003 runtime/distribution assessment](docs/legal/runtime-and-distribution-assessment.md) compares pinned build edges, GPL host decoder code, LGPL runtime dependencies, vendor SDK restrictions and artifact delivery dispositions. [Component evidence](docs/legal/rexglue-components.json) records ReXGlue's 14 declared submodule pins and root/header license sources; it is not a final release SBOM. The BSD/MIT root licenses do not relicense GNU decoder code, LGPL libraries, Microsoft-derived PE declarations or proprietary NVIDIA/Steamworks materials. Runtime/game-linked binaries and SDK packages remain unapproved for release.
