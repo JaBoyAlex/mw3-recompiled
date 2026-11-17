@@ -45,8 +45,8 @@ python3 -m unittest discover -s experiments/runtime-bakeoff/tests -v
 python3 tools/check.py
 ```
 
-Experiment-specific Python tests currently require the explicit command above;
-the root CI suite does not automatically discover this experimental directory.
+The root suite and CI also include these 11 game-free experiment guards through
+`tests/test_runtime_bakeoff.py`; the explicit command runs just this subset.
 
 To compile a ReXGlue inspection's private output, substitute its exact generated
 directory. Default behavior only builds. `--execute` requests a bounded startup

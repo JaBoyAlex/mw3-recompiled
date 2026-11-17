@@ -80,11 +80,13 @@ positive runs, retaining the original file/hash. No original trace was rewritten
 
 ## Verification and limits
 
-Commands: [reproduction guide](README.md). Windows Release root check passes
-56 Python cases with two explicit skips (LLVM oracle tools, file symlink
-privilege), plus native CTest. Eleven experiment Python cases pass with one
-Windows symlink-privilege skip. Linux and CI evidence accompany integration.
-The experiment tests need their explicit command; root CI does not discover them.
+Commands: [reproduction guide](README.md). Before CI integration, Windows Release
+root check passed 56 Python cases with two explicit skips (LLVM oracle tools,
+file symlink privilege), plus native CTest. Linux Release ASan/UBSan root check
+passed all 56. The 11 experiment Python cases passed on Linux and Windows
+(one Windows symlink-privilege skip). These now join the root CI suite, making
+67 cases; final combined checks and remote CI accompany integration. Upstream
+SDK and actual title execution were not part of the root sanitizer checks.
 
 No common runtime workload has executed on the MW2 candidate. No comparable
 FPS/frame time, memory peak, loading, GPU or latency measurement exists. The
