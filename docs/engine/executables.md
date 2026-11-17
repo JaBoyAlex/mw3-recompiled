@@ -16,6 +16,10 @@ Inputs are the exact SP/MP SHA-256 values in [title identity](../research/title-
 | Additional `BINK` code size | 68,132 bytes | 68,132 bytes |
 | `.pdata` size | 120,192 bytes | 127,608 bytes |
 | Import symbols resolved by loader | 258 | 262 |
+| Original import records audited | 529 | 537 |
+| Complete imported function pairs | 258 | 262 |
+| Imported kernel data variables | 13 | 13 |
+| Ordinals absent from pinned name tables | 0 | 0 |
 | Switch tables detected by pinned analyzer | 5 | 5 |
 | Targets in those tables | 29 | 29 |
 | Complete, unique ABI helper families | 8 | 8 |
@@ -28,6 +32,8 @@ Inputs are the exact SP/MP SHA-256 values in [title identity](../research/title-
 | Unresolved noncanonical LR/CTR branch sites | 3,658 | 4,093 |
 
 Both images also contain `.rdata`, `BINKBSS`, `.data`, `.tls`, `.XBMOVIE`, `BINKDATA`, `.XEXID`, `.idata`, `.XBLD` and `.reloc`. Entry points agree with the earlier independent XEX optional-header observations. All detected dispatch addresses and targets are inside executable sections. Image size and section sizes are layout facts, **not measured runtime RAM usage**.
+
+**Switch-coverage limitation:** all five detected tables per image are in the embedded `BINK` code section. None are in main `.text`. These matches provide no measured gameplay jump-table coverage. Main-engine dispatch remains a concrete runtime-comparison/diagnostic case; do not extend this analyzer pattern by pattern indefinitely if existing upstream analysis can solve it more efficiently.
 
 ## Verified save/restore helper locations
 
@@ -58,7 +64,22 @@ Of the immediate-call words, 8,903 Campaign / 9,419 Multiplayer target verified 
 
 ## Platform boundaries identified
 
-Resolved names include `ExCreateThread`, thread wait/suspend/resume primitives, `XamInputGetState`/capability/rumble APIs, GPU ring/display/`VdSwap` APIs, `XAudioSubmitRenderDriverFrame`, XMA context functions, and legacy `NetDll_*` sockets. These identify concrete kernel/input/GPU/audio/network seams to examine during the runtime comparison. They do not prove any host implementation is correct or that every import is resolved. Names come from the pinned loader's ordinal tables; version/ordinal coverage still needs a complete audit.
+Resolved names include `ExCreateThread`, thread wait/suspend/resume primitives, `XamInputGetState`/capability/rumble APIs, GPU ring/display/`VdSwap` APIs, `XAudioSubmitRenderDriverFrame`, XMA context functions, and legacy `NetDll_*` sockets. These identify concrete kernel/input/GPU/audio/network seams to examine during the runtime comparison. Names do not prove host implementation or ABI/version compatibility.
+
+The original import audit reads records **before** normalization, bound to the same exact title hashes above. Both images import `xam.xex` and `xboxkrnl.exe`, with raw version `0x20501400` and minimum-version `0x20351f00` for each library. Library IDs are recorded privately; raw fields are preserved without an unverified human-readable version interpretation.
+
+| Library | Campaign records / unique ordinals | Multiplayer records / unique ordinals |
+| --- | ---: | ---: |
+| `xam.xex` | 196 / 98 | 202 / 101 |
+| `xboxkrnl.exe` | 333 / 173 | 335 / 174 |
+
+All observed types are 0 (value slots) or 1 (function thunks). A type-0 record is not necessarily a variable: each function has a value/thunk pair sharing its ordinal. Pinned export tables classify 258 Campaign / 262 Multiplayer complete function pairs and **13 variable imports per image**, with no unknown ordinals, unknown record types or malformed known groups. All function identities/addresses agree with the normalizing loader's symbol list. This audits header-declared imports; it does not establish dynamic lookup coverage, runtime support or version compatibility.
+
+The 13 variable names in both images are `ExEventObjectType`, `ExLoadedCommandLine`, `ExThreadObjectType`, `KeCertMonitorData`, `KeDebugMonitorData`, `KeTimeStampBundle`, `VdGlobalDevice`, `VdGlobalXamDevice`, `VdGpuClockInMHz`, `VdHSIOCalibrationLock`, `XboxHardwareInfo`, `XboxKrnlVersion` and `XexExecutableModuleHandle`. Their sizes, representation, initialization and lifetime still need runtime verification. Placeholder pointers or arbitrary success values cannot satisfy these dependencies.
+
+Method references: [ReXGlue's header reader](https://github.com/rexglue/rexglue-sdk/blob/ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d/src/filesystem/xex.cpp) and [its value/thunk grouping](https://github.com/rexglue/rexglue-sdk/blob/ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d/src/kernel/xex_module.cpp). The bounded reader is original maintained code; the private observed loader retains its upstream MIT attribution.
+
+Both images import `RtlUnwind` and `RtlCaptureContext`. Each has three direct-call words targeting the former and one targeting the latter, each in a distinct declared `.pdata` range. The private inventory records those sites/ranges for follow-up. These are navigation evidence, **not verified setjmp/longjmp identities**, reachable-call proofs or functioning exception handling.
 
 The separate code/data sections named BINK are evidence of an embedded video component. Its execution, compatibility and any replacement/delivery implications remain to be tested and rights-reviewed. No vendor SDK or decoded game image is distributed here.
 
@@ -68,9 +89,13 @@ The upstream loader normalizes import thunks in its private in-memory image. The
 
 Five recognized switch tables do **not** establish completeness. The analyzer looks for specific compiler patterns; other jump tables, leaf functions, indirect calls and exception/nonlocal flow remain open. There is no valid decompilation/recompilation percentage from these results.
 
-Still required before MW3-007 can close: verify setjmp/longjmp, refine leaf/function boundaries, audit all import kinds/versions and unresolved ordinals, and investigate switch-pattern coverage, indirect-call behavior and exception paths. Never copy MW2 addresses into an MW3 config. No production title-generation config is authorized by this inventory alone.
+Remaining MW3-007 work: independently verify representative switch-table decoding, investigate main-engine dispatch and nonlocal/exception paths, and refine function-boundary evidence. Header-declared imports and raw versions are audited; host compatibility remains later runtime work. Keep unresolved targets diagnostic rather than guessing every possible runtime target statically. Never copy MW2 addresses into an MW3 config. No production title-generation config is authorized by this inventory alone.
+
+The latest analysis privately compiles a pinned loader copy with one read-only observer call before normalization; the upstream checkout remains unchanged. The earlier uninstrumented-loader observations above are retained as historical evidence. See the analysis guide for current instrumentation/provenance details.
 
 ## Reproduction and evidence
+
+Latest import/nonlocal metadata hashes: Campaign `6c10f625745d728b9e86806d0642055da54fc33e21b26d0a858066924578cdce`, Multiplayer `896a18c98d61d8e8316800a48117e86652041516b32fd32ef0895dbb84f48722`. Two fresh sanitized observed-loader builds produced identical metadata. See [the import checkpoint](../../config/analysis/validation-imports-2026-11-17.md) for commands/manifests and skips. These runs instrument the observed XEX loader source in addition to maintained code; remaining prepared archives are uninstrumented.
 
 Use the canonical toolchain and `config/analysis/analyze.py` as described in [the analysis guide](../../config/analysis/README.md). It verifies the owned pair, pinned sources and analyzer digest before loading either executable; output must be a fresh private directory. It records tool/library/probe/input hashes and refuses invalid switch bounds. Public unit tests use original synthetic metadata, not game bytes.
 
