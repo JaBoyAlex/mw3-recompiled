@@ -1,6 +1,6 @@
 # Initial executable map — owner-supplied Xbox 360 Rev 1
 
-Status: MW3-007 **in progress**. Observed on 2026-11-17 after exact input verification. No guest code was executed. This is an image/import/control-flow inventory with verified ABI helper locations, not a complete function map or recompiler configuration.
+Status: MW3-007 **initial executable inventory complete**. Observed on 2026-11-17 after exact input verification. No guest code was executed. This includes verified ABI helper locations, header-declared imports and independent checks of detected switch tables. It is not a complete function map or production recompiler configuration.
 
 Inputs are the exact SP/MP SHA-256 values in [title identity](../research/title-identity.md). The pinned XenonRecomp source is `ddd128bcca99fe8bfbb99bea583c972351fa6ace`. A metadata-only adapter links its XenonUtils loader; the analyzer is from the verified Clang 18.1.3 preparation build. The owner-restored ClangCL analyzer was also run separately, and its parsed switch tables matched the Linux results exactly.
 
@@ -89,11 +89,13 @@ The upstream loader normalizes import thunks in its private in-memory image. The
 
 Five recognized switch tables do **not** establish completeness. The analyzer looks for specific compiler patterns; other jump tables, leaf functions, indirect calls and exception/nonlocal flow remain open. There is no valid decompilation/recompilation percentage from these results.
 
-Remaining MW3-007 work: independently verify representative switch-table decoding, investigate main-engine dispatch and nonlocal/exception paths, and refine function-boundary evidence. Header-declared imports and raw versions are audited; host compatibility remains later runtime work. Keep unresolved targets diagnostic rather than guessing every possible runtime target statically. Never copy MW2 addresses into an MW3 config. No production title-generation config is authorized by this inventory alone.
+MW3-007's inventory acceptance is met: all maintained addresses are bound to exact input/tool identities, representative helpers and every detected table have independent checks, repetition is deterministic, and unknown indirect/exception paths remain explicit. Completing dynamic dispatch, exception/nonlocal semantics and executable function coverage belongs to the bounded runtime comparison and selected title-generation/runtime work. Requiring hand resolution of every dynamic target before that comparison would duplicate analysis already available in candidate frameworks. See [the handoff](../../config/analysis/HANDOFF.md). Never copy MW2 addresses or promote this inventory alone to production title generation.
 
 The latest analysis privately compiles a pinned loader copy with one read-only observer call before normalization; the upstream checkout remains unchanged. The earlier uninstrumented-loader observations above are retained as historical evidence. See the analysis guide for current instrumentation/provenance details.
 
 ## Reproduction and evidence
+
+The independent verifier agrees with all five detected absolute tables / 29 targets per image: register, default, labels and range-count evidence match. It decodes PPC fields directly, checks pointer/index/load/CTR data flow and bounded table reads, and records comparison/guard addresses. The bounded lookback is **not CFG dominance or reachability proof**. The main-engine table count remains zero. Current metadata hashes: Campaign `ec41aa95971afc908995af454a35583f3708aca0a2a324b4a4bee8c4efdcc388`, Multiplayer `91258c06e63d15e4f4bd88b73ef70535824347f567c62ea59f44c1dfec3f8031`. See [inventory completion evidence](../../config/analysis/validation-control-2026-11-17.md).
 
 Latest import/nonlocal metadata hashes: Campaign `6c10f625745d728b9e86806d0642055da54fc33e21b26d0a858066924578cdce`, Multiplayer `896a18c98d61d8e8316800a48117e86652041516b32fd32ef0895dbb84f48722`. Two fresh sanitized observed-loader builds produced identical metadata. See [the import checkpoint](../../config/analysis/validation-imports-2026-11-17.md) for commands/manifests and skips. These runs instrument the observed XEX loader source in addition to maintained code; remaining prepared archives are uninstrumented.
 
