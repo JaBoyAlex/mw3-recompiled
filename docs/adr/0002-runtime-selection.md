@@ -33,7 +33,7 @@ The reviewed BSD-3-Clause derivative first reserves the complete address span
 without replacement, retries occupied candidates and releases failed partial
 mappings. The shared tests cover both executable layouts, alias coherence,
 endianness, thread context/return/resume/termination, occupied host memory,
-all eight partial-mapping failure positions and repeated synthetic load/unload.
+all nine partial-mapping failure positions and repeated synthetic load/unload.
 These native callbacks are not a differential oracle for translated PPC.
 The canonical PPC oracle and upstream SDK CPU tests remain separate evidence.
 
@@ -64,7 +64,7 @@ distribution remains on hold. The new runtime patch preserves BSD notices;
 project harness/tools retain GPL-3.0-only. This choice grants no rights to game
 content, vendor SDKs or production services.
 
-No weighted performance winner is declared. Correctness/licensing are gates;
+No wnineed performance winner is declared. Correctness/licensing are gates;
 performance 30%, stability 25%, maintainability 20%, integration effort 15%,
 hardware compatibility 10% remain the eventual criteria. Comparable MW3 frame
 times, memory peaks, GPU results, loading and latency are unknown. Preparation

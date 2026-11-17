@@ -97,7 +97,7 @@ not a previous profile's SDK. Sanitized core packages are validation-only and
 must never be used for title generation. Only base/PPC/kernel and their built
 dependencies are instrumented; unchanged packaged drivers are not a fully
 sanitized SDK. The host collision fixture occupies ASan shadow space and is
-explicitly skipped in that profile; native tests cover it. Eight-position
+explicitly skipped in that profile; native tests cover it. Nine-position
 mapping-failure injection uses a test-only preload shim in the native profile.
 
 Exit **1** from the comparison means recorded candidate failures, including

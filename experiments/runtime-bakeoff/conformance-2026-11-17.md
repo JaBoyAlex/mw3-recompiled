@@ -23,10 +23,10 @@ is tested; translated PPC arithmetic/control-flow equivalence is **not**.
 | Suspended start, timeout, resume and completion | 3 pass | 3 pass |
 | Actual ExTerminateThread must not return to callback | 3 fail: returns | 3 pass |
 | Occupied host mapping must survive runtime initialization | 3 pass | 3 pass after repair; baseline fails |
-| ReXGlue-only: eight mapping-failure positions | Not applicable | 24 pass |
+| ReXGlue-only: nine mapping-failure positions | Not applicable | 27 pass |
 | ReXGlue-only: 16 synthetic load/unload cycles, memory and all thread cases per cycle | Not applicable | 3 pass |
 
-Native totals: MW2 **12 pass / 9 fail**; ReXGlue **48 pass**. The command exits
+Native totals: MW2 **12 pass / 9 fail**; ReXGlue **51 pass**. The command exits
 1 because the candidate failures are real, retained failures. This is not an
 overall passing bakeoff. Native callback timings are not title benchmarks.
 Suspended-start timing covers an observed bounded interval; it is not a proof
@@ -40,7 +40,7 @@ The reviewed [BSD patch](patches/rexglue-linux-reservation.patch) reserves the
 whole 4.5 GiB span with MAP_FIXED_NOREPLACE before mapping views, rejects kernels
 that ignore the requested address, and releases the entire reservation on any
 partial failure. The test preload shim injects exactly one failure at each of
-eight view positions, then verifies retry and reclaimability of released space.
+nine view positions, then verifies retry and reclaimability of released space.
 Windows mapping semantics remain unchanged apart from clearing released pointers.
 An optional CMake output directory prevents native/sanitizer profiles from
 overwriting each other's artifacts.
@@ -56,7 +56,7 @@ the base/PPC/kernel shared libraries, as confirmed by the compiler command and
 ASan symbols in all three. ReXGlue: **21 pass / 3 explicit collision-fixture
 skips**; MW2: **9 pass / 9 fail / 3 matching skips**. No reported sanitizer
 errors occur in those cases. Unchanged packaged platform/driver libraries are
-not instrumented. Eight-position fault injection runs only in the native
+not instrumented. Nine-position fault injection runs only in the native
 profile. Earlier wrapper-only sanitizer and baseline shadow-collision failures
 remain recorded; neither is relabeled as this stronger core check.
 
@@ -91,6 +91,7 @@ reports are retained. Reproduce using [the commands](README.md).
 
 | Manifest | SHA-256 |
 | --- | --- |
+| `runs/7c3593b7168244f681231004641ef970/manifest.json`, final native contracts including ninth view | `eb408f905e469f6b21e2a152c15b800d415edf33029c51556f513fac12a0e1d1` |
 | `runs/b938f93b72e343c3b49ed44ad7a51f17/manifest.json`, final native SDK preparation | `36d6921c25cf65d5459130437c4d7ece32f4b98acfa616547332ac67d88b1e74` |
 | `runs/dbb5642852e74ff4a761ea19d2c03047/manifest.json`, final native contracts | `fb938260f5692a410c6d2cb7a559f384fbb9be80614c0a91deac64cbdcb7f6b7` |
 | `runs/6aacfa9e39b34ef6b0458bac678628f0/manifest.json`, instrumented core preparation | `3b6e3070e481eb050336c4c55e5bb5833531fd3cd8f9b17a4f0065a518fd748c` |
@@ -101,6 +102,10 @@ reports are retained. Reproduce using [the commands](README.md).
 | `runs/63050616424d4cdd8a6678fc547b13ba/manifest.json`, owned startup recheck with repaired core | `fdfe08a9d87de4d3df17ec1fddaa8f6a4fb97260f3f994be70e4104024817725` |
 
 The memory-only derivative tree was `077b23af33f646340517d77dc64cea053ff93d6e`.
+Self-review caught that the initial fault matrix covered eight of the nine
+views. The final native rerun adds the ninth, passes all 27 injected cases,
+and raises the ReXGlue total from 48 to 51. Older reports retain their actual
+eight-position scope. The runtime patch itself did not change.
 The final patch additionally changes only the build-output setting; current
 pins bind that exact derivative. SDK build timestamps prevent a claim of
 byte-reproducible SDK binaries; actual library hashes are retained. No public

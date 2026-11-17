@@ -168,7 +168,7 @@ def main():
                 binary = build / "rex-conformance"
                 helper = build / "libview-fault.so"
                 report["fault_helper_sha256"] = sha(helper)
-                for position in range(1,9):
+                for position in range(1,10):
                     for trial in range(3):
                         case = lane / f"rex-mapping-failure-{position}-{trial}"
                         case.mkdir()

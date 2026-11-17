@@ -23,7 +23,7 @@ void* MapFileView(FileMappingHandle handle,void* base,size_t length,PageAccess a
     const unsigned target=static_cast<unsigned>(std::strtoul(setting,nullptr,10));
     const unsigned index=++count;
     if(index == 1) first_base=reinterpret_cast<uintptr_t>(base);
-    if(target >= 1 && target <= 8 && index == target) {
+    if(target >= 1 && target <= 9 && index == target) {
       ++fired;std::fprintf(stderr,"FAULT_INJECTION_TRIGGERED:%u\n",index);return nullptr;
     }
   }
