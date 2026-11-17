@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "synthetic": true,
+  "scenario": "original-synthetic-case",
+  "file_sha256": {
+    "executable": "1913aec21500946e6302248e6d53aaa050de17a2314e6538ef2bca524e3ca897"
+  },
+  "build": {
+    "id": "synthetic-a",
+    "artifact_sha256": "ffd7011d7278dde008ac325487ca448d6ccdf6b512dd3a90ee6adcc43b88c2e2",
+    "source_revision": "fixture-only",
+    "flags": "synthetic"
+  },
+  "compiler": "fixture compiler 1",
+  "hardware": {
+    "cpu": "synthetic CPU",
+    "gpu": "synthetic GPU",
+    "ram_bytes": 1024,
+    "machine_id": "synthetic-machine"
+  },
+  "os": "synthetic OS",
+  "driver": "synthetic driver",
+  "settings": {
+    "resolution": "synthetic",
+    "quality": "fixture"
+  },
+  "cache": {
+    "state": "warm",
+    "policy": "fixture prewarm"
+  },
+  "measurement": "synthetic present intervals",
+  "metric": "frame_time",
+  "unit": "ms",
+  "view_count": 1,
+  "warmup": {
+    "description": "synthetic warmup",
+    "duration_ms": 100
+  },
+  "capture_tool": "original fixture exporter 1",
+  "sample_window_ms": 1000,
+  "runs": [
+    {
+      "id": "run-0",
+      "trace_file": "run-0.trace",
+      "trace_sha256": "3aa942a607ce69bd2c89e1e7f706eacd6fe3b8f6bafa1ab2c77a3c6076d0be3a",
+      "samples": [
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "id": "run-1",
+      "trace_file": "run-1.trace",
+      "trace_sha256": "db38abb6d2378a17debc0804f277250fcb147568aea9e09ae1d851290466f2a6",
+      "samples": [
+        10,
+        10,
+        10
+      ]
+    },
+    {
+      "id": "run-2",
+      "trace_file": "run-2.trace",
+      "trace_sha256": "898ac48568020e19b9d1e6bf83b8eb8e6ae3b34d59770e478c89f5e50b31f618",
+      "samples": [
+        10,
+        10,
+        10
+      ]
+    }
+  ],
+  "notes": "Original synthetic demonstration only. No MW3 timing, raw game trace or collector is represented."
+}
