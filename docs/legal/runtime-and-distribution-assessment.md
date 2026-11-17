@@ -17,7 +17,7 @@ The generator's own license does not alone decide its output's license. Copied t
 
 ## Transitive and file-level findings
 
-The machine-readable [ReXGlue component evidence](rexglue-components.json) records all 14 declared submodule revisions, root/header license evidence and source blob identities observed through the parent tree. It is an assessment inventory, **not a release SBOM**. Optional components, bundled subcomponents and selected platform files still need package-specific verification. Immutable parent build evidence: [thirdparty targets](https://github.com/rexglue/rexglue-sdk/blob/ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d/thirdparty/CMakeLists.txt).
+The machine-readable [ReXGlue component evidence](rexglue-components.json) records all 15 declared submodule revisions, root/header license evidence and source blob identities observed through the parent tree. It is an assessment inventory, **not a release SBOM**. Optional components, bundled subcomponents and selected platform files still need package-specific verification. Immutable parent build evidence: [thirdparty targets](https://github.com/rexglue/rexglue-sdk/blob/ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d/thirdparty/CMakeLists.txt).
 
 | File/component | Evidence and observed role | Required treatment / remaining question |
 | --- | --- | --- |
@@ -73,4 +73,4 @@ For MW3-008, freeze actual transitive inputs and keep generated title code priva
 
 For MW3-019/031 and feature work: review account/SDK agreements with an authorized owner, settle the selected adapter/runtime licensing, resolve questionable file provenance or replace those files, produce the real link graph/SBOM and LGPL relink plan, and review every final package entry. These unresolved items are recorded release dependencies, not an excuse to block unrelated private bringup or to silently drop Steam/DLSS goals.
 
-Assessment validation: checked pinned roots, relevant per-file notices and build edges; inspected all declared ReXGlue submodule license locations (including TLSF's header); recorded immutable source/blob evidence; reviewed the proposed package against the matrix. No counsel opinion, distributor rights grant, SDK authorization or completed-package audit is represented.
+Assessment validation: checked pinned roots, relevant per-file notices and build edges; inspected all declared ReXGlue submodule license locations (including TLSF's header); recorded immutable source/blob evidence; reviewed the proposed package against the matrix. A read-only tree comparison requires all 15 component pins to match the declared parent gitlinks exactly, with license evidence for each. No counsel opinion, distributor rights grant, SDK authorization or completed-package audit is represented.

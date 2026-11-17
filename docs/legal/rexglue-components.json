@@ -13,6 +13,15 @@
   "release_approved": false,
   "components": [
     {
+      "name": "libmspack",
+      "repository": "kyz/libmspack",
+      "commit": "305907723a4e7ab2018e58040059ffb5e77db837",
+      "license_evidence": [{"path": "libmspack/COPYING.LIB", "git_blob_sha1": "b1e3f5a2638797271cbc9b91b856c05ed6942c8f", "url": "https://raw.githubusercontent.com/kyz/libmspack/305907723a4e7ab2018e58040059ffb5e77db837/libmspack/COPYING.LIB"}],
+      "license_family": "LGPL-2.1 in selected lzxd.c header; inspect exact COPYING.LIB and combined-artifact obligations",
+      "scope": "static XEX filesystem decompressor; host tools also consume it",
+      "review_status": "pinned file/header evidence; not a final selected-build release SBOM"
+    },
+    {
       "name": "ffmpeg",
       "repository": "wmarti/FFmpeg",
       "commit": "0604b464c7cb4ebc94940cf1f324a3b26b87717c",
