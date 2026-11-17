@@ -1,0 +1,11 @@
+# Host preparation validation — 2026-11-17
+
+Two independent clean Ubuntu 24.04 x86-64 builds under WSL completed with Clang 18.1.3, CMake 3.28.3 and Ninja. Sources were checked out in the native Linux filesystem at the exact root and submodule revisions in `lock.json`. Subsequent validation-only reruns used the same final preparation/fixture inputs and compared both manifests successfully.
+
+Each run built XenonRecomp, XenonAnalyse and XenosRecomp; executed translated original PPC fixtures with 547 checks; verified a deliberate wrong oracle returned failure; processed a synthetic ELF through the analyzer; and compiled original HLSL to DXIL and Vulkan 1.2 SPIR-V using the hash-verified Microsoft `v1.8.2505.1` package. The four generated function sources, synthetic analyzer output and both shader artifacts matched across builds. No game bytes were supplied to these checks. Tool binary hashes were recorded privately; binary identity across build paths is not claimed.
+
+The original assembly encodings were independently checked with LLVM 18.1.3's PowerPC assembler. Unit tests cover archive traversal/symlinks, mutated cached archives/extracted files, dirty/revision-mismatched sources, ELF section layout, and rejection of changed comparison inputs/results. The public Python suite passed 28 tests locally. Existing native metadata build/CTest checks are separate from these translated PPC checks.
+
+On native Windows, ClangCL 19.1.5 linked CPU and shader tool targets. A newly built analyzer was blocked with WinError 225, so the full native preparation suite is **NOT PASSED**. The owner restored an earlier analyzer; its SHA-256 `374a60bdcdc0426a04541d1f4c6e48511265228198a84f87ce42708420d50c1f` was recorded and that exact file processed the original synthetic ELF successfully. The project made no Defender exclusion/protection change or automatic restore. Ubuntu/WSL is therefore the canonical preparation path; native Windows host tools remain experimental. This does not change the native Windows game-runtime target.
+
+Limits: no VMX128, floating-point/full-ABI or full-title instruction coverage; no proof of Xenos instruction translation accuracy, shader rendering, MW3 execution, performance or gameplay. A source/host-tool smoke suite is not a completed runtime.

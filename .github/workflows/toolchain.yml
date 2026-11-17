@@ -1,0 +1,32 @@
+name: host-toolchain
+on:
+  push:
+    branches: [main, 'codex/**']
+    paths: ['tools/prepare_toolchain.py', 'config/toolchains/**', 'cmake/toolchains/**', '.github/workflows/toolchain.yml']
+  pull_request:
+    paths: ['tools/prepare_toolchain.py', 'config/toolchains/**', 'cmake/toolchains/**', '.github/workflows/toolchain.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: host-toolchain-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+jobs:
+  linux-preparation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Install host compiler from signed Ubuntu packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends clang-18 ninja-build
+      - name: Build pinned tools and run actual synthetic translation
+        run: python tools/prepare_toolchain.py --fetch-sources --sources .local/host-sources --output out/toolchain-a
+      - name: Independently rebuild and compare outputs
+        run: python tools/prepare_toolchain.py --sources .local/host-sources --output out/toolchain-b --compare out/toolchain-a/manifest.json

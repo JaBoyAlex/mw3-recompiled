@@ -1,6 +1,6 @@
 {
   "id": "MW3-006",
-  "title": "Build pinned CPU and shader toolchains on Windows",
+  "title": "Establish reproducible CPU and shader host preparation",
   "phase": 1,
   "area": "toolchain",
   "depends_on": [
@@ -9,9 +9,12 @@
   "paths": [
     "cmake/toolchains",
     "tools/prepare_toolchain.py",
-    "config/toolchains"
+    "config/toolchains",
+    "tests/test_toolchain.py",
+    "docs/research/toolchain-bringup.md",
+    ".github/workflows/toolchain.yml"
   ],
-  "goal": "Reproduce XenonRecomp/XenonAnalyse and XenosRecomp/DXC tool builds independently of MW3 data.",
+  "goal": "Reproduce XenonRecomp/XenonAnalyse and XenosRecomp/DXC tool preparation on Ubuntu (including WSL on Windows), and explicitly document native Windows limitations, independently of MW3 data.",
   "acceptance": [
     "Lock transitive source revisions, archive hashes and compiler versions",
     "Run synthetic PPC tests and compile a non-game shader; document native versus cross-build support"
@@ -22,5 +25,6 @@
   ],
   "size": "1-3 days",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": ["config/toolchains/README.md", "config/toolchains/validation-2026-11-17.md", "tests/test_toolchain.py"]
 }

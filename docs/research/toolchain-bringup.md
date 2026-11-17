@@ -1,5 +1,7 @@
 # CPU toolchain bringup observations
 
+Update: the owner restored the original Windows analyzer. That exact file subsequently passed a synthetic ELF check. A new native build copy was still blocked; no security setting was changed. Canonical preparation is now the verified Ubuntu/WSL path described in [the toolchain guide](../../config/toolchains/README.md), with [two independent-build results](../../config/toolchains/validation-2026-11-17.md). The initial observations below remain historical evidence; they do not describe the current availability of the restored original file.
+
 Date: 2026-11-17. Research pin: XenonRecomp `ddd128bcca99fe8bfbb99bea583c972351fa6ace` and its pinned gitlink submodules. These observations do not establish full toolchain reproducibility or MW3 CPU execution.
 
 The installed Visual Studio 2022 MSVC compiler could configure the tool project but compilation failed on Clang `__builtin_bswap*` calls; the pinned project also selected C++17 despite newer library facilities. Reconfiguring with the installed **ClangCL 19.1.5**, x64, plus the repository's `cmake/toolchains/xenon-host-project.cmake` C++20 project-include override built both `XenonAnalyse` and `XenonRecomp` Release targets. The research source was not edited. This host-tool compiler choice is independent of the public metadata inspector, which builds under MSVC.
