@@ -4,6 +4,11 @@
   "stdlib_release": 13,
   "common_cxx_flags": "-march=x86-64-v2",
   "common_release_flags": "-O2 -DNDEBUG",
+  "rexglue_memory_derivative": {
+    "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+    "patch_path": "patches/rexglue-linux-reservation.patch",
+    "patch_sha256": "8e9ad50443c4e5386572011f8ed635dd250dd38ef51d4fa99821672263a05498"
+  },
   "mw2_generator": {
     "url": "https://github.com/hedge-dev/XenonRecomp.git",
     "commit": "ddd128bcca99fe8bfbb99bea583c972351fa6ace",
