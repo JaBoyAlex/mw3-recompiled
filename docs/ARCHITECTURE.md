@@ -1,6 +1,6 @@
 # Architecture decision: Xbox 360 AOT with selective native replacements
 
-Status: direction accepted; runtime implementation choice is provisional until MW3-008. Optimization is part of selection, not an afterthought. No runnable MW3 runtime exists in this repository yet.
+Status: ReXGlue selected for private development by [MW3-008](adr/0002-runtime-selection.md). Optimization remains part of ongoing selection. Private Linux/WSL probes execute bounded SP/MP startup; no playable boot or Windows title execution is verified.
 
 ## Alternatives
 
@@ -33,7 +33,7 @@ flowchart TD
   T --> F[Optional temporal upscaling and latency features]
 ```
 
-Only identity tools, the public test foundation and task tooling currently exist. The other boxes describe planned components.
+Identity tools, the public test foundation and task tooling exist. Private experiments generate and compile both title modules and reach the first guarded import. The other boxes remain planned product components; compiled startup does not establish platform-service or gameplay parity.
 
 ### Preparation and executable identity
 

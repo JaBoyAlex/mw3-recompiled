@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Original changes; upstream BSD-3-Clause notices remain in src/kernel/memory.cpp.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6fff098..bb23f66 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -257,7 +257,7 @@ configure_file(
+ )
+ 
+ # Output directories (multi-config appends /<Config>/ automatically)
+-set(REX_OUTPUT_DIR "${REXGLUE_ROOT}/out/${REX_PLATFORM}")
++set(REX_OUTPUT_DIR "${REXGLUE_ROOT}/out/${REX_PLATFORM}" CACHE PATH "SDK output directory; use one directory per build profile")
+ if (REXGLUE_ENABLE_TSAN)
+   string(APPEND REX_OUTPUT_DIR "-tsan")
+ endif ()
+diff --git a/src/kernel/memory.cpp b/src/kernel/memory.cpp
+index 4ca5049..1339537 100644
+--- a/src/kernel/memory.cpp
++++ b/src/kernel/memory.cpp
+@@ -41,7 +41,7 @@
+ #include <rex/utility.h>
+ #include "kernel/settings_access.h"
+ 
+-#if REX_PLATFORM_MAC
++#if REX_PLATFORM_MAC || REX_PLATFORM_LINUX
+ #include <sys/mman.h>
+ #endif
+ 
+@@ -254,6 +254,20 @@ bool GuestAddressSpace::Initialize() {
+   mapping_base_ = 0;
+   for (size_t n = 32; n < 64; n++) {
+     auto mapping_base = std::bit_cast<u8*>(uintptr_t{1} << n);
++#if REX_PLATFORM_LINUX
++    // Own the complete range before MapFileView uses MAP_FIXED. Never replace
++    // another mapping (including sanitizer shadow memory) while probing bases.
++    constexpr size_t kHostViewSpan = 0x120000000ull;
++    void* reserved = mmap(mapping_base, kHostViewSpan, PROT_NONE,
++                          MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
++    if (reserved == MAP_FAILED) {
++      continue;
++    }
++    if (reserved != mapping_base) {
++      munmap(reserved, kHostViewSpan);
++      continue;
++    }
++#endif
+     if (!MapViews(mapping_base)) {
+       mapping_base_ = mapping_base;
+       break;
+@@ -447,7 +461,16 @@ int GuestAddressSpace::MapViews(u8* mapping_base) {
+         kViewRanges[n].virtual_address_end - kViewRanges[n].virtual_address_start + 1,
+         rex::memory::PageAccess::kReadWrite, kViewRanges[n].target_address & page_mask));
+     if (!views_.all_views[n]) {
++#if REX_PLATFORM_LINUX
++      // One release covers mapped views and the rest of our reservation.
++      // Releasing views first would expose holes before a second munmap.
++      munmap(mapping_base, 0x120000000ull);
++      for (auto& view : views_.all_views) {
++        view = nullptr;
++      }
++#else
+       UnmapViews();
++#endif
+       return 1;
+     }
+   }
+@@ -459,6 +482,7 @@ void GuestAddressSpace::UnmapViews() {
+     if (views_.all_views[n]) {
+       size_t length = kViewRanges[n].virtual_address_end - kViewRanges[n].virtual_address_start + 1;
+       rex::memory::UnmapFileView(mapping_, views_.all_views[n], length);
++      views_.all_views[n] = nullptr;
+     }
+   }
+ }

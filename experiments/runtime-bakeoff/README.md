@@ -2,8 +2,9 @@
 
 These are research tools, not an installer or playable release. Read the
 [current evidence](validation-2026-11-17.md) and
-[provisional decision](../../docs/adr/0002-runtime-selection.md). Task 008 remains
-in progress. Game bytes, generated C++, binaries and logs stay outside Git.
+[runtime decision](../../docs/adr/0002-runtime-selection.md) and
+[common service tests](conformance-2026-11-17.md). Game bytes, generated C++,
+binaries and logs stay outside Git.
 
 ## Reproduction
 
@@ -11,8 +12,9 @@ Use Linux x86-64 with Clang **20.1.2**, GCC 13 development headers, CMake/Ninja,
 lld 20 and the upstream Linux platform development packages. The scripts do
 not install system packages or weaken Windows security settings. The existing
 canonical Clang 18 analysis toolchain is separate. Two build workers are the
-limit; do not run concurrent heavy builds against one SDK checkout: upstream
-places its output in the source tree's `out/linux-amd64` regardless of `-B`.
+limit. The baseline SDK places output in its source tree regardless of `-B`;
+the reviewed derivative adds `REX_OUTPUT_DIR` so native/sanitizer builds have
+separate outputs. Never let different profiles overwrite shared artifacts.
 
 Choose a private Linux cache as `BAKEOFF_CACHE`, an unchanged verified SP/MP
 directory as `OWNED_PAIR`, and a canonical schema-4 analysis directory as
@@ -45,7 +47,7 @@ python3 -m unittest discover -s experiments/runtime-bakeoff/tests -v
 python3 tools/check.py
 ```
 
-The root suite and CI also include these 11 game-free experiment guards through
+The root suite and CI also include these 14 game-free experiment guards through
 `tests/test_runtime_bakeoff.py`; the explicit command runs just this subset.
 
 To compile a ReXGlue inspection's private output, substitute its exact generated
@@ -73,3 +75,33 @@ It cannot establish renderer, audio, input, memory-service, thread-service,
 asset-loading, gameplay or shutdown correctness. Source and binary provenance
 snapshots are reproducibility records, not independent proof of generator
 semantics. [Distribution holds still apply](../../docs/legal/runtime-and-distribution-assessment.md).
+
+## Common runtime-service contracts
+
+These compile original, game-free native callbacks against the actual runtime
+services. SP/MP labels select verified image/code geometry, not title execution.
+The MW2 adapter compiles the pinned memory/kernel/thread sources directly;
+unused title initialization is discarded. The ReXGlue adapter uses its real
+TitleRuntime, memory, registry and termination import. No successful guest
+service stubs or generated title objects are linked into this harness.
+
+```sh
+python3 experiments/runtime-bakeoff/prepare_rexglue_memory.py --root "$BAKEOFF_CACHE" --fetch
+python3 experiments/runtime-bakeoff/run_conformance.py --root "$BAKEOFF_CACHE" --metadata "$TITLE_METADATA" --derived-sdk-report "$NATIVE_PREPARATION_REPORT"
+python3 experiments/runtime-bakeoff/prepare_rexglue_memory.py --root "$BAKEOFF_CACHE" --core-sanitizers
+python3 experiments/runtime-bakeoff/run_conformance.py --root "$BAKEOFF_CACHE" --metadata "$TITLE_METADATA" --derived-sdk-report "$SANITIZED_PREPARATION_REPORT" --sanitizers
+```
+
+Each preparation prints its private manifest location. Use that exact report,
+not a previous profile's SDK. Sanitized core packages are validation-only and
+must never be used for title generation. Only base/PPC/kernel and their built
+dependencies are instrumented; unchanged packaged drivers are not a fully
+sanitized SDK. The host collision fixture occupies ASan shadow space and is
+explicitly skipped in that profile; native tests cover it. Nine-position
+mapping-failure injection uses a test-only preload shim in the native profile.
+
+Exit **1** from the comparison means recorded candidate failures, including
+the intentionally retained MW2 defects. Exit **2** means an experiment error.
+Neither may be reported as an overall passing comparison. No timing in these
+logs is an MW3 performance result. The losing runtime is retired from further
+adaptation; these commands retain a reproducible record of why.

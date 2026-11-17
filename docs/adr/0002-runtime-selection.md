@@ -1,61 +1,73 @@
-# Runtime selection: ReXGlue leads the bounded bring-up experiment
+# Runtime selection: ReXGlue for private MW3 development
 
-Status: **provisional, MW3-008 incomplete**. Evidence dated 2026-11-17.
+Status: **selected for continued private development**, 2026-11-17. This is
+neither release clearance nor a gameplay/performance certification.
 
-Continue bounded MW3 bring-up with pinned ReXGlue v0.11.0 while retaining the
-related-title generator as a control. Do not commit to a permanent runtime,
-combine runtime internals or unlock dependent product gates yet. The
-[reproduction and evidence](../../experiments/runtime-bakeoff/README.md) preserve
-both failures and successes.
+Use pinned ReXGlue v0.11.0 with the reviewed Linux reservation repair. Stop
+adapting the MW2 runtime; retain its analysis tools, source references and
+failed comparison evidence. Maintain one runtime model rather than combining
+its memory layout, PPC context or scheduler with the MW2 implementation.
+[Reproduction](../../experiments/runtime-bakeoff/README.md) and
+[evidence](../../experiments/runtime-bakeoff/conformance-2026-11-17.md) record
+the exact revisions, failures, tests and remaining limits.
 
-ReXGlue generated both owned executables without forced validation, compiled
-both private native host programs, and reached the first function import from
-each translated entry path. All function imports were guarded stops, not
-successful stubs. Each title reproduced that stop in three separate processes;
-the observed return sites match the independently decoded MW3 call inventory.
-This establishes bounded Linux/WSL execution only. Windows boot, full modes and
-normal shutdown remain unverified.
+ReXGlue generates both owned executables without forced validation. Private
+Linux/WSL native programs execute translated startup to the first guarded
+function import, reproduced in three processes per title. The same stop was
+rechecked with the memory repair. All function imports remain diagnostic
+stops; all 13 data imports per image still require semantic review. Windows
+title execution, normal game shutdown and all original modes remain unverified.
 
-The MW2-derived analyzer usefully finds main-engine switch candidates that the
-original analyzer misses. Reuse its proven tool patch and review its techniques.
-Its translator also emits 377 SP / 436 MP switch-target/function-boundary error
-diagnostics despite returning zero. Its unmodified runtime heap starts inside
-MW3's generated function-table range. Those are correctness/integration blockers
-before a comparable title run, not a reason to call generation successful or
-hand-edit generated C++. No MW2 guest addresses were imported into MW3.
+The MW2 candidate fails preflight correctness: its translator emits 377 SP /
+436 MP switch-boundary errors despite exit zero; its fixed heap overlaps both
+MW3 function-table ranges. The common synthetic harness actually allocates
+inside those ranges and demonstrates that its ExTerminateThread returns to
+the callback. These failures are retained, not scored as successful work.
+Repairing a second runtime before choosing a base would add unnecessary scope.
+Its analyzer remains useful for switch discovery; range checks alone do not
+establish recovered engine control flow.
 
-The shared runtime currently requires less demonstrated title-specific repair.
-Its 261 selected original host cases pass in isolated processes, but aggregate
-execution exposes shared-state/order-sensitive failures. Its SDK requires
-C++23/Clang 20 and has unresolved distribution/provenance obligations. Related
-title code remains a reference; its GPL licensing alone does not decide this
-technical choice. Neither candidate has release clearance.
+ReXGlue also failed an important test: its original Linux fixed-address mapping
+overwrites an occupied host page and conflicts with sanitizer shadow mappings.
+The reviewed BSD-3-Clause derivative first reserves the complete address span
+without replacement, retries occupied candidates and releases failed partial
+mappings. The shared tests cover both executable layouts, alias coherence,
+endianness, thread context/return/resume/termination, occupied host memory,
+all nine partial-mapping failure positions and repeated synthetic load/unload.
+These native callbacks are not a differential oracle for translated PPC.
+The canonical PPC oracle and upstream SDK CPU tests remain separate evidence.
 
-No weighted performance winner can be declared. Correctness and licensing
-remain gates; performance 30%, stability 25%, maintainability 20%, integration
-effort 15%, hardware compatibility 10% remain the eventual criteria. There are
-no comparable MW3 frame times, memory peaks, GPU results, loading distributions
-or input-latency measurements. Generation/build durations are preparation
-observations with unequal work and cache histories, not gameplay benchmarks.
+## Deliberate change to the experiment
 
-To finish MW3-008:
+The original task required executing the same MW3 slice on both candidates.
+That did **not** happen: no MW2 title instructions were executed. As lead, we
+replace that validation step with fail-fast preflight rejection plus common
+runtime-service tests on the same machine. This change follows observed
+correctness failures and the owner's instruction to avoid inefficient work.
+It does not establish comparative title speed or excuse these failures. The
+first-service/data-import audit moves to scoped runtime bring-up after
+reproducible generation (009); it is not claimed complete by this selection.
 
-1. Resolve or narrowly isolate the MW2 translator boundary failures and memory
-   collision before running the same bounded title workload. Do not grow this
-   into a second permanent port; reassess the stop decision if repair becomes
-   disproportionate, retaining the explicit unmet comparison requirement.
-2. Run common original CPU/memory/thread workloads on both actual runtime
-   paths. Existing ReXGlue tests and the canonical PPC oracle are different
-   workloads and cannot be scored against one another.
-3. Audit the first imported service and all used data imports against the exact
-   MW3 module; permit services only with explicit semantic evidence. Continue
-   diagnostic stops everywhere else.
-4. Record actual memory aliases, TLS/thread behavior, shutdown, native Windows
-   constraints and link/provenance issues, then select one base and stop the
-   losing experiment. If the spike exceeds three days, split testable follow-ups
-   before more implementation claims.
+## Costs, limits and reconsideration
 
-Revisit the choice at first playable boot, first complete mode, major
-optimization and relevant upstream security changes. Steam/NVIDIA work,
-four-player Survival, community interoperability and launcher packaging remain
-behind their existing dependencies.
+The shared runtime has less demonstrated title-specific repair, reusable
+platform services and a coherent memory/thread model. It requires C++23 and
+Clang 20; maintained game-free project code remains C++20. Its upstream aggregate
+tests expose shared-state/order failures even though the 261 selected tests
+pass when isolated. These remain defects to investigate, not erased failures.
+One focused Linux memory patch and isolated build-output setting are maintained
+with exact base/patch identities. No renderer fork or generic emulator is added.
+
+Both candidates are permitted for bounded private research under the existing
+[assessment](../legal/runtime-and-distribution-assessment.md); SDK/game-linked
+distribution remains on hold. The new runtime patch preserves BSD notices;
+project harness/tools retain GPL-3.0-only. This choice grants no rights to game
+content, vendor SDKs or production services.
+
+No wnineed performance winner is declared. Correctness/licensing are gates;
+performance 30%, stability 25%, maintainability 20%, integration effort 15%,
+hardware compatibility 10% remain the eventual criteria. Comparable MW3 frame
+times, memory peaks, GPU results, loading and latency are unknown. Preparation
+durations and synthetic callback timings are not gameplay benchmarks. Reassess
+at first playable boot, first complete mode, major optimization and relevant
+upstream security changes. Dependent product gates remain open.

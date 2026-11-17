@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: GPL-3.0-only
+cmake_minimum_required(VERSION 3.25)
+project(mw3_runtime_conformance LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+option(MW3_CONFORMANCE_SANITIZERS "Instrument adapters and directly compiled MW2 runtime sources" OFF)
+if(MW3_CONFORMANCE_SANITIZERS)
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,undefined)
+endif()
+find_package(rexglue 0.11 REQUIRED CONFIG)
+foreach(required MW2_SOURCE MW2_GENERATOR PPC_IMAGE_BASE PPC_IMAGE_SIZE PPC_CODE_BASE PPC_CODE_SIZE)
+  if(NOT DEFINED ${required})
+    message(FATAL_ERROR "Missing private test input: ${required}")
+  endif()
+endforeach()
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/fixture")
+file(WRITE "${CMAKE_BINARY_DIR}/fixture/ppc_config.h" "#pragma once\n#define PPC_CONFIG_H_INCLUDED\n#define PPC_IMAGE_BASE ${PPC_IMAGE_BASE}ull\n#define PPC_IMAGE_SIZE ${PPC_IMAGE_SIZE}ull\n#define PPC_CODE_BASE ${PPC_CODE_BASE}ull\n#define PPC_CODE_SIZE ${PPC_CODE_SIZE}ull\n")
+file(WRITE "${CMAKE_BINARY_DIR}/fixture/ppc_recomp_shared.h" "#pragma once\n#include <ppc_config.h>\n#include <ppc_context.h>\n")
+# No title-specific initialization is called or linked in this game-free test.
+# These definitions only let unused original routines compile before linker GC.
+file(WRITE "${CMAKE_BINARY_DIR}/fixture/title.h" "#pragma once\n#define T_DATA_DebugMonitorPtr 0\n#define T_DATA_TimeStampBundlePtr 0\n")
+add_executable(mw2-conformance mw2.cpp
+  "${MW2_SOURCE}/runtime/guest_memory.cpp" "${MW2_SOURCE}/runtime/kernel/kernel.cpp"
+  "${MW2_SOURCE}/runtime/kernel/threads.cpp" "${MW2_SOURCE}/runtime/kernel/objects.cpp"
+  "${MW2_SOURCE}/runtime/kernel/sync_objects.cpp" "${MW2_SOURCE}/runtime/kernel/misc.cpp")
+target_include_directories(mw2-conformance PRIVATE "${CMAKE_BINARY_DIR}/fixture"
+  "${MW2_SOURCE}/runtime" "${MW2_GENERATOR}/XenonUtils" "${MW2_GENERATOR}/thirdparty/simde")
+target_compile_definitions(mw2-conformance PRIVATE MW2_DIAGNOSTICS=0 MW2_NO_LOGGING=1)
+target_compile_options(mw2-conformance PRIVATE "SHELL:-iquote ${CMAKE_BINARY_DIR}/fixture" -ffunction-sections -fdata-sections -fwrapv)
+target_link_options(mw2-conformance PRIVATE -Wl,--gc-sections)
+target_link_libraries(mw2-conformance PRIVATE pthread)
+add_executable(rex-conformance rexglue.cpp)
+target_include_directories(rex-conformance PRIVATE "${CMAKE_BINARY_DIR}/fixture")
+target_compile_options(rex-conformance PRIVATE -include "${CMAKE_BINARY_DIR}/fixture/ppc_config.h")
+target_link_libraries(rex-conformance PRIVATE rex::sdk)
+rexglue_apply_target_settings(rex-conformance)
+rexglue_configure_target(rex-conformance)
+add_library(view-fault SHARED view_fault.cpp)
+target_link_libraries(view-fault PRIVATE rex::base dl)
