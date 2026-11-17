@@ -2,6 +2,7 @@
 // Original synthetic instructions/metadata only. Does not load an XEX.
 #include "scan.h"
 #include "imports.h"
+#include "switches.h"
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -133,10 +134,45 @@ void import_tests() {
     std::fill(input.begin()+44,input.begin()+60,0xff);
     refuses([&]{import_header(input);});
 }
+void switch_tests() {
+    // Original PPC fixture: cmplwi r3,1; bgt default; lis/addi r11,0x2000;
+    // slwi r10,r3,2; lwzx r11,r11,r10; mtctr r11; bctr; case/default BLRs.
+    std::vector<uint8_t> code,table;
+    for (const auto value : {0x28030001u,0x41810024u,0x3d600000u,0x396b2000u,0x546a103au,0x7d6b502eu,
+                            0x7d6903a6u,0x4e800420u,0x4e800020u,0x4e800020u,0x4e800020u}) word(code,value);
+    word(table,0x1020); word(table,0x1024);
+    auto verify=[&](uint32_t base=0x1008,uint32_t count=2) {
+        return verify_absolute_switch(std::array{Region{0x1000,code,true},Region{0x2000,table,false}},base,count);
+    };
+    const auto valid=verify();
+    check(valid.index_register==3 && valid.table_address==0x2000 && valid.default_target==0x1028);
+    check(valid.labels==std::vector<uint32_t>({0x1020,0x1024}));
+    // r0 is a valid index in RB; only RA=0 has the literal-zero meaning.
+    const auto original=code;
+    code[17]=0x60; // rlwinm r0,r3,2,0,29
+    code[21]=0x6b; code[22]=0x00; // lwzx r11,r11,r0
+    check(verify().labels==valid.labels);
+    code[21]=0x60; code[22]=0x58; // lwzx r11,r0,r11: RA=0 cannot index via r0
+    refuses([&]{verify();}); code=original;
+    refuses([&]{verify(4);}); refuses([&]{verify(0x1008,0);}); refuses([&]{verify(0x1008,65537);});
+    refuses([&]{verify(0x1008,3);});
+    // Corrupt each instruction, including the guard, data-flow links and bctr.
+    for (size_t i=0;i<32;i+=4) { code[i+3]^=1; refuses([&]{verify();}); code[i+3]^=1; }
+    for (size_t n=0;n<32;++n)
+        refuses([&]{verify_absolute_switch(std::array{Region{0x1000,std::span(code).first(n),true},Region{0x2000,table,false}},0x1008,2);});
+    for (size_t n=0;n<table.size();++n)
+        refuses([&]{verify_absolute_switch(std::array{Region{0x1000,code,true},Region{0x2000,std::span(table).first(n),false}},0x1008,2);});
+    table[3]^=1; refuses([&]{verify();}); table[3]^=1; // unaligned target
+    table[0]=0xff; refuses([&]{verify();}); table[0]=0;
+    refuses([&]{verify_absolute_switch(std::array{Region{0x1000,code,false},Region{0x2000,table,false}},0x1008,2);});
+    code.insert(code.begin()+4,4,0); code[4]=0x60; // NOP between comparison and guard
+    const auto separated=verify(0x100c);
+    check(separated.comparison_address==0x1000 && separated.guard_address==0x1008 && separated.default_target==0x102c);
+}
 }
 int main(int argc,char** argv) {
     try {
-        if (argc==2) fixture(argv[1]); else if (argc==1) { synthetic(); import_tests(); } else return 2;
+        if (argc==2) fixture(argv[1]); else if (argc==1) { synthetic(); import_tests(); switch_tests(); } else return 2;
         std::cout << "PASS: " << checks << " metadata scan checks (synthetic only)\n";
         return 0;
     } catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; }
