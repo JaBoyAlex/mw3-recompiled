@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "observed_date": "2026-11-17",
+  "parent": {
+    "repository": "rexglue/rexglue-sdk",
+    "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+    "evidence": [
+      ".gitmodules",
+      "thirdparty/CMakeLists.txt"
+    ]
+  },
+  "assessment_only": true,
+  "release_approved": false,
+  "components": [
+    {
+      "name": "libmspack",
+      "repository": "kyz/libmspack",
+      "commit": "305907723a4e7ab2018e58040059ffb5e77db837",
+      "license_evidence": [{"path": "libmspack/COPYING.LIB", "git_blob_sha1": "b1e3f5a2638797271cbc9b91b856c05ed6942c8f", "url": "https://raw.githubusercontent.com/kyz/libmspack/305907723a4e7ab2018e58040059ffb5e77db837/libmspack/COPYING.LIB"}],
+      "license_family": "LGPL-2.1 in selected lzxd.c header; inspect exact COPYING.LIB and combined-artifact obligations",
+      "scope": "static XEX filesystem decompressor; host tools also consume it",
+      "review_status": "pinned file/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "ffmpeg",
+      "repository": "wmarti/FFmpeg",
+      "commit": "0604b464c7cb4ebc94940cf1f324a3b26b87717c",
+      "license_evidence": [
+        {
+          "path": "COPYING.GPLv2",
+          "git_blob_sha1": "d159169d1050894d3ea3b98e1c965c4058208fe1",
+          "url": "https://raw.githubusercontent.com/wmarti/FFmpeg/0604b464c7cb4ebc94940cf1f324a3b26b87717c/COPYING.GPLv2"
+        },
+        {
+          "path": "COPYING.GPLv3",
+          "git_blob_sha1": "94a9ed024d3859793618152ea559a168bbcbb5e2",
+          "url": "https://raw.githubusercontent.com/wmarti/FFmpeg/0604b464c7cb4ebc94940cf1f324a3b26b87717c/COPYING.GPLv3"
+        },
+        {
+          "path": "COPYING.LGPLv2.1",
+          "git_blob_sha1": "58af0d3787aec7d6f8d833535d64879156e7ec23",
+          "url": "https://raw.githubusercontent.com/wmarti/FFmpeg/0604b464c7cb4ebc94940cf1f324a3b26b87717c/COPYING.LGPLv2.1"
+        },
+        {
+          "path": "COPYING.LGPLv3",
+          "git_blob_sha1": "65c5ca88a67c30becee01c5a8816d964b03862f9",
+          "url": "https://raw.githubusercontent.com/wmarti/FFmpeg/0604b464c7cb4ebc94940cf1f324a3b26b87717c/COPYING.LGPLv3"
+        },
+        {
+          "path": "LICENSE.md",
+          "git_blob_sha1": "613070e1b631a919a74c862f2a75a0f249a631ff",
+          "url": "https://raw.githubusercontent.com/wmarti/FFmpeg/0604b464c7cb4ebc94940cf1f324a3b26b87717c/LICENSE.md"
+        }
+      ],
+      "license_family": "LGPL-2.1-or-later; optional GPL/version3/nonfree selections require build audit",
+      "scope": "runtime audio codec dependencies, selected static avcodec/avutil",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "sdl3",
+      "repository": "libsdl-org/SDL",
+      "commit": "147a8ee32dbf9ac02f3794964490687b6bbda1bc",
+      "license_evidence": [
+        {
+          "path": "LICENSE.txt",
+          "git_blob_sha1": "e9adee4484511b4b1730461679fed21d9b13d88e",
+          "url": "https://raw.githubusercontent.com/libsdl-org/SDL/147a8ee32dbf9ac02f3794964490687b6bbda1bc/LICENSE.txt"
+        }
+      ],
+      "license_family": "Zlib",
+      "scope": "host runtime window/input/audio/platform",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "excrypt",
+      "repository": "emoose/ExCrypt",
+      "commit": "088094585aee1694cdeef9a9330d29d14aef9203",
+      "license_evidence": [
+        {
+          "path": "LICENSE",
+          "git_blob_sha1": "4c715f723a0fbb348d137133694d8adc0dd30d34",
+          "url": "https://raw.githubusercontent.com/emoose/ExCrypt/088094585aee1694cdeef9a9330d29d14aef9203/LICENSE"
+        }
+      ],
+      "license_family": "BSD-3-Clause at root; preserve file-level third-party notices",
+      "scope": "XEX filesystem/crypto support",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "tlsf",
+      "repository": "mattconte/tlsf",
+      "commit": "deff9ab509341f264addbd3c8ada533678591905",
+      "license_evidence": [
+        {
+          "path": "tlsf.h",
+          "url": "https://raw.githubusercontent.com/mattconte/tlsf/deff9ab509341f264addbd3c8ada533678591905/tlsf.h"
+        }
+      ],
+      "license_family": "BSD-3-Clause in tlsf.h",
+      "scope": "guest allocator",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "glslang",
+      "repository": "KhronosGroup/glslang",
+      "commit": "f4f1d8a352ca1908943aea2ad8c54b39b4879080",
+      "license_evidence": [
+        {
+          "path": "LICENSE.txt",
+          "git_blob_sha1": "5f58565dc451aa353323ff29ccd9e0d8219ced14",
+          "url": "https://raw.githubusercontent.com/KhronosGroup/glslang/f4f1d8a352ca1908943aea2ad8c54b39b4879080/LICENSE.txt"
+        }
+      ],
+      "license_family": "Mixed permissive; read combined LICENSE.txt and selected sources",
+      "scope": "shader toolchain/runtime selected build review",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "simde",
+      "repository": "simd-everywhere/simde",
+      "commit": "71fd833d9666141edcd1d3c109a80e228303d8d7",
+      "license_evidence": [
+        {
+          "path": "COPYING",
+          "git_blob_sha1": "c7f6b6d752a96f0a337351de7841cc5fe1ff780d",
+          "url": "https://raw.githubusercontent.com/simd-everywhere/simde/71fd833d9666141edcd1d3c109a80e228303d8d7/COPYING"
+        }
+      ],
+      "license_family": "MIT",
+      "scope": "codegen/generated runtime headers",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "cli11",
+      "repository": "CLIUtils/CLI11",
+      "commit": "bfffd37e1f804ca4fae1caae106935791696b6a9",
+      "license_evidence": [
+        {
+          "path": "LICENSE",
+          "git_blob_sha1": "dabdcb45371ffbd6d782d24a86d669cd6a599816",
+          "url": "https://raw.githubusercontent.com/CLIUtils/CLI11/bfffd37e1f804ca4fae1caae106935791696b6a9/LICENSE"
+        }
+      ],
+      "license_family": "BSD-3-Clause",
+      "scope": "host CLI",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "imgui",
+      "repository": "ocornut/imgui",
+      "commit": "6d910d5487d11ca567b61c7824b0c78c569d62f0",
+      "license_evidence": [
+        {
+          "path": "LICENSE.txt",
+          "git_blob_sha1": "00ae473abe62bf1c53b333613bd9e05aa72e2ca0",
+          "url": "https://raw.githubusercontent.com/ocornut/imgui/6d910d5487d11ca567b61c7824b0c78c569d62f0/LICENSE.txt"
+        }
+      ],
+      "license_family": "MIT",
+      "scope": "runtime developer/UI code",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "inja",
+      "repository": "pantor/inja",
+      "commit": "7d1b4600b68595085a949743331c2e5673f511ea",
+      "license_evidence": [
+        {
+          "path": "LICENSE",
+          "git_blob_sha1": "e92b00821027543d4f21c41fc6ff47f9afb5edce",
+          "url": "https://raw.githubusercontent.com/pantor/inja/7d1b4600b68595085a949743331c2e5673f511ea/LICENSE"
+        }
+      ],
+      "license_family": "MIT; bundled nlohmann/json has its own notices",
+      "scope": "host generator templates",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "spdlog",
+      "repository": "gabime/spdlog",
+      "commit": "79524ddd08a4ec981b7fea76afd08ee05f83755d",
+      "license_evidence": [
+        {
+          "path": "LICENSE",
+          "git_blob_sha1": "4b1b23357f9685fb6b6291aa33489fc9fe1c122c",
+          "url": "https://raw.githubusercontent.com/gabime/spdlog/79524ddd08a4ec981b7fea76afd08ee05f83755d/LICENSE"
+        }
+      ],
+      "license_family": "MIT",
+      "scope": "runtime logging; observed build uses std::format",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "tomlplusplus",
+      "repository": "marzer/tomlplusplus",
+      "commit": "30172438cee64926dc41fdd9c11fb3ba5b2ba9de",
+      "license_evidence": [
+        {
+          "path": "LICENSE",
+          "git_blob_sha1": "261cd6158738041e15adb526423d05075b060fcb",
+          "url": "https://raw.githubusercontent.com/marzer/tomlplusplus/30172438cee64926dc41fdd9c11fb3ba5b2ba9de/LICENSE"
+        }
+      ],
+      "license_family": "MIT",
+      "scope": "host configuration, inspect runtime edges",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "xxhash",
+      "repository": "Cyan4973/xxHash",
+      "commit": "e626a72bc2321cd320e953a0ccf1584cad60f363",
+      "license_evidence": [
+        {
+          "path": "LICENSE",
+          "git_blob_sha1": "e4c5da7234eca7baad9a46f0b144e49ccad2e500",
+          "url": "https://raw.githubusercontent.com/Cyan4973/xxHash/e626a72bc2321cd320e953a0ccf1584cad60f363/LICENSE"
+        }
+      ],
+      "license_family": "BSD-2-Clause library; GPL CLI excluded by observed build settings",
+      "scope": "runtime/host hashing; xxhsum disabled",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "catch2",
+      "repository": "catchorg/Catch2",
+      "commit": "88abf9bf325c798c33f54f6b9220ef885b267f4f",
+      "license_evidence": [
+        {
+          "path": "LICENSE.txt",
+          "git_blob_sha1": "36b7cd93cdfbac762f5be4c6ce276df2ea6305c2",
+          "url": "https://raw.githubusercontent.com/catchorg/Catch2/88abf9bf325c798c33f54f6b9220ef885b267f4f/LICENSE.txt"
+        }
+      ],
+      "license_family": "BSL-1.0",
+      "scope": "test only",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    },
+    {
+      "name": "tracy",
+      "repository": "wolfpld/tracy",
+      "commit": "05cceee0df3b8d7c6fa87e9638af311dbabc63cb",
+      "license_evidence": [
+        {
+          "path": "LICENSE",
+          "git_blob_sha1": "62016082197c26492274b66f2e04c6ed5a62779c",
+          "url": "https://raw.githubusercontent.com/wolfpld/tracy/05cceee0df3b8d7c6fa87e9638af311dbabc63cb/LICENSE"
+        }
+      ],
+      "license_family": "BSD-3-Clause",
+      "scope": "optional profiling",
+      "review_status": "pinned root/header evidence; not a final selected-build release SBOM"
+    }
+  ]
+}
