@@ -10,7 +10,10 @@
   ],
   "paths": [
     "experiments/runtime-bakeoff",
-    "docs/adr/0002-runtime-selection.md"
+    "docs/adr/0002-runtime-selection.md",
+    "docs/STATUS.md",
+    "AGENTS.md",
+    "tests/test_runtime_bakeoff.py"
   ],
   "goal": "Choose one runtime using the same title entry/import slice, integration effort, correctness tests and legal constraints.",
   "acceptance": [
@@ -23,5 +26,5 @@
   ],
   "size": "bounded spike; split after 3 days",
   "priority": 0,
-  "status": "todo"
+  "status": "in_progress"
 }

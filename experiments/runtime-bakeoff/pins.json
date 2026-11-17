@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "compiler": "20.1.2",
+  "stdlib_release": 13,
+  "common_cxx_flags": "-march=x86-64-v2",
+  "common_release_flags": "-O2 -DNDEBUG",
+  "mw2_generator": {
+    "url": "https://github.com/hedge-dev/XenonRecomp.git",
+    "commit": "ddd128bcca99fe8bfbb99bea583c972351fa6ace",
+    "patch_path": "patches/xenonrecomp-mw2.patch",
+    "patch_sha256": "e0f45d89ed7a5c8afc3b3c71e73a79c9d58c297ad5e6e7e37108ed83520e004d"
+  },
+  "sources": [
+    {
+      "name": "rexglue-sdk",
+      "url": "https://github.com/rexglue/rexglue-sdk.git",
+      "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+      "submodules": true
+    },
+    {
+      "name": "mw2-recompiled",
+      "url": "https://github.com/PaulCombal/mw2-recompiled.git",
+      "commit": "b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b",
+      "submodules": false
+    },
+    {
+      "name": "headers",
+      "url": "https://github.com/KhronosGroup/Vulkan-Headers.git",
+      "commit": "409c16be502e39fe70dd6fe2d9ad4842ef2c9a53",
+      "submodules": false
+    },
+    {
+      "name": "vma",
+      "url": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git",
+      "commit": "c788c52156f3ef7bc7ab769cb03c110a53ac8fcb",
+      "submodules": false
+    },
+    {
+      "name": "mw2-sdl",
+      "url": "https://github.com/libsdl-org/SDL.git",
+      "commit": "f6864924f76e1a0b4abaefc76ae2ed22b1a8916e",
+      "submodules": false
+    },
+    {
+      "name": "mw2-imgui",
+      "url": "https://github.com/ocornut/imgui.git",
+      "commit": "f5befd2d29e66809cd1110a152e375a7f1981f06",
+      "submodules": false
+    },
+    {
+      "name": "mw2-zlib",
+      "url": "https://github.com/madler/zlib.git",
+      "commit": "51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf",
+      "submodules": false
+    }
+  ]
+}
