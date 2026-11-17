@@ -106,6 +106,21 @@ class AnalysisTests(unittest.TestCase):
         metadata["resolved_import_symbols"] = []
         self.assertEqual(analysis.nonlocal_inventory(metadata)["setjmp_longjmp_status"], "unverified")
 
+    def test_independent_switch_disagreement_and_section_coverage(self):
+        table = dict(base=0x1010, r=3, default=0x1050, labels=[0x1030, 0x1040])
+        metadata = copy.deepcopy(self.metadata)
+        metadata["sections"][0]["name"] = "synthetic-code"
+        metadata["independent_switch_checks"] = [dict(table, kind="absolute-with-range-evidence", dominance_proven=False)]
+        self.assertEqual(analysis.validate_independent_switches(metadata, dict(switch=[table])),
+                         dict(independently_verified_switches=1, switch_tables_by_section={"synthetic-code": 1}))
+        for key in ("base", "r", "default", "labels", "kind"):
+            changed = copy.deepcopy(metadata)
+            changed["independent_switch_checks"][0][key] = "mutation"
+            with self.assertRaisesRegex(ValueError, "disagrees"):
+                analysis.validate_independent_switches(changed, dict(switch=[table]))
+        with self.assertRaisesRegex(ValueError, "count differs"):
+            analysis.validate_independent_switches(metadata, dict(switch=[]))
+
 
 class NativeScanTests(unittest.TestCase):
     @classmethod

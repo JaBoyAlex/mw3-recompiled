@@ -5,6 +5,7 @@
 #include <disasm.h>
 #include "scan.h"
 #include "imports.h"
+#include "switches.h"
 #include "import_hook.h"
 #include <filesystem>
 #include <fstream>
@@ -67,7 +68,7 @@ void verify_helper(const Region& region, uint32_t address, const HelperPattern& 
     }
 }
 
-void write_analysis(const Image& image) {
+void write_analysis(const Image& image,const std::vector<std::pair<uint32_t,uint32_t>>& switches) {
     std::vector<Region> regions;
     const Section* pdata=nullptr;
     uint64_t code_bytes=0;
@@ -141,6 +142,20 @@ void write_analysis(const Image& image) {
         std::cout << "{\"site\":" << site << ",\"register\":"; write_json_string(kind); std::cout << '}';
     }
     std::cout << "],\"exception_paths_resolved\":false,\"scan_is_reachable_code_proof\":false}";
+    std::cout << ",\"independent_switch_checks\":[";
+    first=true;
+    for (const auto& [base,count] : switches) {
+        const auto checked=verify_absolute_switch(regions,base,count);
+        if (!first) std::cout << ',';
+        first=false;
+        std::cout << "{\"base\":" << checked.base << ",\"r\":" << checked.index_register
+                  << ",\"default\":" << checked.default_target << ",\"table_address\":" << checked.table_address
+                  << ",\"comparison_address\":" << checked.comparison_address << ",\"guard_address\":" << checked.guard_address
+                  << ",\"kind\":\"absolute-with-range-evidence\",\"dominance_proven\":false,\"labels\":[";
+        for (size_t i=0;i<checked.labels.size();++i) { if (i) std::cout << ','; std::cout << checked.labels[i]; }
+        std::cout << "]}";
+    }
+    std::cout << ']';
 }
 
 void write_imports() {
@@ -187,8 +202,15 @@ void mw3_observe_imports(const Image& image,const uint8_t* input,std::size_t siz
 }
 
 int main(int argc, char** argv) {
-    if (argc != 2) { std::cerr << "usage: mw3-image-probe <verified-owned.xex>\n"; return 2; }
+    if (argc<2 || argc>1026 || argc%2) { std::cerr << "usage: mw3-image-probe <verified-owned.xex> [switch-base case-count]...\n"; return 2; }
     try {
+        std::vector<std::pair<uint32_t,uint32_t>> switches;
+        auto number=[](const char* text) {
+            size_t end=0; const auto value=std::stoull(text,&end,0);
+            if (text[end] || value>UINT32_MAX) throw std::runtime_error("invalid switch argument");
+            return uint32_t(value);
+        };
+        for (int i=2;i<argc;i+=2) switches.emplace_back(number(argv[i]),number(argv[i+1]));
         const auto size = std::filesystem::file_size(argv[1]);
         if (size < 24 || size > 64 * 1024 * 1024) throw std::runtime_error("input size outside analysis budget");
         std::vector<uint8_t> input(static_cast<std::size_t>(size));
@@ -223,7 +245,7 @@ int main(int argc, char** argv) {
             std::cout << ",\"address\":" << symbol.address << '}';
         }
         std::cout << ']';
-        write_analysis(image);
+        write_analysis(image,switches);
         write_imports();
         std::cout << ",\"unknown_import_coverage\":\"records-observed-runtime-unverified\",\"guest_executed\":false}\n";
         return 0;

@@ -43,3 +43,11 @@ The observer bounds-checks the XEX optional/import headers, padded string table,
 The manifest records the observed loader source and export-table digests. `--sanitizers` instruments this loader copy as well as maintained code; prepared archive objects remain uninstrumented. Header/record inventories remain private. Raw version fields document requested identities, not proven runtime compatibility.
 
 The nonlocal-flow inventory records direct-call words targeting imported unwind/context services and containing `.pdata` entries as navigation hints. It keeps `setjmp_longjmp_status=unverified` and `exception_paths_resolved=false`; neither a call to `RtlUnwind` nor its absence establishes a `longjmp` identity.
+
+## Independent switch checks and inventory boundary
+
+The driver runs XenonAnalyse first, then asks the adapter to independently inspect each candidate. A separate direct-field PPC decoder verifies the observed absolute-table form: pointer construction, scaled index, `lwzx`, `mtctr`, `bctr`, bounded range-count/default evidence and every mapped target. It explicitly handles r0's differing RA/RB semantics. Results must exactly agree on base, index, default and labels; unsupported forms or disagreements fail analysis. Tests cover instruction corruption, truncation, range/count disagreement, invalid targets and a separated compare/guard. This is a candidate verifier, not another general-purpose analyzer.
+
+Reports give per-section switch counts and list every unresolved handler-bearing `.pdata` entry. `dominance_proven=false`, `control_flow_complete=false` and unverified setjmp/longjmp status remain explicit. A bounded backward search for comparison/guard evidence does not prove CFG dominance or reachability. All current detected tables are in BINK, leaving main-engine coverage unestablished.
+
+MW3-007 completes the **initial inventory**, not native execution or exhaustive flow recovery. [The handoff](HANDOFF.md) directs unresolved semantics to the runtime bakeoff and selected generation/runtime tasks; it does not permit successful stubs or guessed targets.

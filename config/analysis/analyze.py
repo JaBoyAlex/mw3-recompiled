@@ -76,6 +76,19 @@ def summarize_mapping(metadata):
                 unresolved_indirect_sites=len(flow["unresolved_indirect_sites"]))
 
 
+def validate_independent_switches(metadata, switches):
+    checked = metadata["independent_switch_checks"]
+    expected = switches.get("switch", [])
+    if len(checked) != len(expected):
+        raise ValueError("independent switch count differs")
+    for actual, original in zip(checked, expected):
+        if actual["kind"] != "absolute-with-range-evidence" or actual["dominance_proven"] is not False or any(actual[key] != original[key] for key in ("base", "r", "default", "labels")):
+            raise ValueError("independent switch decoding disagrees")
+    return dict(independently_verified_switches=len(checked),
+                switch_tables_by_section={row["name"]: sum(row["address"] <= t["base"] < row["address"] + row["size"] for t in expected)
+                                          for row in metadata["sections"] if row["code"]})
+
+
 def summarize_imports(metadata):
     audit = metadata["import_audit"]
     if audit["observed_before_normalization"] is not True or audit["runtime_implemented"] is not False:
@@ -130,7 +143,8 @@ def nonlocal_inventory(metadata):
                              if row["address"] <= site < row["address"] + row["size"]})
         services.append(dict(name=symbol["name"], address=symbol["address"], direct_call_word_sites=calls,
                              containing_pdata_entries=containing))
-    return dict(setjmp_longjmp_status="unverified", exception_paths_resolved=False, services=services)
+    return dict(setjmp_longjmp_status="unverified", exception_paths_resolved=False, services=services,
+                unresolved_exception_function_entries=[row["address"] for row in metadata["pdata"]["functions"] if row.get("type") == 3])
 
 
 def compare_reports(current, previous):
@@ -193,23 +207,28 @@ def main():
         probe = output / "build/mw3-image-probe"
         summaries = []
         for role, filename in (("sp", "default.xex"), ("mp", "default_mp.xex")):
-            metadata = json.loads(run([probe, (args.owned / filename).resolve()], role + "-image"))
-            metadata["nonlocal_flow"] = nonlocal_inventory(metadata)
             table_file = output / f"{role}-switches.toml"
             run([analyzer, (args.owned / filename).resolve(), table_file], role + "-switches")
             switches = tomllib.loads(table_file.read_text())
+            requests = []
+            for table in switches.get("switch", []):
+                if type(table["base"]) is not int or not 0 <= table["base"] <= 0xffffffff or not 1 <= len(table["labels"]) <= 65536:
+                    raise ValueError("switch request outside verification budget")
+                requests.extend([table["base"], len(table["labels"])])
+            metadata = json.loads(run([probe, (args.owned / filename).resolve(), *requests], role + "-image"))
+            metadata["nonlocal_flow"] = nonlocal_inventory(metadata)
             checked = validate_switches(metadata, switches)
             (output / f"{role}-image.json").write_text(json.dumps(metadata, indent=2) + "\n")
             summaries.append(dict(role=role, executable_sha256=next(row["sha256"] for row in identity["executables"] if row["name"] == filename),
                                   base=metadata["base"], entry_point=metadata["entry_point"], image_size=metadata["size"],
                                   section_count=len(metadata["sections"]), resolved_import_symbols=len(metadata["resolved_import_symbols"]),
                                   switches_sha256=sha256(table_file), metadata_sha256=sha256(output / f"{role}-image.json"),
-                                  **checked, **summarize_mapping(metadata), **summarize_imports(metadata)))
-        report = dict(schema_version=3, identity=identity["manifest_id"], analyzer_sha256=sha256(analyzer), probe_sha256=sha256(probe),
+                                  **checked, **summarize_mapping(metadata), **summarize_imports(metadata), **validate_independent_switches(metadata, switches)))
+        report = dict(schema_version=4, inventory_scope="initial-executable-map", identity=identity["manifest_id"], analyzer_sha256=sha256(analyzer), probe_sha256=sha256(probe),
                       compiler=lock["compilers"]["linux"], probe_sanitizers=args.sanitizers,
                       probe_source_sha256=text_sha256(ROOT / "config/analysis/probe/image_probe.cpp"),
                       analysis_source_sha256={name: text_sha256(ROOT / "config/analysis" / name) for name in
-                                             ("analyze.py", "probe/image_probe.cpp", "probe/scan.h", "probe/imports.h", "probe/import_hook.h",
+                                             ("analyze.py", "probe/image_probe.cpp", "probe/scan.h", "probe/imports.h", "probe/import_hook.h", "probe/switches.h",
                                               "probe/CMakeLists.txt", "probe/scan_tests.cpp")},
                       observed_loader_source_sha256=text_sha256(loader_source),
                       export_tables_sha256={name: text_sha256(loader_root / "XenonUtils/xbox" / name)
