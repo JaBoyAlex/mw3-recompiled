@@ -32,6 +32,7 @@ Create `.local` first. Reports never imply ownership verification or supported g
 ## Project navigation
 
 - [Current status and verified checks](docs/STATUS.md)
+- [Friends: easy Codex onboarding and copyable prompt](docs/FRIENDS-START-HERE.md)
 - [Architecture and alternatives](docs/ARCHITECTURE.md)
 - [Dependency-driven roadmap](docs/ROADMAP.md)
 - [Upstream technical investigation](docs/research/UPSTREAMS.md)

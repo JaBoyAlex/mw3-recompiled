@@ -79,10 +79,13 @@ def prompt(task):
 def issue_body(task, numbers=None):
     numbers = numbers or {}
     deps = ", ".join(f"#{numbers[d]} ({d})" if d in numbers else d for d in task["depends_on"]) or "none"
+    mark = "x" if task["status"] == "done" else " "
+    evidence = "\n\nCatalog evidence: " + ", ".join(task["evidence"]) if task.get("evidence") else ""
     return (f"<!-- mw3-task:{task['id']} -->\n{task['goal']}\n\n"
             f"Phase: {task['phase']} | Area: {task['area']} | Size: {task['size']} | Priority: P{task['priority']}\n\n"
+            f"Catalog status: {task['status']} (live ownership: issue assignee){evidence}\n\n"
             f"Dependencies: {deps}\n\nPaths: " + ", ".join(f"`{p}`" for p in task["paths"]) +
-            "\n\nAcceptance criteria:\n" + "\n".join(f"- [ ] {v}" for v in task["acceptance"]) +
+            "\n\nAcceptance criteria:\n" + "\n".join(f"- [{mark}] {v}" for v in task["acceptance"]) +
             "\n\nCopyable agent prompt:\n```text\n" + prompt(task) + "```\n\n"
             "Catalog defines scope; issue assignee is the current owner. Completed work needs a merged, verified PR.\n")
 
