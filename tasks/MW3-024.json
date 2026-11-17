@@ -1,0 +1,25 @@
+{
+  "id": "MW3-024",
+  "title": "Produce validated temporal inputs per viewport",
+  "phase": 5,
+  "area": "temporal",
+  "depends_on": [
+    "MW3-023"
+  ],
+  "paths": [
+    "runtime/render/temporal",
+    "tests/temporal"
+  ],
+  "goal": "Expose correct depth, object/camera motion, jitter, exposure and reset boundaries for DLSS/DLAA.",
+  "acceptance": [
+    "Independent history for every local viewport; cut/resize/join/leave resets correct",
+    "Transparent, particles, weapon, HUD and cinematics tested; no fabricated zero motion for moving geometry"
+  ],
+  "validation": [
+    "Debug visualize each temporal input against known scenes",
+    "Verify no cross-viewport history bleed"
+  ],
+  "size": "epic; split before claiming",
+  "priority": 1,
+  "status": "todo"
+}

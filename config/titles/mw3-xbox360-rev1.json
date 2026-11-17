@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "mw3-xbox360-usa-korea-rev1",
+  "status": "identified-not-runtime-supported",
+  "label": "Owner supplied Rev 1; informal 1.1 preference; no separate title update supplied",
+  "iso": {
+    "size": 8738846720,
+    "sha256": "f5531196d7c064a237791e2dc3e9434ee436aab2c4edb49f870f5a7fcda9d1d5"
+  },
+  "executables": [
+    {
+      "execution": {
+        "base_version_raw": "00000012",
+        "disc_count": 1,
+        "disc_number": 1,
+        "executable_type": 0,
+        "media_id": "3b46ae32",
+        "platform": 0,
+        "title_id": "415608cb",
+        "version_raw": "00000012"
+      },
+      "format": "XEX2",
+      "name": "default.xex",
+      "sha256": "f59be1342c2fc664e2a2e7322d024028a0ca7216d279ed32fef6e114d8c37c30",
+      "size": 6082560
+    },
+    {
+      "execution": {
+        "base_version_raw": "00000012",
+        "disc_count": 1,
+        "disc_number": 1,
+        "executable_type": 0,
+        "media_id": "3b46ae32",
+        "platform": 0,
+        "title_id": "415608cb",
+        "version_raw": "00000012"
+      },
+      "format": "XEX2",
+      "name": "default_mp.xex",
+      "sha256": "ba1bc57af4c4f75934a106b3d470559b356252b9e100d98e335bcfd0e574806a",
+      "size": 6705152
+    }
+  ]
+}

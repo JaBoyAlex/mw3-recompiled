@@ -1,0 +1,27 @@
+{
+  "id": "MW3-008",
+  "title": "Run the MW2-runtime versus ReXGlue vertical-slice bakeoff",
+  "phase": 2,
+  "area": "runtime",
+  "depends_on": [
+    "MW3-003",
+    "MW3-005",
+    "MW3-007"
+  ],
+  "paths": [
+    "experiments/runtime-bakeoff",
+    "docs/adr/0002-runtime-selection.md"
+  ],
+  "goal": "Choose one runtime using the same title entry/import slice, integration effort, correctness tests and legal constraints.",
+  "acceptance": [
+    "Document build effort, implemented imports, unresolved semantics, memory aliases and threading gaps for each candidate",
+    "Choose one maintainable base; stop the losing experiment and retain comparable evidence; no fake stub boot success"
+  ],
+  "validation": [
+    "Execute same slice for both candidates on the same hardware",
+    "Run synthetic CPU/memory/thread tests and record title failures"
+  ],
+  "size": "bounded spike; split after 3 days",
+  "priority": 0,
+  "status": "todo"
+}

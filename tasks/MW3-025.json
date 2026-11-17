@@ -1,0 +1,26 @@
+{
+  "id": "MW3-025",
+  "title": "Integrate optional DLSS/DLAA with legal fallback",
+  "phase": 5,
+  "area": "dlss",
+  "depends_on": [
+    "MW3-024",
+    "MW3-003"
+  ],
+  "paths": [
+    "runtime/render/streamline",
+    "tests/streamline"
+  ],
+  "goal": "Use supported NVIDIA interfaces only when compatible deployment and validated inputs exist.",
+  "acceptance": [
+    "Audit vendor binary terms and GPL combination before shipping; signatures and capability query verified",
+    "Per-view DLSS/DLAA handles; unsupported device or missing DLL keeps native rendering available"
+  ],
+  "validation": [
+    "Compare motion/disocclusion/HUD quality and GPU time against native",
+    "Test missing SDK/DLL, unsupported GPU and toggle/reset paths"
+  ],
+  "size": "epic; split before claiming",
+  "priority": 1,
+  "status": "todo"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "MW3-035",
+  "title": "Evaluate REA providers for XEX and PPC analysis",
+  "phase": 1,
+  "area": "rea",
+  "priority": 1,
+  "status": "todo",
+  "depends_on": [
+    "MW3-001"
+  ],
+  "paths": [
+    "experiments/rea",
+    "docs/research/rea-evaluation.md"
+  ],
+  "goal": "Assess official morluto/rea tooling for reproducible MW3 analysis without treating an MCP wrapper as a recompiler.",
+  "acceptance": [
+    "Pin tool/provider versions and verify big-endian PPC/XEX/VMX128 support or explicit limitations",
+    "Compare synthetic and owned-title evidence with independent tools; no auto-install or external upload of game bytes"
+  ],
+  "validation": [
+    "Run synthetic PPC/xref fixture and private title-slice checks if supported",
+    "Record capabilities, failures and provider license requirements"
+  ],
+  "size": "1-3 days"
+}

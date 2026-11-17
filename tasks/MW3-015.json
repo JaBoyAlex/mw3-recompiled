@@ -1,0 +1,26 @@
+{
+  "id": "MW3-015",
+  "title": "Restore and verify the full Campaign",
+  "phase": 3,
+  "area": "campaign",
+  "depends_on": [
+    "MW3-014",
+    "MW3-004"
+  ],
+  "paths": [
+    "runtime/title/campaign",
+    "qa/scenarios/campaign"
+  ],
+  "goal": "Finish all baseline missions, difficulties, cinematics, checkpoints, death/retry and saves.",
+  "acceptance": [
+    "Enumerated mission cases pass with progression assertions and load/save identity",
+    "Preserve original single-player Campaign scope; no invented campaign co-op requirement"
+  ],
+  "validation": [
+    "Automated checkpoint/mission routes plus human presentation review",
+    "Repeat completion and reload on both PCs"
+  ],
+  "size": "epic; split by mission",
+  "priority": 0,
+  "status": "todo"
+}

@@ -1,0 +1,26 @@
+name: Scoped development task
+description: Propose a dependency-aware task or split a roadmap epic
+title: '[proposal] '
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Observable outcome and product value
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies, owned paths and conflicts
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and reproducible verification
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence, performance implications and known blockers

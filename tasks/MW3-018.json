@@ -1,0 +1,27 @@
+{
+  "id": "MW3-018",
+  "title": "Pass original-gameplay parity gate",
+  "phase": 3,
+  "area": "gate",
+  "depends_on": [
+    "MW3-015",
+    "MW3-016",
+    "MW3-017"
+  ],
+  "paths": [
+    "qa/gates/parity",
+    "docs/compatibility.md"
+  ],
+  "goal": "Audit the full baseline content matrix and close critical correctness gaps.",
+  "acceptance": [
+    "All required cases have real evidence; original capabilities not silently dropped",
+    "Baseline versus DLC/region support explicit; no P0/P1 stability regressions"
+  ],
+  "validation": [
+    "Run complete regression on two PCs",
+    "Independently review representative visual, audio and input cases"
+  ],
+  "size": "gate",
+  "priority": 0,
+  "status": "todo"
+}

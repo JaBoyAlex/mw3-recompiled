@@ -1,0 +1,30 @@
+{
+  "id": "MW3-029",
+  "title": "Validate release evidence, packaging and reproducibility",
+  "phase": 6,
+  "area": "release",
+  "depends_on": [
+    "MW3-025",
+    "MW3-026",
+    "MW3-027",
+    "MW3-028",
+    "MW3-034"
+  ],
+  "paths": [
+    "qa/gates/release",
+    "release",
+    "docs/releases"
+  ],
+  "goal": "Prepare a finished release only after all original modes, network and optional graphics pass.",
+  "acceptance": [
+    "Multi-hour all-mode soak; no unresolved P0/P1 defects; downgrade and SDK-absent fallback tested",
+    "Two clean builders reproduce generated inputs and explained binary differences; license/SBOM/source obligations satisfied"
+  ],
+  "validation": [
+    "Run complete regression on NVIDIA and AMD/Intel and two-household relay",
+    "Audit artifact contents and publish checksums only for approved artifacts"
+  ],
+  "size": "gate",
+  "priority": 0,
+  "status": "todo"
+}

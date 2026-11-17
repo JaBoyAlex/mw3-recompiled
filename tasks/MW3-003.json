@@ -1,0 +1,25 @@
+{
+  "id": "MW3-003",
+  "title": "Compare runtime integration and distribution licenses",
+  "phase": 1,
+  "area": "legal",
+  "depends_on": [
+    "MW3-001"
+  ],
+  "paths": [
+    "docs/legal",
+    "THIRD_PARTY.md"
+  ],
+  "goal": "Resolve file-level provenance and compatibility of candidate runtimes, generated title code, Steamworks and NVIDIA binaries.",
+  "acceptance": [
+    "Compare MW2 GPL-only and ReXGlue permissive runtime paths and transitive licenses",
+    "Record permitted source/tool delivery and unresolved game-linked binary and SDK release restrictions; no assumed linking exception"
+  ],
+  "validation": [
+    "Attach pinned license sources and artifact-by-artifact disposition",
+    "Review intended package against license inventory"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

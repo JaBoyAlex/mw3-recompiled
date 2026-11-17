@@ -1,0 +1,25 @@
+{
+  "id": "MW3-022",
+  "title": "Pass two-household CGNAT and network-chaos gate",
+  "phase": 4,
+  "area": "gate",
+  "depends_on": [
+    "MW3-021"
+  ],
+  "paths": [
+    "qa/gates/network",
+    "qa/scenarios/network"
+  ],
+  "goal": "Prove all networked modes and supported local/remote player combinations over relay without inbound ports.",
+  "acceptance": [
+    "Two distinct households behind restrictive NAT/CGNAT complete sessions with confirmed relay route",
+    "Loss/jitter/reorder, unauthorized peers, reconnect, host loss and extended soak have explicit outcomes"
+  ],
+  "validation": [
+    "Record RTT/loss/relay identity without tokens or public IPs",
+    "Run regression with direct UDP deliberately unavailable"
+  ],
+  "size": "gate",
+  "priority": 0,
+  "status": "todo"
+}

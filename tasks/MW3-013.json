@@ -1,0 +1,27 @@
+{
+  "id": "MW3-013",
+  "title": "Add real-title scenario and crash evidence harness",
+  "phase": 2,
+  "area": "qa",
+  "depends_on": [
+    "MW3-011",
+    "MW3-012"
+  ],
+  "paths": [
+    "qa/runner",
+    "runtime/diagnostics",
+    "tests/qa"
+  ],
+  "goal": "Drive actual engine actions with deadlines, state oracles and scoped process ownership.",
+  "acceptance": [
+    "Reports distinguish pass/fail/skip/not-run and include build/content identity",
+    "Missing client, timeout, exit crash and silent solo fallback cannot pass; bridge local-only in diagnostic builds"
+  ],
+  "validation": [
+    "Inject timeout, crash and false-readiness mutations",
+    "Run repeated real menu load and clean exit"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

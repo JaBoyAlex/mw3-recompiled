@@ -1,0 +1,26 @@
+{
+  "id": "MW3-011",
+  "title": "Reach faithful first frame and menu",
+  "phase": 2,
+  "area": "gpu",
+  "depends_on": [
+    "MW3-010"
+  ],
+  "paths": [
+    "runtime/gpu",
+    "config/shaders",
+    "tests/gpu"
+  ],
+  "goal": "Render the title's first frame using the chosen compatibility backend and validate against console reference.",
+  "acceptance": [
+    "Log unsupported shader instructions, formats, resolves and render-target states",
+    "Compare capture with defined tolerances, correct color/depth and cold-cache behavior"
+  ],
+  "validation": [
+    "Run synthetic shader/format tests",
+    "Capture menu on at least NVIDIA and AMD/Intel hardware"
+  ],
+  "size": "epic; split before claiming",
+  "priority": 0,
+  "status": "todo"
+}

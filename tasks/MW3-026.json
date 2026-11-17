@@ -1,0 +1,26 @@
+{
+  "id": "MW3-026",
+  "title": "Integrate frame pacing and optional NVIDIA Reflex",
+  "phase": 5,
+  "area": "latency",
+  "depends_on": [
+    "MW3-023",
+    "MW3-003"
+  ],
+  "paths": [
+    "runtime/render/latency",
+    "qa/benchmarks/latency"
+  ],
+  "goal": "Place pacing and Reflex markers at verified simulation/render/present boundaries.",
+  "acceptance": [
+    "One frame token tracks real frame lifecycle; markers do not block guest jobs incorrectly",
+    "Measure end-to-end latency where hardware permits; CPU timings alone not called input-to-photon latency"
+  ],
+  "validation": [
+    "GPU-bound and CPU-bound A/B tests with and without Reflex",
+    "Offline, split-screen, unsupported GPU and minimized/resume tests"
+  ],
+  "size": "epic; split before claiming",
+  "priority": 1,
+  "status": "todo"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "MW3-005",
+  "title": "Create provenance-aware benchmark and evidence tooling",
+  "phase": 1,
+  "area": "perf",
+  "depends_on": [
+    "MW3-001"
+  ],
+  "paths": [
+    "tools/benchmark.py",
+    "qa/benchmarks",
+    "tests/test_benchmark.py"
+  ],
+  "goal": "Record comparable frame, memory, loading and latency measurements without claiming synthetic timing measures MW3.",
+  "acceptance": [
+    "Schema records build, file hashes, hardware, drivers, configuration, scenario and cold/warm cache",
+    "Compare repeated runs with percentiles and noise handling; retain raw traces privately"
+  ],
+  "validation": [
+    "Test invalid/missing metadata rejection and known percentile results",
+    "Demonstrate comparison on synthetic labeled data"
+  ],
+  "size": "1-3 days",
+  "priority": 1,
+  "status": "todo"
+}

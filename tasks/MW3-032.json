@@ -1,0 +1,25 @@
+{
+  "id": "MW3-032",
+  "title": "Define release performance and supported-hardware budgets",
+  "phase": 1,
+  "area": "perf-policy",
+  "depends_on": [
+    "MW3-001"
+  ],
+  "paths": [
+    "docs/performance-budgets.md"
+  ],
+  "goal": "Set provisional measurable targets for 1/2/4-view play, load times, memory and latency based on declared target hardware.",
+  "acceptance": [
+    "Separate reference console simulation timing from render frame rate targets",
+    "Specify sampling window, warmup, repeated runs and performance regression tolerance; targets remain provisional before MW3 measurements"
+  ],
+  "validation": [
+    "Review metric definitions against benchmark schema task",
+    "Require budget revision after first playable slice"
+  ],
+  "size": "1-3 days",
+  "priority": 1,
+  "status": "done",
+  "evidence": ["docs/performance-budgets.md", "docs/research/scorecard.md", "tools/benchmark.py"]
+}

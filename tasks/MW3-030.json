@@ -1,0 +1,24 @@
+{
+  "id": "MW3-030",
+  "title": "Maintain runtime and toolchain decision scorecards",
+  "phase": 1,
+  "area": "research",
+  "depends_on": [
+    "MW3-001"
+  ],
+  "paths": [
+    "docs/research/scorecard.md"
+  ],
+  "goal": "Keep a primary-source comparison of MW2, XenonRecomp/Analyse, XenosRecomp, ReXGlue, Unleashed, CoD3 and other relevant ports.",
+  "acceptance": [
+    "Separate upstream claims, source inspection, local tests and actual MW3 measurements",
+    "Revisit at first boot, first full mode, each optimization and upstream/security update; recommend pivots with migration cost"
+  ],
+  "validation": [
+    "Check pinned sources and exact comparison criteria",
+    "No unmeasured fastest/most advanced claim"
+  ],
+  "size": "1-3 days",
+  "priority": 1,
+  "status": "todo"
+}

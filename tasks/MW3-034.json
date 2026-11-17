@@ -1,0 +1,27 @@
+{
+  "id": "MW3-034",
+  "title": "Implement and verify four-player Survival",
+  "phase": 4,
+  "area": "survival-four",
+  "priority": 1,
+  "status": "todo",
+  "depends_on": [
+    "MW3-033",
+    "MW3-022"
+  ],
+  "paths": [
+    "runtime/title/survival-four",
+    "qa/scenarios/survival-four"
+  ],
+  "goal": "Deliver the requested four-player extension without regressing original two-player Survival.",
+  "acceptance": [
+    "Four local viewports/controllers, four online players and supported mixed configurations pass documented cases",
+    "Wave state, revives, targeting, purchases/rewards, disconnect/rejoin and session teardown correct; creative balance changes agreed with owner",
+    "Performance meets declared four-view budgets with faithful fallback and no player-state overruns"
+  ],
+  "validation": [
+    "Run four-player functional, visual, packet and soak suites",
+    "Run two-household relay tests and original two-player regressions"
+  ],
+  "size": "epic; split before claiming"
+}

@@ -1,0 +1,27 @@
+{
+  "id": "MW3-001",
+  "title": "Establish verified contributor and build foundation",
+  "phase": 1,
+  "area": "infra",
+  "depends_on": [],
+  "paths": [
+    "tools",
+    "tests",
+    ".github",
+    ".agents",
+    "CMakeLists.txt"
+  ],
+  "goal": "Deliver game-free native builds, dependency-aware tasks and reusable contributor workflows.",
+  "acceptance": [
+    "Native metadata inspector and Python tools pass documented tests",
+    "GitHub catalog, claims and PR workflow documented with honest limitations"
+  ],
+  "validation": [
+    "Run native Debug and Release checks",
+    "Run Python unit tests and project validate"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "done",
+  "evidence": ["docs/validation-2026-11-17.md", "docs/STATUS.md", "CONTRIBUTING.md"]
+}

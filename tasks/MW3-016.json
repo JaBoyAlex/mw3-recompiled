@@ -1,0 +1,26 @@
+{
+  "id": "MW3-016",
+  "title": "Restore cooperative Special Ops and Survival locally",
+  "phase": 3,
+  "area": "specops",
+  "depends_on": [
+    "MW3-014",
+    "MW3-004"
+  ],
+  "paths": [
+    "runtime/title/specops",
+    "qa/scenarios/specops"
+  ],
+  "goal": "Verify every supported mission and Survival map with original local player limits.",
+  "acceptance": [
+    "Two local players have independent input, HUD, audio and profile behavior",
+    "Revives, failure, retry, unlocks, rewards and long Survival runs verified"
+  ],
+  "validation": [
+    "Run each enumerated case and local split-screen endurance",
+    "Disconnect a controller and reload progress"
+  ],
+  "size": "epic; split by mission/map",
+  "priority": 0,
+  "status": "todo"
+}

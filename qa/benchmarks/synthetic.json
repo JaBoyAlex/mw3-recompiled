@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "scenario": "comparator-demo-only",
+  "content_sha256": "none-synthetic",
+  "hardware": "synthetic-no-device",
+  "driver": "none",
+  "settings": "synthetic",
+  "cache": "warm",
+  "measurement": "synthetic-frame-ms",
+  "build": "synthetic-a",
+  "compiler": "none",
+  "runs_ms": [[10, 11, 10, 12], [10, 10, 11, 12], [11, 10, 10, 12]]
+}

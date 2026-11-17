@@ -1,0 +1,25 @@
+{
+  "id": "MW3-004",
+  "title": "Freeze a reference gameplay and split-screen matrix",
+  "phase": 1,
+  "area": "qa",
+  "depends_on": [
+    "MW3-001"
+  ],
+  "paths": [
+    "qa/reference",
+    "docs/reference.md"
+  ],
+  "goal": "Define exact MW3 2011 parity from manuals and the selected console build, including local versus online player counts.",
+  "acceptance": [
+    "Separate single-player Campaign, cooperative Spec Ops/Survival and local/online MP limits",
+    "Catalog mission, map, checkpoint, controller, save, region and DLC cases; unknown facts remain unknown"
+  ],
+  "validation": [
+    "Cross-check primary manual with owned-console observations",
+    "Add machine-readable case IDs with explicit skip reasons"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

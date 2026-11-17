@@ -1,0 +1,26 @@
+{
+  "id": "MW3-007",
+  "title": "Map MW3 executable entry points, imports and control flow",
+  "phase": 2,
+  "area": "analysis",
+  "depends_on": [
+    "MW3-002",
+    "MW3-006"
+  ],
+  "paths": [
+    "config/analysis",
+    "docs/engine/executables.md"
+  ],
+  "goal": "Derive SP/MP module boundaries, save/restore helpers, jump tables and imports from the exact owned build.",
+  "acceptance": [
+    "Every address is bound to an executable SHA-256 and evidence; no MW2 addresses copied",
+    "Unknown indirect targets and exception paths reported, not silently stubbed"
+  ],
+  "validation": [
+    "Repeat analysis deterministically",
+    "Independently inspect representative helpers and switch tables"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "MW3-002",
+  "title": "Identify the owner's Xbox 360 1.1 baseline",
+  "phase": 1,
+  "area": "identity",
+  "depends_on": [
+    "MW3-001"
+  ],
+  "paths": [
+    "config/titles",
+    "docs/research/title-identity.md"
+  ],
+  "goal": "Resolve the 1.1 label into exact region, disc revision, executable hashes and any separately obtained title update.",
+  "acceptance": [
+    "Record hashes for all supplied executables and update packages without committing bytes",
+    "Reject wrong title/platform, mixed builds and modified inputs; explicitly record unsupported cases"
+  ],
+  "validation": [
+    "Run inventory against owned files",
+    "Verify metadata using a second independent reader"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

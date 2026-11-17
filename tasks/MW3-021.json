@@ -1,0 +1,26 @@
+{
+  "id": "MW3-021",
+  "title": "Implement Steam private lobbies, invites and SDR transport",
+  "phase": 4,
+  "area": "steam",
+  "depends_on": [
+    "MW3-019",
+    "MW3-020"
+  ],
+  "paths": [
+    "runtime/net/steam",
+    "tests/steam"
+  ],
+  "goal": "Bridge existing game packets to authenticated Steam peers and private friend invites.",
+  "acceptance": [
+    "No command text from lobby metadata; negotiate protocol/content identity before guest parsing",
+    "Relay capability and path logged; direct fallback never silently satisfies CGNAT acceptance; SDK optional at build time"
+  ],
+  "validation": [
+    "Two authorized Steam accounts test invite accept/decline/expiry and host loss",
+    "Unavailable Steam/relay fails clearly with offline play still usable"
+  ],
+  "size": "epic; split before claiming",
+  "priority": 0,
+  "status": "todo"
+}

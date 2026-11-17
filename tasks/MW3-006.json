@@ -1,0 +1,26 @@
+{
+  "id": "MW3-006",
+  "title": "Build pinned CPU and shader toolchains on Windows",
+  "phase": 1,
+  "area": "toolchain",
+  "depends_on": [
+    "MW3-001"
+  ],
+  "paths": [
+    "cmake/toolchains",
+    "tools/prepare_toolchain.py",
+    "config/toolchains"
+  ],
+  "goal": "Reproduce XenonRecomp/XenonAnalyse and XenosRecomp/DXC tool builds independently of MW3 data.",
+  "acceptance": [
+    "Lock transitive source revisions, archive hashes and compiler versions",
+    "Run synthetic PPC tests and compile a non-game shader; document native versus cross-build support"
+  ],
+  "validation": [
+    "Repeat clean build in isolated directories",
+    "Compare generated synthetic outputs across two runs"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

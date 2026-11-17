@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "checked": "2026-11-17",
+  "upstreams": [
+    {
+      "name": "mw2-recompiled",
+      "url": "https://github.com/PaulCombal/mw2-recompiled.git",
+      "commit": "b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b",
+      "license_sha256": {
+        "LICENSE": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+      },
+      "role": "research-only"
+    },
+    {
+      "name": "coop-anything",
+      "url": "https://github.com/cranebeaker/coop-anything.git",
+      "commit": "d08f5b6d47f0ba73ec1c0806414170eb961c1508",
+      "license_sha256": {
+        "LICENSE": "26a4d8c82346980aeca9ee638c057cb63c7e32eeede0280b90ba3da42023421c"
+      },
+      "role": "research-only"
+    },
+    {
+      "name": "Streamline",
+      "url": "https://github.com/NVIDIA-RTX/Streamline.git",
+      "commit": "625db07d4bca5abc67d781c42af7e7fb0761f1b6",
+      "license_sha256": {
+        "license.txt": "7b6f23e7d6f3ad6292f9308d2b42cdc3d82ae4e9b2abb55f230279d83bedd43d"
+      },
+      "role": "research-only"
+    },
+    {
+      "name": "XenonRecomp",
+      "url": "https://github.com/hedge-dev/XenonRecomp.git",
+      "commit": "ddd128bcca99fe8bfbb99bea583c972351fa6ace",
+      "license_sha256": {
+        "LICENSE.md": "7fd801bac4a25e8d8bcdaa5a025f02ea245fd4c039b513ab4fc11cb5a0cfd3f7"
+      },
+      "role": "research-only"
+    },
+    {
+      "name": "XenosRecomp",
+      "url": "https://github.com/hedge-dev/XenosRecomp.git",
+      "commit": "70a084c2392378818a4da4086e8e3420b4c3ea8d",
+      "license_sha256": {
+        "LICENSE.md": "7fd801bac4a25e8d8bcdaa5a025f02ea245fd4c039b513ab4fc11cb5a0cfd3f7"
+      },
+      "role": "research-only"
+    },
+    {
+      "name": "UnleashedRecomp",
+      "url": "https://github.com/hedge-dev/UnleashedRecomp.git",
+      "commit": "7949ed5371b091be310771564a8f1c020974a2ca",
+      "license_sha256": {
+        "COPYING": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+      },
+      "role": "research-only"
+    },
+    {
+      "name": "rexglue-sdk",
+      "url": "https://github.com/rexglue/rexglue-sdk.git",
+      "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+      "license_sha256": {
+        "LICENSE": "8e065be1da2ff9a16b1f063d4636d8b67e6a654bb90583ea4332e66ac421bb18"
+      },
+      "role": "research-only"
+    },
+    {
+      "name": "CoD3Recomp",
+      "url": "https://github.com/FrankHUN88453/CoD3Recomp.git",
+      "commit": "3c3178a85075cfa6e0703de5e553ff472acc7916",
+      "license_sha256": {},
+      "role": "research-only"
+    },
+    {
+      "name": "rea",
+      "url": "https://github.com/morluto/rea.git",
+      "commit": "e9c72dbd1fa6b318cb3e455c92df064eed62333a",
+      "license_sha256": {
+        "LICENSE": "798f9e4d18e49b30bf2f12696c8ced73dc4e1413da375a333d01281543a1ea8b"
+      },
+      "role": "research-only"
+    }
+  ]
+}

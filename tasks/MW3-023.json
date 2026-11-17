@@ -1,0 +1,27 @@
+{
+  "id": "MW3-023",
+  "title": "Benchmark renderer seams and remove proven bottlenecks",
+  "phase": 5,
+  "area": "renderer",
+  "depends_on": [
+    "MW3-022",
+    "MW3-005"
+  ],
+  "paths": [
+    "runtime/render",
+    "qa/benchmarks/render",
+    "docs/adr/0003-renderer.md"
+  ],
+  "goal": "Compare existing backend against a bounded engine-level rendering seam; avoid an unnecessary renderer rewrite.",
+  "acceptance": [
+    "Correctness-preserving wins measured for shader prewarm, cache keys, copies, bindings and queue use",
+    "Choose one backend initially; preserve faithful fallback and disable optimizations that violate frame or gameplay semantics"
+  ],
+  "validation": [
+    "Matched replay cold/warm CPU/GPU p50/p95/p99 and memory comparison",
+    "Visual regression across vendor GPUs and split-screen"
+  ],
+  "size": "epic; split before claiming",
+  "priority": 1,
+  "status": "todo"
+}

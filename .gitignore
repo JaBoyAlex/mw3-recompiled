@@ -1,0 +1,17 @@
+.local/
+/out/
+/build/
+/game/
+/generated/
+/private/
+__pycache__/
+*.pyc
+.env
+*.iso
+*.xex
+*.xexp
+*.ff
+*.pak
+*.bik
+*.dmp
+*.cofr

@@ -1,0 +1,26 @@
+{
+  "id": "MW3-009",
+  "title": "Establish reproducible private title generation",
+  "phase": 2,
+  "area": "recomp",
+  "depends_on": [
+    "MW3-008"
+  ],
+  "paths": [
+    "tools/recompile.py",
+    "config/recomp",
+    "tests/test_recompile.py"
+  ],
+  "goal": "Generate SP and MP native code locally from verified files and the selected toolchain.",
+  "acceptance": [
+    "Key output cache by title hashes, toolchain, config and patches",
+    "Fail on unknown version, unreviewed code targets or dirty dependencies; generated code stays ignored"
+  ],
+  "validation": [
+    "Clean-generate twice and compare manifests",
+    "Corrupt an input and confirm early refusal"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

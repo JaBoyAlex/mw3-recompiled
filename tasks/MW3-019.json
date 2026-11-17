@@ -1,0 +1,24 @@
+{
+  "id": "MW3-019",
+  "title": "Resolve an authorized Steam application and SDK path",
+  "phase": 1,
+  "area": "steam-access",
+  "depends_on": [
+    "MW3-003"
+  ],
+  "paths": [
+    "docs/legal/steam-access.md"
+  ],
+  "goal": "Establish whether a supported Steam AppID and SDK/relay access can be used for this project.",
+  "acceptance": [
+    "Record owner-provided authorization and actual Steamworks access without publishing credentials",
+    "No borrowed retail identity or Spacewar production dependency; unresolved access remains a blocker"
+  ],
+  "validation": [
+    "Document SDK provenance and redistribution constraints",
+    "Confirm authorized app configuration with account owner"
+  ],
+  "size": "external dependency",
+  "priority": 0,
+  "status": "todo"
+}

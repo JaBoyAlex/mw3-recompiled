@@ -1,0 +1,26 @@
+{
+  "id": "MW3-020",
+  "title": "Specify session admission and audit legacy packet parsers",
+  "phase": 4,
+  "area": "net-security",
+  "depends_on": [
+    "MW3-018"
+  ],
+  "paths": [
+    "runtime/net/admission",
+    "tests/net",
+    "docs/networking.md"
+  ],
+  "goal": "Define authenticated peers, lobby-bound identity, compatibility negotiation and bounded legacy packet handling.",
+  "acceptance": [
+    "Audit MW3 parsers independently; MW2 CVE fixes are leads, not copied proof",
+    "Reject malformed packets, stale sessions, unsolicited peers, replayed joins and command/path injection"
+  ],
+  "validation": [
+    "Fuzz parser and admission boundaries with sanitizers",
+    "Mutation tests prove size/sender/epoch protections are active"
+  ],
+  "size": "epic; split by parser",
+  "priority": 0,
+  "status": "todo"
+}

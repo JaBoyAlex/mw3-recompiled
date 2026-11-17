@@ -1,0 +1,26 @@
+{
+  "id": "MW3-017",
+  "title": "Restore multiplayer local and system-link parity",
+  "phase": 3,
+  "area": "multiplayer",
+  "depends_on": [
+    "MW3-014",
+    "MW3-004"
+  ],
+  "paths": [
+    "runtime/title/multiplayer",
+    "qa/scenarios/multiplayer"
+  ],
+  "goal": "Verify baseline private multiplayer rules, maps and native split-screen behavior before public transport exposure.",
+  "acceptance": [
+    "Test four local players where original supports it, supported online local-player combinations separately",
+    "Team changes, loadouts, scoring, round changes, map rotation and clean lobby return verified"
+  ],
+  "validation": [
+    "Enumerated map/mode pair coverage and soak",
+    "Two isolated local processes test system link without external exposure"
+  ],
+  "size": "epic; split by mode/map",
+  "priority": 0,
+  "status": "todo"
+}

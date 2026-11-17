@@ -1,0 +1,26 @@
+{
+  "id": "MW3-028",
+  "title": "Build transactional owned-content installer and updates",
+  "phase": 6,
+  "area": "installer",
+  "depends_on": [
+    "MW3-018",
+    "MW3-003"
+  ],
+  "paths": [
+    "launcher/install",
+    "tests/install"
+  ],
+  "goal": "Import verified owned content, keep saves separate, and deliver recoverable updates.",
+  "acceptance": [
+    "Read-only originals; reject unsupported/corrupt inputs and archive traversal",
+    "Interrupted install/update, disk full, rollback and uninstall preserve user saves; release artifacts allowlisted"
+  ],
+  "validation": [
+    "Fault-inject at every transactional boundary",
+    "Install from a clean non-developer Windows account"
+  ],
+  "size": "epic; split before claiming",
+  "priority": 1,
+  "status": "todo"
+}

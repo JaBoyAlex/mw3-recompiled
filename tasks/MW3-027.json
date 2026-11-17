@@ -1,0 +1,27 @@
+{
+  "id": "MW3-027",
+  "title": "Optimize CPU translation and synchronization from profiles",
+  "phase": 6,
+  "area": "optimization",
+  "depends_on": [
+    "MW3-022",
+    "MW3-005"
+  ],
+  "paths": [
+    "runtime/perf",
+    "config/optimization",
+    "qa/benchmarks/cpu"
+  ],
+  "goal": "Apply register locality, ThinLTO, PGO and targeted synchronization improvements only with differential evidence.",
+  "acceptance": [
+    "Retain conservative ABI path; verify callbacks, nonlocal exits, atomics and indirect targets",
+    "Use representative all-mode training data and compare speed, binary size, build time and correctness"
+  ],
+  "validation": [
+    "Differential synthetic instruction suites and all-mode regressions",
+    "Repeated A/B runs with matched compiler/hardware settings"
+  ],
+  "size": "epic; split before claiming",
+  "priority": 1,
+  "status": "todo"
+}

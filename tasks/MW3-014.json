@@ -1,0 +1,25 @@
+{
+  "id": "MW3-014",
+  "title": "Pass the stable native execution gate",
+  "phase": 2,
+  "area": "gate",
+  "depends_on": [
+    "MW3-013"
+  ],
+  "paths": [
+    "qa/gates/native",
+    "docs/engine/overview.md"
+  ],
+  "goal": "Prove repeated boot/load/exit with documented engine boundaries before expanding gameplay.",
+  "acceptance": [
+    "Twenty cold/warm launches, one representative playable scene per executable, clean exits and no unhandled import fallbacks",
+    "Record unresolved crashes and performance baseline; no runnable claim until real evidence exists"
+  ],
+  "validation": [
+    "Run gate suite on two PCs",
+    "Review crash logs, audio and visual oracle results"
+  ],
+  "size": "gate",
+  "priority": 0,
+  "status": "todo"
+}

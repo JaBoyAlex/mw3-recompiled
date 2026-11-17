@@ -1,0 +1,26 @@
+{
+  "id": "MW3-033",
+  "title": "Audit four-player Survival feasibility and resource limits",
+  "phase": 3,
+  "area": "survival-extension",
+  "priority": 1,
+  "status": "todo",
+  "depends_on": [
+    "MW3-016",
+    "MW3-005"
+  ],
+  "paths": [
+    "experiments/survival-four",
+    "docs/engine/survival-four.md"
+  ],
+  "goal": "Map every two-player assumption and propose the smallest correct four-player implementation for local, online and mixed play.",
+  "acceptance": [
+    "Identify fixed arrays, scripts, spawn/revive, AI, rewards/profiles, HUD/cameras and packet layouts with exact-build evidence",
+    "Prototype four distinct player states and measure memory/CPU/GPU cost; preserve original two-player fallback; estimate real remaining work"
+  ],
+  "validation": [
+    "Run controlled four-slot state probe with failure cases",
+    "Compare two- and four-view rendering and late-wave load when available"
+  ],
+  "size": "1-3 days"
+}

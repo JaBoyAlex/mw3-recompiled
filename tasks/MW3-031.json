@@ -1,0 +1,24 @@
+{
+  "id": "MW3-031",
+  "title": "Document MW3 game-linked distribution feasibility",
+  "phase": 1,
+  "area": "distribution",
+  "depends_on": [
+    "MW3-003"
+  ],
+  "paths": [
+    "docs/legal/distribution.md"
+  ],
+  "goal": "Decide whether planned source, local generation and binary delivery are permissible for each upstream and game-derived component.",
+  "acceptance": [
+    "GPL runtime plus proprietary generated title code is analyzed explicitly, not waved away by omitting assets",
+    "If binary distribution is unresolved, choose documented source/local-build path and track remaining installation complexity"
+  ],
+  "validation": [
+    "Review complete planned source and binary manifests",
+    "Record unresolved permissions and accountable decision owner"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

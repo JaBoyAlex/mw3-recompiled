@@ -1,0 +1,46 @@
+name: task-admin
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        type: choice
+        required: true
+        options: [sync, claim, release]
+      task:
+        description: Task ID for claim/release (MW3-NNN)
+        type: string
+        required: false
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: mw3-task-admin
+  cancel-in-progress: false
+jobs:
+  administer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - name: Validate and apply serialized catalog operation
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_REPO: ${{ github.repository }}
+          TASK_ACTION: ${{ inputs.action }}
+          TASK_ID: ${{ inputs.task }}
+        run: |
+          set -euo pipefail
+          python tools/project.py validate
+          case "$TASK_ACTION" in
+            sync) python tools/project.py github-sync --repo "$TARGET_REPO" --apply ;;
+            claim) python tools/project.py github-claim "$TASK_ID" --repo "$TARGET_REPO" --owner "$GITHUB_ACTOR" --apply ;;
+            release) python tools/project.py github-release "$TASK_ID" --repo "$TARGET_REPO" --owner "$GITHUB_ACTOR" --apply ;;
+            *) exit 2 ;;
+          esac
