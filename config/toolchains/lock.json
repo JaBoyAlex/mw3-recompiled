@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "name": "XenonRecomp",
+      "url": "https://github.com/hedge-dev/XenonRecomp.git",
+      "commit": "ddd128bcca99fe8bfbb99bea583c972351fa6ace",
+      "submodules": [
+        {
+          "path": "thirdparty/fmt",
+          "commit": "873670ba3f9e7bc77ec2c1c94b04f1f8bef77e9f"
+        },
+        {
+          "path": "thirdparty/libmspack",
+          "commit": "305907723a4e7ab2018e58040059ffb5e77db837"
+        },
+        {
+          "path": "thirdparty/simde",
+          "commit": "a532a12ca9bbdc5e6547eb602e6256b71a5377d4"
+        },
+        {
+          "path": "thirdparty/tiny-AES-c",
+          "commit": "23856752fbd139da0b8ca6e471a13d5bcc99a08d"
+        },
+        {
+          "path": "thirdparty/tomlplusplus",
+          "commit": "c4369ae1d8955cae20c4ab40b9813ef4b60e48be"
+        },
+        {
+          "path": "thirdparty/xxHash",
+          "commit": "2bf8313b934633b2a5b7e8fd239645b85e10c852"
+        }
+      ]
+    },
+    {
+      "name": "XenosRecomp",
+      "url": "https://github.com/hedge-dev/XenosRecomp.git",
+      "commit": "70a084c2392378818a4da4086e8e3420b4c3ea8d",
+      "submodules": [
+        {
+          "path": "thirdparty/dxc-bin",
+          "commit": "12395e36295f950361ca842d8cc461492412facc"
+        },
+        {
+          "path": "thirdparty/fmt",
+          "commit": "873670ba3f9e7bc77ec2c1c94b04f1f8bef77e9f"
+        },
+        {
+          "path": "thirdparty/smol-v",
+          "commit": "9dd54c379ac29fa148cb1b829bb939ba7381d8f4"
+        },
+        {
+          "path": "thirdparty/xxHash",
+          "commit": "2bf8313b934633b2a5b7e8fd239645b85e10c852"
+        },
+        {
+          "path": "thirdparty/zstd",
+          "commit": "f7a8bb1263448e5028aceeba606a08fe3809550f"
+        }
+      ]
+    }
+  ],
+  "compilers": {
+    "linux": "18.1.3",
+    "windows": "19.1.5"
+  },
+  "dxc": {
+    "windows": {
+      "url": "https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2505.1/dxc_2025_07_14.zip",
+      "sha256": "9ad895a6b039e3a8f8c22a1009f866800b840a74b50db9218d13319e215ea8a4"
+    },
+    "linux": {
+      "url": "https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2505.1/linux_dxc_2025_07_14.x86_64.tar.gz",
+      "sha256": "f2213da1fc99dc8778c8823078e16ba97c7f80f86a1d4520ab1adf4b462bc48c"
+    }
+  }
+}
