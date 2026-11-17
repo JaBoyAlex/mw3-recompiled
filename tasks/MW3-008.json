@@ -13,18 +13,25 @@
     "docs/adr/0002-runtime-selection.md",
     "docs/STATUS.md",
     "AGENTS.md",
-    "tests/test_runtime_bakeoff.py"
+    "tests/test_runtime_bakeoff.py",
+    "README.md",
+    "docs/ARCHITECTURE.md"
   ],
-  "goal": "Choose one runtime using the same title entry/import slice, integration effort, correctness tests and legal constraints.",
+  "goal": "Choose one private-development runtime using title preflight, guarded startup, common service contracts, integration effort and legal constraints.",
   "acceptance": [
     "Document build effort, implemented imports, unresolved semantics, memory aliases and threading gaps for each candidate",
     "Choose one maintainable base; stop the losing experiment and retain comparable evidence; no fake stub boot success"
   ],
   "validation": [
-    "Execute same slice for both candidates on the same hardware",
-    "Run synthetic CPU/memory/thread tests and record title failures"
+    "Attempt identical title preparation on the same machine; reject candidates before execution on demonstrated correctness failures and record the unmet two-runtime execution comparison",
+    "Run common original memory/thread contracts, distinct upstream CPU checks and sanitizer coverage; retain all candidate failures"
   ],
   "size": "bounded spike; split after 3 days",
   "priority": 0,
-  "status": "in_progress"
+  "status": "done",
+  "evidence": [
+    "docs/adr/0002-runtime-selection.md",
+    "experiments/runtime-bakeoff/conformance-2026-11-17.md",
+    "experiments/runtime-bakeoff/validation-2026-11-17.md"
+  ]
 }

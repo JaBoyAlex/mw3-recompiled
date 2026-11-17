@@ -1,5 +1,9 @@
 # Bounded runtime evidence — 2026-11-17
 
+Historical startup checkpoint; superseded for selection and common tests by
+[the service comparison](conformance-2026-11-17.md). The original failures and
+unmet checks below are preserved as this checkpoint's observations.
+
 **Owned MW3 SP and MP startup code executed privately on Linux/WSL, stopping at
 the first unreviewed function import. Not playable. MW3-008 is incomplete.**
 

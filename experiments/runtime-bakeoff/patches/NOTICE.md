@@ -6,6 +6,9 @@ mw3-recompiled contributors. The accompanying `LICENSE.rexglue` contains the
 upstream copyright notices, conditions and disclaimer; those conditions also
 apply to these new changes. `src/kernel/memory.cpp` additionally retains its
 Copyright 2020 Ben Vanik notice and Tom Clay's adaptation notice.
+The same patch adds an optional CMake output-directory setting so separate
+build profiles cannot overwrite one another's artifacts; upstream CMake
+copyright/license notices are preserved.
 
 No existing GPL project tools were relicensed, no GPL code was copied into this
 patch, and no linking exception is claimed. The experiment scripts and test

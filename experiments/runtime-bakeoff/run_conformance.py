@@ -83,6 +83,9 @@ def main():
             actual = derive(root / "sources/rexglue-memory", HERE / pin["patch_path"], pin)
             if prepared["status"] != "PASS" or prepared["source"] != actual:
                 raise ValueError("derived SDK source/preparation mismatch")
+            if prepared.get("core_sanitizers") and not args.sanitizers:
+                raise ValueError("sanitized core requires the sanitizer harness")
+            report["sdk_core_sanitizers"] = prepared.get("core_sanitizers", False)
             sdk = Path(prepared["sdk_prefix"])
             if any(sha(sdk / "lib" / name) != value for name, value in prepared["final_libraries"].items()):
                 raise ValueError("derived SDK library identity mismatch")

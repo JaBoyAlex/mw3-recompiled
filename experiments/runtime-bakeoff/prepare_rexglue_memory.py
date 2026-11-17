@@ -21,11 +21,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", required=True, type=Path)
     parser.add_argument("--fetch", action="store_true")
+    parser.add_argument("--core-sanitizers", action="store_true",
+                        help="instrument base/PPC/kernel for validation; never use this package for code generation")
     args = parser.parse_args()
     root = args.root.resolve()
     output = root / "runs" / uuid.uuid4().hex
     output.mkdir(parents=True)
     report = dict(schema_version=1, guest_executed=False, release_package=False,
+                  core_sanitizers=args.core_sanitizers, codegen_compatible=not args.core_sanitizers,
                   script_sha256=sha(__file__), pins_sha256=sha(HERE / "pins.json"))
     print(json.dumps(dict(output=str(output), guest_executed=False)), flush=True)
     try:
@@ -46,13 +49,17 @@ def main():
         if not re.search(r"clang version " + re.escape(lock["compiler"]) + r"\b", compiler):
             raise ValueError("compiler differs from common profile")
         report.update(compiler=compiler.splitlines()[0], compiler_sha256=sha(shutil.which("clang++-20")))
-        build = root / "build/rexglue-memory"
+        build = root / ("build/rexglue-memory-asan" if args.core_sanitizers else "build/rexglue-memory")
+        sdk_output = build / "sdk-output"
+        sanitizer_flags = " -fsanitize=address,undefined -fno-sanitize=vptr -fno-omit-frame-pointer" if args.core_sanitizers else ""
+        linker_flags = "-fuse-ld=/usr/bin/ld.lld-20 -Wl,--threads=2" + sanitizer_flags
         command = ["cmake", "-S", source, "-B", build, "-G", "Ninja",
                    "-DCMAKE_C_COMPILER=clang-20", "-DCMAKE_CXX_COMPILER=clang++-20", "-DCMAKE_BUILD_TYPE=Release",
-                   "-DCMAKE_CXX_FLAGS=" + lock["common_cxx_flags"], "-DCMAKE_C_FLAGS=" + lock["common_cxx_flags"],
+                   "-DCMAKE_CXX_FLAGS=" + lock["common_cxx_flags"] + sanitizer_flags, "-DCMAKE_C_FLAGS=" + lock["common_cxx_flags"] + sanitizer_flags,
                    "-DCMAKE_CXX_FLAGS_RELEASE=" + lock["common_release_flags"], "-DCMAKE_C_FLAGS_RELEASE=" + lock["common_release_flags"],
-                   "-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=/usr/bin/ld.lld-20 -Wl,--threads=2",
-                   "-DCMAKE_SHARED_LINKER_FLAGS=-fuse-ld=/usr/bin/ld.lld-20 -Wl,--threads=2",
+                   "-DCMAKE_EXE_LINKER_FLAGS=" + linker_flags,
+                   "-DCMAKE_SHARED_LINKER_FLAGS=" + linker_flags,
+                   "-DREX_OUTPUT_DIR=" + str(sdk_output),
                    "-DREXGLUE_GCC_INSTALL_DIR=/usr/lib/gcc/x86_64-linux-gnu/13",
                    "-DREXGLUE_BUILD_TESTS=OFF", "-DREXGLUE_BUILD_PPC_TESTS=OFF", "-DREXGLUE_ENABLE_TRACY=OFF", "-DREXGLUE_REGISTER_PACKAGE=OFF",
                    "-DVulkan_INCLUDE_DIR=" + str(root / "sources/headers/include"),
@@ -65,7 +72,8 @@ def main():
         package = output / "sdk"
         shutil.copytree(root / "install/rexglue", package)
         changed = {}
-        for library in sorted((source / "out/linux-amd64").glob("librex*.so")):
+        for name in ("librexbase.so", "librexppc.so", "librexkernel.so"):
+            library = sdk_output / name
             shutil.copy2(library, package / "lib" / library.name)
             changed[library.name] = sha(library)
         if "librexkernel.so" not in changed:

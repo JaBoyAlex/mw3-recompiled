@@ -1,5 +1,18 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # Original changes; upstream BSD-3-Clause notices remain in src/kernel/memory.cpp.
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6fff098..bb23f66 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -257,7 +257,7 @@ configure_file(
+ )
+ 
+ # Output directories (multi-config appends /<Config>/ automatically)
+-set(REX_OUTPUT_DIR "${REXGLUE_ROOT}/out/${REX_PLATFORM}")
++set(REX_OUTPUT_DIR "${REXGLUE_ROOT}/out/${REX_PLATFORM}" CACHE PATH "SDK output directory; use one directory per build profile")
+ if (REXGLUE_ENABLE_TSAN)
+   string(APPEND REX_OUTPUT_DIR "-tsan")
+ endif ()
 diff --git a/src/kernel/memory.cpp b/src/kernel/memory.cpp
 index 4ca5049..1339537 100644
 --- a/src/kernel/memory.cpp

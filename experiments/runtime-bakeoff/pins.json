@@ -7,7 +7,7 @@
   "rexglue_memory_derivative": {
     "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
     "patch_path": "patches/rexglue-linux-reservation.patch",
-    "patch_sha256": "8e9ad50443c4e5386572011f8ed635dd250dd38ef51d4fa99821672263a05498"
+    "patch_sha256": "800c6a6a28e1d567d442956a352a84d9eabd136202f54531c72876e3e4af56a9"
   },
   "mw2_generator": {
     "url": "https://github.com/hedge-dev/XenonRecomp.git",
