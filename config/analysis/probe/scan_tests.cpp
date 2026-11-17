@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Original synthetic instructions/metadata only. Does not load an XEX.
 #include "scan.h"
+#include "imports.h"
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -84,10 +85,58 @@ void synthetic() {
     refuses([&]{be32(std::span(code).first(3),0);});
     refuses([&]{be32(code,SIZE_MAX);});
 }
+void import_tests() {
+    // Original minimal header: two libraries deliberately name strings out of
+    // order; the first library includes declared padding beyond its records.
+    std::vector<uint8_t> input(156);
+    auto put=[&](size_t offset,uint32_t value) { for (int i=0;i<4;++i) input.at(offset+i)=uint8_t(value>>(24-8*i)); };
+    put(0,0x58455832); put(8,156); put(20,1); put(24,0x103ff); put(28,32);
+    put(32,124); put(36,16); put(40,2);
+    const std::array<uint8_t,16> names{'s','e','c','o','n','d','.','x','e','x',0,0,'a',0,0,0};
+    std::copy(names.begin(),names.end(),input.begin()+44);
+    put(60,52); put(84,3); put(88,0x10000001); put(92,0x10000000);
+    put(96,0x00010002); put(100,0x1000); put(104,0x1010); // name 1, two records
+    put(112,44); put(148,1); put(152,0x2000); // name 0, one record
+    const auto pristine=input;
+    auto libs=import_header(input);
+    check(libs.size()==2 && libs[0].name=="a" && libs[1].name=="second.xex");
+    check(libs[0].version==0x10000001 && libs[0].minimum_version==0x10000000);
+    check(libs[1].addresses==std::vector<uint32_t>{0x2000});
+    std::vector<uint8_t> text(32),data(4);
+    auto store=[](std::vector<uint8_t>& bytes,size_t off,uint32_t value) {
+        for (int i=0;i<4;++i) bytes.at(off+i)=uint8_t(value>>(24-8*i));
+    };
+    store(text,0,0x00000003); store(text,16,0x01000003); store(data,0,0x00010007);
+    const std::array regions{Region{0x1000,text,true},Region{0x2000,data,false}};
+    read_import_records(libs,regions);
+    check(libs[0].records[0].ordinal==3 && libs[0].records[0].type==0);
+    check(libs[0].records[1].ordinal==3 && libs[0].records[1].type==1);
+    check(libs[1].records[0].hint==1 && libs[1].records[0].ordinal==7);
+    check(input==pristine); // Header and record readers never write to inputs.
+    store(data,0,0x02010007); read_import_records(libs,regions);
+    check(libs[1].records[0].type==2); // Unknown kinds remain explicit, not dropped.
+    store(data,0,0x01010007); refuses([&]{read_import_records(libs,regions);}); // thunk in data
+    const std::array short_code{Region{0x1000,std::span(text).first(20),true},regions[1]};
+    refuses([&]{read_import_records(libs,short_code);});
+    const std::array missing{regions[0]}; refuses([&]{read_import_records(libs,missing);});
+    const std::array overlap{regions[0],regions[0],regions[1]}; refuses([&]{read_import_records(libs,overlap);});
+    for (size_t n=0;n<input.size();++n) refuses([&]{import_header(std::span(input).first(n));});
+    const std::array mutations{
+        std::pair{0u,0u}, std::pair{8u,155u}, std::pair{20u,4097u}, std::pair{24u,0u},
+        std::pair{28u,0u}, std::pair{28u,155u}, std::pair{32u,11u}, std::pair{36u,UINT32_MAX},
+        std::pair{40u,257u}, std::pair{40u,3u}, std::pair{60u,39u}, std::pair{60u,UINT32_MAX},
+        std::pair{96u,0x00020002u}, std::pair{96u,0x0001ffffu}, std::pair{100u,0x1001u},
+        std::pair{100u,0u}, std::pair{104u,0x1000u}, std::pair{112u,UINT32_MAX}};
+    for (const auto& [offset,value] : mutations) { put(offset,value); refuses([&]{import_header(input);}); input=pristine; }
+    input.insert(input.end(),0); put(8,157); put(32,125);
+    refuses([&]{import_header(input);}); input=pristine;
+    std::fill(input.begin()+44,input.begin()+60,0xff);
+    refuses([&]{import_header(input);});
+}
 }
 int main(int argc,char** argv) {
     try {
-        if (argc==2) fixture(argv[1]); else if (argc==1) synthetic(); else return 2;
+        if (argc==2) fixture(argv[1]); else if (argc==1) { synthetic(); import_tests(); } else return 2;
         std::cout << "PASS: " << checks << " metadata scan checks (synthetic only)\n";
         return 0;
     } catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; }
