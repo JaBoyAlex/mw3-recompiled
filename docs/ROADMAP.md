@@ -24,3 +24,11 @@ If the bakeoff shows MW2 adaptation costs more than a shared runtime, choose the
 The owner identified possible long-term interoperability with existing MW3 multiplayer communities, particularly **Plutonium IW5** and **XLink Kai**, with **Open-IW5** as a potential technical reference. This is future product context, not a change to current priorities or an added release requirement.
 
 Compatibility, feasibility and permitted reuse have not been investigated or promised. Revisit the idea only after the underlying original multiplayer functionality and secure networking are sufficiently stable. Do not spend current development or research resources on these projects, and do not alter present architecture or task dependencies to accommodate speculative interoperability.
+
+## Planned RecompLauncher distribution
+
+**RecompLauncher is a planned distribution channel. Easy installation compatible with RecompLauncher is an explicit release-packaging goal.** This records the owner's intended delivery experience; launcher support has not been implemented or verified.
+
+The owner reports an earlier RecompLauncher release of **Mojo! Recomp**. Use that project's established release workflow as the first reference when packaging work begins, checking which parts remain applicable before creating new tooling. Its workflow has not been investigated during the current MW3 analysis work.
+
+Keep this compatibility goal in mind for future packaging decisions. Defer launcher-specific research, manifests, integration and testing to installer/release preparation; current priorities, task dependencies and engine milestones remain unchanged. Installation must retain verification of legally obtained game inputs and respect upstream licenses and SDK redistribution limits. Do not package game content merely because a launcher can distribute a project.

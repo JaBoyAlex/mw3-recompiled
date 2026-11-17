@@ -31,3 +31,5 @@ ctest --test-dir out/scan-tests --output-on-failure
 ```
 
 Use `-C Debug` for CTest with a Windows multi-configuration build. The sanitizer option is supported on Linux; Windows scan tests use MSVC without it.
+
+For full repository checks in WSL, use a separate Linux clone. Linux Git cannot resolve the drive-letter metadata of a worktree created by Windows Git. The owned-title analysis command itself may run from the mounted Windows project because source verification uses the separate Linux upstream checkouts.

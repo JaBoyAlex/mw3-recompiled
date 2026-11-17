@@ -54,6 +54,8 @@ Neither image has malformed, unsorted, zero-padding or overlapping `.pdata` rows
 
 The word scan identifies canonical `blr` encodings (17,493 Campaign / 17,926 Multiplayer) and separately records all other LR/CTR branch sites as unresolved. It does not prove instruction reachability, infer callees from register values or parse exception handlers. Recognized switch tables are not automatically subtracted from unresolved sites. Complete private direct-call target inventories support subsequent leaf-function and nonlocal-exit work; no host stubs or guest execution are involved.
 
+Of the immediate-call words, 8,903 Campaign / 9,419 Multiplayer target verified helper suffix entries. There are also 3,593 / 3,677 distinct targets not declared by `.pdata`, the verified helper entry ladders or resolved loader imports. Those are candidates for further investigation, not automatically registered leaf functions.
+
 ## Platform boundaries identified
 
 Resolved names include `ExCreateThread`, thread wait/suspend/resume primitives, `XamInputGetState`/capability/rumble APIs, GPU ring/display/`VdSwap` APIs, `XAudioSubmitRenderDriverFrame`, XMA context functions, and legacy `NetDll_*` sockets. These identify concrete kernel/input/GPU/audio/network seams to examine during the runtime comparison. They do not prove any host implementation is correct or that every import is resolved. Names come from the pinned loader's ordinal tables; version/ordinal coverage still needs a complete audit.
