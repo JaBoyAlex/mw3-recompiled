@@ -9,7 +9,8 @@
   "paths": [
     "tools/benchmark.py",
     "qa/benchmarks",
-    "tests/test_benchmark.py"
+    "tests/test_benchmark.py",
+    "docs/STATUS.md"
   ],
   "goal": "Record comparable frame, memory, loading and latency measurements without claiming synthetic timing measures MW3.",
   "acceptance": [
@@ -22,5 +23,6 @@
   ],
   "size": "1-3 days",
   "priority": 1,
-  "status": "todo"
+  "status": "done",
+  "evidence": ["qa/benchmarks/schema-v2.md", "qa/benchmarks/validation-2026-11-17.md", "tests/test_benchmark.py"]
 }
