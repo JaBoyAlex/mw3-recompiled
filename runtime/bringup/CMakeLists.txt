@@ -19,6 +19,11 @@ rexglue_recomp_options(guest_options optimized)
 target_compile_options(guest PRIVATE ${guest_options} -fwrapv -ffp-contract=off)
 target_precompile_headers(guest PRIVATE "${MW3_GENERATED_DIR}/${MW3_GENERATED_PREFIX}_pch.h")
 add_executable(mw3-header-probe header_probe.cpp "${MW3_PRIVATE_TRAPS}" "${MW3_REPO}/src/xex.cpp")
+option(MW3_PROBE_SANITIZERS "Instrument the original host harness/parser, not generated guest objects" OFF)
+if(MW3_PROBE_SANITIZERS)
+  target_compile_options(mw3-header-probe PRIVATE -fsanitize=address,undefined -fno-sanitize=vptr -fno-omit-frame-pointer)
+  target_link_options(mw3-header-probe PRIVATE -fsanitize=address,undefined -fno-sanitize=vptr)
+endif()
 target_include_directories(mw3-header-probe PRIVATE "${MW3_GENERATED_DIR}" "${MW3_REPO}/include")
 target_compile_definitions(mw3-header-probe PRIVATE
   MW3_GENERATED_INIT="${MW3_GENERATED_PREFIX}_init.h"

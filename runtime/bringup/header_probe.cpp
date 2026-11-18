@@ -49,12 +49,28 @@ void VerifyHeader() {
 extern "C" void __imp__RtlImageXexHeaderField(PPCContext& ctx, u8* base) {
   try {
     Require(current && original_header_query,"header service not initialized");
-    Require(++queries <= 16,"header query budget exceeded");
+    const unsigned number=++queries;
+    Require(number <= 16,"header query budget exceeded");
+    if(std::getenv("MW3_HEADER_TEST_BAD_POINTER")) ctx.r3.u32 ^= 4;
     const u32 pointer=ctx.r3.u32, key=ctx.r4.u32;
-    if(std::getenv("MW3_HEADER_TEST_BAD_POINTER")) Require(false,"deliberate pointer rejection");
     Require(pointer==header_address,"unexpected header pointer");
     VerifyHeader();
-    const u32 predicted=mw3::resolve_xex_optional_header(raw_header,pointer,key).value_or(0);
+    if(number==1) {
+      // Host-initiated, read-only audit cases in the real guest thread context.
+      // They are not calls observed in the original title's control flow.
+      for(u32 audit_key : {0x10100u,0x10201u,0x40006u,0x103ffu}) {
+        const auto expected=mw3::resolve_xex_optional_header(raw_header,pointer,audit_key);
+        Require(expected.has_value() && *expected!=0,"present-field audit fixture absent");
+        PPCContext audit=ctx;
+        audit.r3.u32=pointer; audit.r4.u32=audit_key;
+        original_header_query(audit,base);
+        Require(audit.r3.u32==*expected,"present-field SDK/oracle disagreement");
+        VerifyHeader();
+        std::fprintf(stderr,"MW3_HEADER_ORACLE_CASE_PASS:key=%08x result=%08x\n",audit_key,*expected);
+      }
+    }
+    u32 predicted=mw3::resolve_xex_optional_header(raw_header,pointer,key).value_or(0);
+    if(std::getenv("MW3_HEADER_TEST_BAD_ORACLE")) predicted ^= 1;
     original_header_query(ctx,base);
     Require(ctx.r3.u32==predicted,"SDK header result differs from independent oracle");
     VerifyHeader();
@@ -71,7 +87,7 @@ class HeaderProbe final : public rex::app::TitleApp {
   rex::AppSysRequirements GetRequirements() const override { return {}; }
   rex::Result<void> OnTitleLaunch(rex::kernel::TitleRuntime& runtime) override {
     current=&runtime;
-    Require(!std::getenv("MW3_HEADER_TEST_BAD_BINDING") && VerifyProbeImportStops(runtime),"function binding verification");
+    Require(VerifyProbeImportStops(runtime),"function binding verification");
     const char* path=std::getenv("MW3_HEADER_OWNED_FILE");
     Require(path!=nullptr,"owned header input missing");
     std::ifstream stream(path,std::ios::binary);
