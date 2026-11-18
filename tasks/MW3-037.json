@@ -9,7 +9,8 @@
   "paths": [
     "tests/memory",
     "tools/test_runtime_memory.py",
-    "docs/engine/memory.md"
+    "docs/engine/memory.md",
+    "docs/STATUS.md"
   ],
   "goal": "Exercise actual selected SDK memory services with synthetic and hash-bound MW3 geometry before trusting guest pointers or allocator behavior.",
   "acceptance": [
@@ -23,5 +24,10 @@
   ],
   "size": "1-3 days",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "docs/engine/memory.md",
+    "tools/test_runtime_memory.py",
+    "tests/memory"
+  ]
 }
