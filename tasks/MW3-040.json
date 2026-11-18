@@ -11,7 +11,13 @@
     "config/toolchains/rexglue-windows",
     "tools/prepare_windows_runtime.py",
     "tests/test_windows_runtime.py",
-    "docs/engine/windows-bringup.md"
+    "docs/engine/windows-bringup.md",
+    "runtime/bringup/header_probe.cpp",
+    "runtime/bringup/CMakeLists.txt",
+    "docs/STATUS.md",
+    "AGENTS.md",
+    "README.md",
+    "docs/ARCHITECTURE.md"
   ],
   "goal": "Build the pinned selected SDK with a capable native Windows compiler and execute the verified guarded modules without weakening host security.",
   "acceptance": [
@@ -25,5 +31,10 @@
   ],
   "size": "1-3 days",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "docs/engine/windows-bringup.md",
+    "tools/prepare_windows_runtime.py",
+    "tests/test_windows_runtime.py"
+  ]
 }

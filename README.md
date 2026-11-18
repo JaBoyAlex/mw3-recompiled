@@ -1,6 +1,6 @@
 # mw3-recompiled
 
-An early research and engineering project for a native PC version of **Call of Duty: Modern Warfare 3 (2011)** using the owner's Xbox 360 files. **Not playable.** Private Linux/WSL programs execute bounded translated SP/MP startup to a guarded import stop. Windows title execution and gameplay remain unverified. The repository provides executable inspection, owned-disc identification, build/test infrastructure and a dependency-aware contributor backlog.
+An early research and engineering project for a native PC version of **Call of Duty: Modern Warfare 3 (2011)** using the owner's Xbox 360 files. **Not playable.** Private native Windows/Linux programs execute bounded translated SP/MP startup through one audited header service to a guarded memory-service stop. Gameplay remains unverified. The repository provides executable inspection, owned-disc identification, build/test infrastructure and a dependency-aware contributor backlog.
 
 The chosen architecture is ahead-of-time Xbox 360 CPU recompilation with ReXGlue and selective native replacements. [The runtime decision](docs/adr/0002-runtime-selection.md) records correctness failures, a focused Linux memory repair and limits of the comparison. Full decompilation is not a completion metric.
 

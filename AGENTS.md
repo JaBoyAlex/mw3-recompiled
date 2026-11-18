@@ -1,6 +1,6 @@
 # mw3-recompiled agent contract
 
-Read [STATUS](docs/STATUS.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [contribution workflow](CONTRIBUTING.md) before choosing work. This is MW3 **2011**, Xbox 360 Rev 1 as supplied by the owner, targeting native Windows PC. Private Linux experiments reach the first guarded SP/MP startup import; no playable boot or Windows title execution is verified. PC game files are optional. "1.1", disc revision, XEX version and title update are different identities; do not conflate them.
+Read [STATUS](docs/STATUS.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [contribution workflow](CONTRIBUTING.md) before choosing work. This is MW3 **2011**, Xbox 360 Rev 1 as supplied by the owner, targeting native Windows PC. Private native Windows/Linux probes execute bounded SP/MP startup through one audited header service to guarded NtAllocateVirtualMemory; no playable boot is verified. PC game files are optional. "1.1", disc revision, XEX version and title update are different identities; do not conflate them.
 
 ## Decide and measure
 
