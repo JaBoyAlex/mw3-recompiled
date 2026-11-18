@@ -1,0 +1,33 @@
+{
+  "id": "MW3-042",
+  "title": "Repair selected-runtime decommit access and validate SDK integration",
+  "phase": 2,
+  "area": "memory",
+  "depends_on": ["MW3-037", "MW3-040"],
+  "paths": [
+    "config/toolchains/rexglue-memory",
+    "tools/prepare_runtime_memory.py",
+    "tests/memory",
+    "docs/engine/memory.md",
+    "experiments/runtime-bakeoff/pins.json",
+    "experiments/runtime-bakeoff/prepare_rexglue_memory.py",
+    "config/toolchains/rexglue-windows/lock.json",
+    "tools/prepare_windows_runtime.py",
+    "tools/recompile.py"
+  ],
+  "goal": "Reject decommitted ranges in checked guest access and enforce decommit host protection without changing release policy or silently replacing the verified SDK baseline.",
+  "acceptance": [
+    "Audit page commitment and access-query callers, then make a minimal licensed source patch that rejects checked reads/writes of decommitted pages and makes forbidden raw accesses fault",
+    "Preserve neighboring pages, physical aliases, reservation/recommit behavior, budgets and explicit protect_on_release policy; add partial-page and boundary regressions",
+    "Compose an independently identified private SDK derivative on Windows/Linux, verify transitive sources/compiler/artifacts and retain failed baseline evidence",
+    "Integrate the validated derivative into preparation/cache identity; regenerate outputs after changed toolchain identity, never edit generated guest source"
+  ],
+  "validation": [
+    "The original memory harness must report all applicable cases passing on Windows/Linux native and supported sanitizers, with deliberate failing oracle and real page faults",
+    "Run relevant isolated SDK tests and regress neighboring commit/protect/release/alias operations; record unsupported instrumentation and aggregate limitations",
+    "Reproduce both owned guarded header/next-import checkpoints with the integrated derivative and full input/output hash checks before advancing title services"
+  ],
+  "size": "bounded repair and integration; split additional defects",
+  "priority": 0,
+  "status": "todo"
+}
