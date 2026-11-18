@@ -31,15 +31,19 @@ def outcome(code,path,expected):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for n in ('root','sdk-report','output-root'):parser.add_argument('--'+n,required=True,type=Path)
-    parser.add_argument('--suite',required=True,choices=('platform',),help='platform diagnostics do not complete guest-kernel contracts')
+    parser.add_argument('--suite',required=True,choices=('platform','kernel'),help='explicit bounded tranche; neither completes all kernel contracts')
     parser.add_argument('--sanitizers',action='store_true')
     args=parser.parse_args();output=None
-    report=dict(schema_version=1,evidence_class='upstream-platform-thread-diagnostics',
+    report=dict(schema_version=1,evidence_class='upstream-platform-thread-diagnostics' if args.suite=='platform' else 'original-synthetic-kernel-thread-contracts',
         kernel_contracts_complete=False,owned_title_executed=False,performance_measured=False,
         script_sha256=prep.sha(__file__),sources=snapshot(),suite=args.suite,results=[])
     try:
         output=prep.private_cache(args.output_root,ROOT/'game')/uuid.uuid4().hex;output.mkdir(parents=True)
         print(json.dumps(dict(output=str(output))),flush=True)
+        for name in report['sources']:
+            archived=output/'maintained-sources'/name;archived.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(SOURCE/name,archived)
+        shutil.copy2(__file__,output/'maintained-driver.py')
         def run(label,call,env,timeout=180):
             path=output/(label+'.log');command=list(map(str,call))
             with path.open('wb') as log:r=subprocess.run(command,env=env,cwd=output,stdout=log,stderr=subprocess.STDOUT,timeout=timeout)
@@ -70,9 +74,13 @@ def main():
             '-DCMAKE_CXX_COMPILER='+cxx.as_posix(),'-DCMAKE_PREFIX_PATH='+sdk.as_posix(),
             '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG','-DCMAKE_EXPORT_COMPILE_COMMANDS=ON',
             '-DMW3_SDK_SOURCE='+source.as_posix(),'-DMW3_THREAD_SANITIZERS='+('ON' if args.sanitizers else 'OFF'),*extra],env)
-        run('build',[cmake,'--build',build,'--target','thread-platform-tests','--parallel','2'],env,900)
-        binary=build/('thread-platform-tests.exe' if windows else 'thread-platform-tests')
+        target='thread-'+args.suite+'-tests'
+        run('build',[cmake,'--build',build,'--target',target,'--parallel','2'],env,900)
+        binary=build/(target+('.exe' if windows else ''))
         report['binary_sha256']=prep.sha(binary);report['compile_commands_sha256']=prep.sha(build/'compile_commands.json')
+        commands=json.loads((build/'compile_commands.json').read_text())
+        callback=next(c['command'] for c in commands if Path(c['file']).name==args.suite+'.cpp')
+        if args.sanitizers and '-fsanitize=' not in callback:raise ValueError('callback sanitizer flags missing')
         child={k:v for k,v in env.items() if not k.startswith(('REX_','LD_','ASAN_','UBSAN_','LSAN_'))}
         child.update(ASAN_OPTIONS='detect_leaks=1',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1',
             SDL_VIDEODRIVER='dummy',SDL_AUDIODRIVER='dummy')
@@ -102,10 +110,10 @@ def main():
             (output/'manifest.json').write_text(json.dumps(report,indent=2)+'\n')
         if windows:
             linked=run('linkage',[clang/'bin/llvm-readobj.exe','--coff-imports',binary],env).read_text()
-            if 'rexbase.dll' not in linked.lower():raise ValueError('platform test does not import SDK base DLL')
+            if 'rexbase.dll' not in linked.lower() or args.suite=='kernel' and 'rexkernel.dll' not in linked.lower():raise ValueError('test does not import required SDK DLLs')
         else:
             linked=run('linkage',['ldd',binary],child).read_text()
-            if str(sdk/'lib/librexbase.so') not in linked:raise ValueError('platform test loaded wrong base library')
+            if str(sdk/'lib/librexbase.so') not in linked or args.suite=='kernel' and str(sdk/'lib/librexkernel.so') not in linked:raise ValueError('test loaded wrong SDK library')
         _,after=memory.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
         if after!=evidence or report['sources']!=snapshot() or report['script_sha256']!=prep.sha(__file__):
             raise ValueError('SDK or maintained source changed during diagnostics')

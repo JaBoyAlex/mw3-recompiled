@@ -59,3 +59,25 @@ performance or full-kernel equivalence claim is made.
 | --- | --- | --- |
 | Linux native | `f94758ccf05d425d8b83e9955967374f` | `26f02f87cfbe8a9e7c02f8bc9f3941c929f63a13ef1b8c528a8845624f78cbdd` |
 | Windows native | `fd2c94da2c7d4affbc81c913b4cbf09b` | `a89f12e105eb37c0470096ce941112c291f63b6cca2ec6c335103b811db37c06` |
+
+## Initial guest-kernel tranche
+
+Two original cases pass in isolation and three aggregate orders on both hosts.
+Each case performs four synthetic runtime cycles: 32 load/unload cycles per
+profile across the five processes. Native callbacks use the actual exported
+semaphore/event/mutex functions, verify PCR/r13 and guarded stack bounds, check
+counted suspended starts, and verify that ExTerminateThread never returns and
+retains exit code 42. This is not translated nonlocal-unwind validation.
+Handle counts recover after each run; tracked title-page observations recover
+in these samples. Full leak/deadline and cancellation coverage remain open.
+
+The resource observer uses the pinned upstream exported GetAddressSpace test
+seam, rather than private TitleState implementation objects. The first object
+prototype rejected an invented NtResetEvent name; it was corrected to the actual
+NtClearEvent export, with no successful stub added. Unknown names now appear in
+the diagnostic. Exact maintained source/driver copies are retained per attempt.
+
+| Profile | Private output directory | Manifest SHA-256 |
+| --- | --- | --- |
+| Linux native kernel | `994672d124b348dd85ade05e850a4225` | `868f9b1d243030cb969f0be9fb09a95ecb405d3cfe521f489c700494dde38407` |
+| Windows native kernel | `ef46f1b7cc7e4325918b427088464d31` | `6b073a065cc497f4eb2deb6a6454cf6b2f18c4005b3dc349ae30d2d1132ca0ec` |
