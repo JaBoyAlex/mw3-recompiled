@@ -32,9 +32,18 @@ def composition(windows=False):
     return b"\n".join(p.read_bytes() for p,_ in paths),lock
 
 
-def source_identity(root,output,windows=False):
+def source_identity(root,output,windows=False,existing=False):
     patch,lock=composition(windows)
-    path=output/"combined-memory.patch";path.write_bytes(patch)
+    path=output/"combined-memory.patch"
+    if path.exists():
+        if path.read_bytes()!=patch:raise ValueError("recorded memory patch changed")
+    elif existing:
+        raise ValueError("recorded memory patch missing")
+    else:path.write_bytes(patch)
+    if existing:
+        from mw2_tools import git
+        if git(root/"sources/rexglue-decommit","diff","--quiet",lock["commit"],"--ignore-submodules=none",check=False).returncode==0:
+            raise ValueError("prepared memory source was reset to baseline")
     return common.derive(root/"sources/rexglue-decommit",path,dict(commit=lock["commit"],patch_sha256=common.sha(path)))
 
 
@@ -52,7 +61,7 @@ def verify_prepared(root,report_path,allow_sanitized=False):
         raise ValueError("unreviewed or validation-only memory preparation")
     windows=sys.platform=="win32"
     # Verify exact composition without changing any tracked or baseline file.
-    actual=source_identity(root,report_path.parent,windows)
+    actual=source_identity(root,report_path.parent,windows,existing=True)
     if actual!=receipt["source"]:raise ValueError("memory source tree changed")
     sdk=Path(receipt["sdk_prefix"])
     files=package_files(sdk)
@@ -81,6 +90,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ("root","baseline-report"):parser.add_argument("--"+name,required=True,type=Path)
     parser.add_argument("--core-sanitizers",action="store_true")
+    parser.add_argument("--fetch",action="store_true",help="create the isolated source worktree and fetch its pinned submodules")
     args=parser.parse_args();output=None
     report=dict(schema_version=1,guest_executed=False,release_package=False,core_sanitizers=args.core_sanitizers,
                 script_sha256=common.sha(__file__),memory_lock_sha256=common.sha(LOCK),
@@ -126,7 +136,18 @@ def main():
                    "-DREXGLUE_GCC_INSTALL_DIR=/usr/lib/gcc/x86_64-linux-gnu/13","-DVulkan_LIBRARY=/usr/lib/x86_64-linux-gnu/libvulkan.so"]
         baseline_files=package_files(sdk)
         report.update(baseline_report_sha256=common.sha(args.baseline_report),baseline_sdk_files=baseline_files)
+        source=root/"sources/rexglue-decommit"
+        if not source.exists():
+            if not args.fetch:raise ValueError("isolated source absent; explicit --fetch required")
+            with (output/"source-worktree.log").open("wb") as log:
+                subprocess.run(["git","-C",str(root/"sources/rexglue-sdk"),"worktree","add","--detach",str(source),
+                                json.loads(LOCK.read_text())["commit"]],stdout=log,stderr=subprocess.STDOUT,check=True,timeout=60)
+        if args.fetch:
+            with (output/"source-submodules.log").open("wb") as log:
+                subprocess.run(["git","-C",str(source),"submodule","update","--init","--recursive","--depth","1","--jobs","2"],
+                               stdout=log,stderr=subprocess.STDOUT,check=True,timeout=900)
         report["source"]=source_identity(root,output,windows)
+        print(json.dumps(dict(stage="source-verified",profile=report["profile"])),flush=True)
         build=root/"build"/("rexglue-decommit-asan" if args.core_sanitizers else "rexglue-decommit")
         source=root/"sources/rexglue-decommit"
         command=[cmake,"-S",source,"-B",build,"-G","Ninja","-DCMAKE_BUILD_TYPE=Release",
@@ -139,6 +160,7 @@ def main():
                  "-DREXGLUE_VMA_INCLUDE_DIR="+(root/"sources/vma/include").as_posix(),*extra]
         report["configure_command"]=list(map(str,command))
         for index,call in enumerate((command,[cmake,"--build",build,"--target","rexkernel","--parallel","2"])):
+            print(json.dumps(dict(stage="configure" if index==0 else "build",log=str(output/f"build-{index}.log"))),flush=True)
             with (output/f"build-{index}.log").open("wb") as log:
                 subprocess.run(list(map(str,call)),env=env,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=1800)
         package=output/"sdk";shutil.copytree(sdk,package,symlinks=not windows)
