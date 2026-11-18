@@ -50,6 +50,7 @@ def main():
     for n in ('root','sdk-report','output-root'):parser.add_argument('--'+n,required=True,type=Path)
     parser.add_argument('--suite',required=True,choices=('platform','kernel','all'),help='explicit bounded tranche; all also checks cross-tranche orders')
     parser.add_argument('--sanitizers',action='store_true')
+    parser.add_argument('--sdk-profile',choices=('memory','stop'),default='memory')
     args=parser.parse_args();output=None
     report=dict(schema_version=1,evidence_class='upstream-platform-thread-diagnostics' if args.suite=='platform' else 'original-synthetic-kernel-thread-contracts',
         kernel_contracts_complete=False,owned_title_executed=False,performance_measured=False,
@@ -68,7 +69,10 @@ def main():
             if r.returncode:raise ValueError(label+' failed')
             return path
         windows=sys.platform=='win32';root=args.root.resolve()
-        sdk,evidence=memory.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
+        if args.sdk_profile=='stop':
+            import prepare_runtime_stop as selected
+        else:selected=memory
+        sdk,evidence=selected.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
         report.update(sdk=evidence,sdk_report_sha256=prep.sha(args.sdk_report),
             sdk_core_instrumented=evidence['core_sanitizers'],test_callback_sanitizers=args.sanitizers)
         if windows:
@@ -86,7 +90,7 @@ def main():
             report['compiler']=dict(version=version.splitlines()[0],sha256=prep.sha(cxx))
             extra=['-DCMAKE_CXX_FLAGS=-march=x86-64-v2 --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13',
                    '-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=/usr/bin/ld.lld-20 -Wl,--threads=2']
-        source=root/'sources/rexglue-decommit';build=output/'build'
+        source=root/('sources/rexglue-stop' if args.sdk_profile=='stop' else 'sources/rexglue-decommit');build=output/'build'
         run('configure',[cmake,'-S',SOURCE,'-B',build,'-G','Ninja','-DCMAKE_BUILD_TYPE=Release',
             '-DCMAKE_CXX_COMPILER='+cxx.as_posix(),'-DCMAKE_PREFIX_PATH='+sdk.as_posix(),
             '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG','-DCMAKE_EXPORT_COMPILE_COMMANDS=ON',
@@ -137,7 +141,7 @@ def main():
         else:
             linked=run('linkage',['ldd',binary],child).read_text()
             if str(sdk/'lib/librexbase.so') not in linked or args.suite!='platform' and str(sdk/'lib/librexkernel.so') not in linked:raise ValueError('test loaded wrong SDK library')
-        _,after=memory.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
+        _,after=selected.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
         if after!=evidence or report['sources']!=snapshot() or report['script_sha256']!=prep.sha(__file__):
             raise ValueError('SDK or maintained source changed during diagnostics')
         if report['binary_sha256']!=prep.sha(binary):raise ValueError('executed binary changed')

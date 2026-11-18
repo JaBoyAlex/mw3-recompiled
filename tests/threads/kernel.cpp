@@ -15,6 +15,7 @@
 #include <rex/logging/log_category.h>
 #include <rex/kernel/types/thread.h>
 #include <rex/ppc/image.h>
+#include <rex/ppc/call.h>
 #include "kernel/test_access.h" // Exported upstream seam for real-DLL resource inspection.
 #include "kernel/guest_stack.h"
 #include <algorithm>
@@ -25,6 +26,7 @@
 #include <filesystem>
 #include <functional>
 #include <memory>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -99,7 +101,7 @@ struct Fixture {
       catch(...) {std::fputs("THREAD_RUNTIME_CLEANUP_FAILED\n",stderr);std::fflush(stderr);std::_Exit(3);}
     }
   }
-  void Run(State& state,bool suspended=false,bool termination=false) {
+  void Run(State& state,bool suspended=false,bool termination=false,u32 expected_exit=42) {
     State* empty=nullptr;
     Check(active.compare_exchange_strong(empty,&state),"overlapping synthetic contract state");
     struct Binding {~Binding(){active.store(nullptr,std::memory_order_release);}} binding;
@@ -124,7 +126,7 @@ struct Fixture {
     const bool completed=state.completed.load(std::memory_order_acquire);
     auto pin=runtime->GetThreadRegistry().FindByHandle(handle);Ok(pin,"completed guest handle missing");
     auto object=runtime->GetGuestMemory().Load<k::X_KTHREAD>(pin->GetGuestObject());Ok(object,"completed guest object unreadable");
-    const bool status=object->terminated==1 && object->exit_status==(termination?42u:0u);
+    const bool status=object->terminated==1 && object->exit_status==(termination?expected_exit:0u);
     pin.Reset();k::CloseOwned(runtime->GetObjectTable(),handle);
     for(auto leftover:handles) k::CloseOwned(runtime->GetObjectTable(),leftover);
     const bool no_leaks=handles.empty();handles.clear();active.store(nullptr,std::memory_order_release);
@@ -156,6 +158,35 @@ void Context(k::TitleRuntime& runtime,PPCContext& ctx,u32 expected_cookie=cookie
   Check(!runtime.GetGuestMemory().GetReadOnlySpan(guard+k::kGuestStackPageSize-1,1),"guest stack guard end readable");
   std::printf("THREAD_STACK allocation=%08x limit=%08x top=%08x\n",guard,u32(pcr->stack_end_ptr),u32(pcr->stack_base_ptr));
 }
+u32 RequestStopInsideThunk(u32 exit) {
+  k::KernelThread::GetCallingThread()->RequestStop(static_cast<std::int32_t>(exit));
+  return 0x5a;
+}
+}
+
+TEST_CASE("original kernel: a stop after a native thunk body preserves the requested exit", "[mw3][kernel][cancel][boundary]") {
+  State state;Fixture fixture(0);
+  state.body=[&](PPCContext& ctx,u8* base) {
+    Context(*fixture.runtime,ctx);state.armed.store(true,std::memory_order_release);
+    ctx.r3.u32=77;
+    rex::ppc::GuestToHostThunk<&RequestStopInsideThunk>(ctx,base);
+    state.returned.store(true,std::memory_order_release);
+  };
+  REQUIRE_NOTHROW(fixture.Run(state,false,true,77));REQUIRE_NOTHROW(fixture.Finish());
+}
+
+TEST_CASE("original kernel: an explicit exit keeps its value despite a pending stop", "[mw3][kernel][exit]") {
+  unsigned cycle=0;
+  for(const std::int32_t exit:{0,42,-17,std::numeric_limits<std::int32_t>::min()}) {
+    State state;Fixture fixture(cycle++);
+    state.body=[&](PPCContext& ctx,u8*) {
+      Context(*fixture.runtime,ctx);state.armed.store(true,std::memory_order_release);
+      auto* thread=k::KernelThread::GetCallingThread();thread->RequestStop(77);
+      thread->Exit(exit);state.returned.store(true,std::memory_order_release);
+    };
+    REQUIRE_NOTHROW(fixture.Run(state,false,true,static_cast<u32>(exit)));
+    REQUIRE_NOTHROW(fixture.Finish());
+  }
 }
 
 TEST_CASE("original kernel: guest context and object semantics survive repeated teardown", "[mw3][kernel]") {
