@@ -34,5 +34,11 @@
   ],
   "size": "bounded repair and integration; split additional defects",
   "priority": 0,
-  "status": "in_progress"
+  "status": "done",
+  "evidence": [
+    "config/toolchains/rexglue-memory/validation-2026-11-18.md",
+    "docs/engine/memory.md",
+    "tools/prepare_runtime_memory.py",
+    "tools/test_runtime_memory.py"
+  ]
 }

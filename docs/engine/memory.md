@@ -1,10 +1,13 @@
-# Selected-runtime memory contracts — 2026-11-17
+# Selected-runtime memory contracts — 2026-11-18
 
-**Memory correctness gate remains open.** MW3-037 supplies a reproducible
-regression harness and records an actual SDK defect; it does not certify the
-selected runtime. MW3-042 repairs decommit behavior before kernel integration
-041 can pass. No title code executes in these tests and no performance claim
-is made. The owned-title startup checkpoint remains separately documented in
+**The isolated decommit repair now passes its scoped regressions.** See
+[task 042 validation](../../config/toolchains/rexglue-memory/validation-2026-11-18.md)
+for 300 passing memory cases, focused SDK tests, regenerated outputs and native
+Windows/Linux title checkpoints. Full kernel/gameplay gates remain open.
+The following task-037 evidence records the original failing baseline; it does
+not certify that baseline runtime. No title code executes in these contract
+tests and no performance claim is made. The owned-title startup checkpoint is
+separately documented in
 [Windows bring-up](windows-bringup.md).
 
 ## Reproduce
@@ -68,7 +71,7 @@ on both hosts. An earlier test assumed strict protection without enabling it;
 that failure is retained and is not presented as an upstream defect. This is
 separate from decommit, which has no such opt-out in this test contract.
 
-## Actual results and defect
+## Historical baseline results and defect
 
 | Profile | PASS | FAIL | Coverage limit |
 | --- | ---: | ---: | --- |

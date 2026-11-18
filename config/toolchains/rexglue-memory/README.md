@@ -1,8 +1,8 @@
 # Isolated memory repair profile
 
-Task 042 is in validation. Do not mark its acceptance complete from compilation
-or the first Linux result. Follow [memory evidence](../../../docs/engine/memory.md)
-for baseline failures and final integration status.
+Task 042 passes the bounded [validation matrix](validation-2026-11-18.md).
+Full kernel/gameplay gates remain open. Historical failures remain in
+[memory evidence](../../../docs/engine/memory.md).
 
 Start with the verified native baseline SDK from task 008 (Linux) or 040
 (Windows). Keep its preparation receipt and cache unchanged. Then:
