@@ -186,8 +186,12 @@ def main():
             '-DCMAKE_CXX_COMPILER='+tools['clang++'].as_posix(),'-DCMAKE_PREFIX_PATH='+sdk.as_posix(),
             '-DMW3_SDK_SOURCE='+source.as_posix(),'-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG',*extra],env)
         run('build-generator',[cmake,'--build',generator_build,'--target','ppc-generator','--parallel','2'],env,timeout=900)
-        generator=generator_build/('ppc-generator'+suffix)
-        report.update(generator_sha256=prep.sha(generator),generator_build=str(generator_build),generator_key=key)
+        # A later cache rebuild must not replace an earlier receipt's executable.
+        generator=output/('ppc-generator'+suffix)
+        shutil.copy2(generator_build/generator.name,generator)
+        if windows:child['PATH']=str(sdk/'bin')+os.pathsep+child.get('PATH','')
+        report.update(generator_sha256=prep.sha(generator),generator_binary=str(generator),
+                      generator_build=str(generator_build),generator_key=key)
         run('generate',[generator,bins/'fixtures.bin',bins/'fixtures.map',generated],child)
         baseline=prep.snapshot(generated)
         second=output/'generated-repeat';second.mkdir()
