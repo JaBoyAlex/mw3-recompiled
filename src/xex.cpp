@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 #include "mw3/xex.hpp"
 #include <array>
+#include <unordered_set>
 
 namespace mw3 {
 namespace {
@@ -30,5 +31,39 @@ XexHeader inspect_xex(std::span<const std::byte> prefix, std::uint64_t file_size
     for (std::size_t i = 0; i < count; ++i)
         header.optional.push_back({be32(prefix, 24 + i * 8), be32(prefix, 28 + i * 8)});
     return header;
+}
+
+std::optional<std::uint32_t> resolve_xex_optional_header(
+    std::span<const std::byte> bytes, std::uint32_t guest_base, std::uint32_t key) {
+    if (bytes.size() > max_xex_metadata || bytes.size() < 24 || guest_base % 4 != 0 ||
+        static_cast<std::uint64_t>(guest_base) + bytes.size() > 0x100000000ull)
+        throw XexError("invalid bounded guest header range");
+    // This span is the complete header, while inspect_xex accepts a prefix.
+    const auto header = inspect_xex(bytes, bytes.size() + 1ull);
+    if (header.image_offset != bytes.size() || header.security_offset >= bytes.size())
+        throw XexError("incomplete or inconsistent raw header span");
+    std::unordered_set<std::uint32_t> keys;
+    std::optional<std::uint32_t> result;
+    const std::size_t table_end = 24 + header.optional.size() * 8;
+    for (std::size_t i = 0; i < header.optional.size(); ++i) {
+        const auto& entry = header.optional[i];
+        if (!keys.insert(entry.key).second) throw XexError("duplicate optional header key");
+        if (entry.key != key) continue;
+        const auto kind = key & 255;
+        if (kind == 0) {
+            result = entry.value;
+        } else if (kind == 1) {
+            result = guest_base + static_cast<std::uint32_t>(28 + i * 8);
+        } else {
+            const std::size_t offset = entry.value;
+            if (offset < table_end || offset % 4 || offset > bytes.size() || bytes.size() - offset < 4)
+                throw XexError("optional payload offset outside header");
+            const std::size_t length = kind == 255 ? be32(bytes, offset) : kind * 4;
+            if (length < 4 || length > bytes.size() - offset)
+                throw XexError("truncated optional payload");
+            result = guest_base + entry.value;
+        }
+    }
+    return result;
 }
 }
