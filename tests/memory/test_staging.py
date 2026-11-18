@@ -28,9 +28,10 @@ class MemoryStagingGuards(unittest.TestCase):
             for wrong in (False,True):
                 inputs["toolchain"]["memory_lock_sha256"]="0"*64 if wrong else common.sha(memory.LOCK)
                 key=common.digest(inputs);source=root/key;(source/"payload").mkdir(parents=True)
-                (source/"payload/original.txt").write_text("inert fixture, never executed\n")
+                (source/"payload/original.cpp").write_text("// Original inert fixture, never compiled or executed.\n")
                 files=common.snapshot(source/"payload")
-                receipt=dict(key=key,inputs=inputs,files=files,code_manifest=files)
+                receipt=dict(schema_version=1,key=key,inputs=inputs,files=files,code_manifest=files,
+                             guest_executed=False,runtime_supported=False,release_package=False)
                 (source/"manifest.json").write_text(json.dumps(receipt))
                 target=root/"staged"/key
                 if wrong:
