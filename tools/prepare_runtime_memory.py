@@ -155,6 +155,7 @@ def main():
                  "-DCMAKE_C_FLAGS="+cflags,"-DCMAKE_CXX_FLAGS="+cflags,
                  "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG","-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
                  "-DPYTHON_EXECUTABLE="+sys.executable,"-DREX_OUTPUT_DIR="+(build/"sdk-output").as_posix(),
+                 "-DCMAKE_INSTALL_PREFIX="+(build/"unused-install-prefix").as_posix(),
                  "-DREXGLUE_BUILD_TESTS=OFF","-DREXGLUE_BUILD_PPC_TESTS=OFF","-DREXGLUE_ENABLE_TRACY=OFF","-DREXGLUE_REGISTER_PACKAGE=OFF",
                  "-DVulkan_INCLUDE_DIR="+(root/"sources/headers/include").as_posix(),
                  "-DREXGLUE_VMA_INCLUDE_DIR="+(root/"sources/vma/include").as_posix(),*extra]

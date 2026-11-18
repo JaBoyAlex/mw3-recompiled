@@ -39,5 +39,13 @@ class MemoryPreparationGuards(unittest.TestCase):
                 common.toolchain(root,path)
             source.assert_not_called()
 
+    def test_modified_composed_patch_is_preserved_instead_of_repaired(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);output=root/"attempt";output.mkdir()
+            path=output/"combined-memory.patch";path.write_bytes(b"changed original fixture")
+            with self.assertRaisesRegex(ValueError,"recorded memory patch changed"):
+                memory.source_identity(root,output,existing=True)
+            self.assertEqual(path.read_bytes(),b"changed original fixture")
+
 
 if __name__=="__main__":unittest.main()
