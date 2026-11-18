@@ -120,3 +120,15 @@ The lead extends 040's reservation to guarded host/CMake, README, architecture
 and agent/status summaries. No other owner overlaps. Self-review is recorded;
 no independent review is claimed. This completes bounded Windows preparation,
 not kernel milestone 010 or first-frame 011.
+
+The final public-driver UBSan runs independently rebuild both generated modules
+and include calibration in each receipt: SP
+`runs/24019327a97d4add9e1aa41846715219/manifest.json`, SHA-256
+`cd3668044f662a9da4b33378ba97b7e684b6852da43b4db2e8f28b267c3ee8a9`;
+MP `runs/9576993107d24e989c4aba22358c47ad/manifest.json`, SHA-256
+`d0f5db50c4edf96598aacaa05b182e558d16b1bb7d9232fa09698f7ae8b2a94d`.
+All twelve cases pass. Final game-free commands: `python tools/check.py --config
+Release` on Windows (84 tests, five explicit LLVM/symlink skips, CTest pass),
+and `python3 tools/check.py --config Release --sanitizers` on Linux (86 tests,
+no skips, ASan/UBSan CTest pass). Platform-specific discovery accounts for the
+suite-count difference; raw logs are retained. No independent review is claimed.
