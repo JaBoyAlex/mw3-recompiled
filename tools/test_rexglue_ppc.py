@@ -77,6 +77,26 @@ def classify(code,log,cases,mutation=False):
                 and failures[0].get('mismatches')==[dict(register='r3',expected=cases[0]['out']['r3'],actual=0)])
     return code==0 and not failures and rows[-1]==dict(completed=len(cases),failures=0)
 
+def linux_calibration(output,tools,env):
+    source=output/'host-calibration.cpp'
+    source.write_text('#include <cstdint>\n#include <cstdio>\nint main(int argc,char**) { '
+        'volatile std::int64_t value=argc==1?41:INT64_MAX; auto result=value+1; '
+        'std::printf("HOST_CALIBRATION:%lld\\n",static_cast<long long>(result)); return 0; }\n',encoding='utf-8')
+    binary=output/'host-calibration'
+    command=[str(tools['clang++']),'--gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13',
+        '-std=c++20','-O2','-fsanitize=address,undefined','-fno-sanitize=vptr',str(source),'-o',str(binary)]
+    with (output/'host-calibration-build.log').open('wb') as log:
+        subprocess.run(command,env=env,stdout=log,stderr=subprocess.STDOUT,timeout=60,check=True)
+    rows=[];child=dict(env,UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1',ASAN_OPTIONS='detect_leaks=1')
+    for name,arguments in [('positive',[]),('signed-overflow',['mutation'])]:
+        result=subprocess.run([str(binary),*arguments],env=child,capture_output=True,timeout=20)
+        data=result.stdout+result.stderr;path=output/('host-calibration-'+name+'.log');path.write_bytes(data)
+        passed=(result.returncode==0 and data.strip()==b'HOST_CALIBRATION:42') if not arguments else (
+            result.returncode==1 and b'runtime error: signed integer overflow' in data)
+        rows.append(dict(case=name,returncode=result.returncode,status='PASS' if passed else 'FAIL',log_sha256=prep.sha(path)))
+    if not all(r['status']=='PASS' for r in rows):raise ValueError('host sanitizer calibration failed')
+    return dict(command=command,source_sha256=prep.sha(source),binary_sha256=prep.sha(binary),results=rows)
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('root','sdk-report','output-root'):parser.add_argument('--'+name,required=True,type=Path)
@@ -85,7 +105,8 @@ def main():
     parser.add_argument('--seed',type=lambda n:int(n,0),default=0x20110360)
     args=parser.parse_args();output=None
     report=dict(schema_version=1,evidence_class='original-synthetic-ppc-oracle',owned_title_executed=False,
-                performance_measured=False,script_sha256=prep.sha(__file__),sources=source_snapshot(),results=[])
+                performance_measured=False,script_sha256=prep.sha(__file__),sources=source_snapshot(),
+                python=dict(version=sys.version,executable_sha256=prep.sha(sys.executable)),results=[])
     try:
         output=prep.private_cache(args.output_root,ROOT/'game')/uuid.uuid4().hex;output.mkdir(parents=True)
         print(json.dumps(dict(output=str(output))),flush=True)
@@ -123,6 +144,7 @@ def main():
             for n in ('llvm-objcopy','llvm-nm','llvm-objdump'):tools[n]=Path('/usr/bin')/(n+'-18')
         report['tools']={n:dict(path=str(p),sha256=prep.sha(p),version=subprocess.check_output([p,'--version'],env=env,text=True).splitlines()[0]) for n,p in tools.items()}
         if not re.search(r'clang version 20\.1\.2\b',report['tools']['clang++']['version']):raise ValueError('wrong compiler')
+        if args.sanitizers and not windows:report['calibration']=linux_calibration(output,tools,env)
         recipe=prep.validate_recipe(json.loads((ROOT/'config/recomp/recipe.json').read_text()))
         production=ROOT/'runtime/bringup/CMakeLists.txt'
         if 'target_compile_options(guest PRIVATE ${guest_options} -fwrapv -ffp-contract=off)' not in production.read_text():
@@ -151,7 +173,7 @@ def main():
                 offset=int(fields[0],16);symbols[fields[2]]=0x82010000+offset
                 map_lines.append(f'{offset:08x} T {fields[2]}')
         if len(symbols)!=14:raise ValueError('unexpected fixture symbol inventory')
-        (bins/'fixtures.map').write_text('\n'.join(map_lines)+'\n',encoding='utf-8')
+        (bins/'fixtures.map').write_bytes(('\n'.join(map_lines)+'\n').encode('utf-8'))
         if not windows:run('disassembly',[tools['llvm-objdump'],'-dr',bins/'fixtures.elf'],env)
         child={k:v for k,v in env.items() if not k.startswith(('REX_','LD_','ASAN_','UBSAN_','LSAN_'))}
         if not windows:child['LD_LIBRARY_PATH']=str(sdk/'lib')
