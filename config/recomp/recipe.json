@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "runtime": "rexglue-sdk",
+  "title": "mw3-xbox360-usa-korea-rev1",
+  "max_file_size_bytes": 1048576,
+  "max_discovery_iterations": 1000,
+  "max_vtable_iterations": 1000,
+  "max_resolve_iterations": 1000,
+  "register_locals": false,
+  "forward_stack_stores": false,
+  "manual_code_targets": [],
+  "vector_math": {
+    "vmaddfp": "exact",
+    "vnmsubfp": "exact",
+    "vmsum3fp128": "exact",
+    "vmsum4fp128": "exact",
+    "vrefp": "exact",
+    "vrsqrtefp": "exact",
+    "vexptefp": "exact",
+    "fres": "exact",
+    "frsqrte": "exact"
+  }
+}

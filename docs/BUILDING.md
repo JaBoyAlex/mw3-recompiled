@@ -27,4 +27,46 @@ Install Git, Python, CMake, Ninja and GCC or Clang. Run `python3 tools/check.py`
 
 The initial tools fingerprint explicit files and inspect XDVDFS/XEX metadata without decryption. Example commands are in README. Reports do not certify legal ownership, complete disc integrity or supported runtime execution. `disc.py --extract-executables .local/game/rev1` copies the two known root executables exclusively; it refuses existing destinations. If interrupted, inspect/remove only your own partial output or choose a new private directory. It is a developer inspection tool, not the final transactional installer.
 
-No production recompile command/config is supplied before function/import/control-flow analysis and runtime selection. Never manufacture MW3 configs by replacing MW2 filenames and retaining guest addresses. Generated game code and flat/decrypted images stay outside Git and public CI. Reproducibility will include every input hash, compiler, transitive dependency, config and patch; bit-for-bit release binaries have not been demonstrated.
+Never manufacture MW3 configs by replacing MW2 filenames and retaining guest addresses. Generated game code and flat/decrypted images stay outside Git and public CI. Bit-for-bit release binaries have not been demonstrated.
+
+## Reproducible private generation (Linux/WSL)
+
+The selected SDK profile currently prepares on Linux x86-64; this is not Windows
+title validation or an installer. First prepare the exact sources, baseline SDK
+and normal memory derivative using the [runtime guide](../experiments/runtime-bakeoff/README.md).
+The preparation prints a manifest; use that exact **normal**, unsanitized
+report. Do not use its validation-only core-sanitizer package for generation.
+
+```sh
+python3 tools/recompile.py --owned "$OWNED_PAIR" --bakeoff-root "$BAKEOFF_CACHE" --sdk-report "$NATIVE_PREPARATION_REPORT" --cache "$PRIVATE_GENERATION_CACHE"
+python3 tools/recompile.py --owned "$OWNED_PAIR" --bakeoff-root "$BAKEOFF_CACHE" --sdk-report "$NATIVE_PREPARATION_REPORT" --cache "$PRIVATE_GENERATION_CACHE" --reproduce
+```
+
+Use a private cache outside Git, or in a Git-ignored directory such as `.local/`.
+It must not overlap the owned inputs or traverse symlinks. The driver checks
+both executable hashes before any cache write, verifies pinned source/submodule
+and derivative identities, hashes the complete SDK inputs and system libraries,
+and binds the exact recipe/driver/helper hashes. SDK-adjacent `bin/logs/` is
+excluded as observation data; new logs/profiles use each attempt's own roots.
+Each key has an exclusive writer lock. A crashed writer's lock is retained:
+inspect its PID/attempt, verify that writer has ended, then remove only that
+lane's stale lock. The tool never deletes another writer's lock automatically.
+
+The versioned [recipe](../config/recomp/recipe.json) requests exact vector and
+scalar-estimate math with conservative register/context handling. This selects
+upstream emission behavior; it does not independently prove console accuracy.
+Manual addresses, includes, hooks, shims and unreviewed optimization settings
+are refused. Automatic function discovery still has unresolved control flow;
+generation success is not a full target/exception/VMX validation. No `--force`
+or successful import stubs are used. SDK load/normalize behavior is private
+preparation, not a title boot or DRM/SDK bypass.
+
+A cache hit rehashes every payload file, including generated ancillary files;
+modified/missing/extra files fail rather than being overwritten. `--reproduce`
+generates both modules in a fresh attempt and compares the byte hashes and
+sizes of **all generated C++/headers** with the existing code manifest.
+Absolute-path dependency files, logs and SDK stamps remain hashed per attempt
+but are not claimed byte-identical between attempts. Both attempts and failures
+remain private. No generated code is edited as maintained source. The current
+SDK receipt is local provenance, not a signed build attestation or redistribution
+approval; compiler/build timestamps can change SDK binaries and cache keys.
