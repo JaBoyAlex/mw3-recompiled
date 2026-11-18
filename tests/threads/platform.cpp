@@ -3,6 +3,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include <rex/platform/sync.h>
 #include <rex/platform/thread.h>
+#include <rex/memory/host.h>
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <cstdio>
@@ -132,4 +134,19 @@ TEST_CASE("original platform: an alertable wait dispatches a queued callback", "
   worker.thread->QueueUserCallback([&]{++called;});
   REQUIRE(p::Wait(worker.thread.get(),false,3s)==p::WaitResult::kSuccess);
   CHECK(called.load()==1);CHECK(result.load(std::memory_order_acquire)==1);
+}
+
+TEST_CASE("original diagnostics: allocation peaks use a maximum rather than an additive history", "[mw3][platform][diagnostics]") {
+  namespace memory=rex::memory;constexpr memory::Tag tag{15};constexpr auto index=static_cast<std::size_t>(tag);
+  for(const auto size:{500u,1000u,1000u}) {
+    const auto before=memory::GetHostStats();void* block=nullptr;
+    {memory::TagScope scope(tag);block=memory::HostAlloc(size);}
+    REQUIRE(block);const auto during=memory::GetHostStats();
+    CHECK(during.tags[index].live_bytes==before.tags[index].live_bytes+size);
+    CHECK(during.tags[index].peak_bytes>=std::max(before.tags[index].peak_bytes,before.tags[index].live_bytes+size));
+    memory::HostFree(block);const auto after=memory::GetHostStats();
+    CHECK(after.tags[index].live_bytes==before.tags[index].live_bytes);
+    CHECK(after.tags[index].live_count==before.tags[index].live_count);
+    CHECK(after.tags[index].peak_bytes==during.tags[index].peak_bytes);
+  }
 }

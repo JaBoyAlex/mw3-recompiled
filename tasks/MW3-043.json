@@ -1,0 +1,30 @@
+{
+  "id": "MW3-043",
+  "title": "Preserve requested stop exits across selected-runtime import boundaries",
+  "phase": 2,
+  "area": "threads",
+  "depends_on": ["MW3-009", "MW3-042"],
+  "paths": [
+    "config/toolchains/rexglue-stop",
+    "tools/prepare_runtime_stop.py",
+    "tools/test_runtime_threads.py",
+    "tests/threads",
+    "docs/engine/threads.md",
+    "docs/STATUS.md"
+  ],
+  "goal": "Repair the demonstrated stop-boundary exit-code loss in a separately identified private SDK derivative, without weakening the failing lifecycle contract.",
+  "acceptance": [
+    "Retain the decommit-v1 failure: a barrier-controlled child with RequestStop(77) before its next kernel import must exit with 77 and never return from that import",
+    "Distinguish a pending cooperative stop from an explicit thread exit; audit import/hook, wait, spin and fiber exception consumers and preserve explicit exit behavior",
+    "Use an original minimal BSD-compatible patch with exact base, composition, compiler, source, header and library identities; preserve all baseline packages and rebuild every affected consumer",
+    "Provide fail-closed preparation/verification and permit the thread diagnostic driver to select the repaired SDK explicitly; do not silently substitute it into owned-title preparation"
+  ],
+  "validation": [
+    "Repeat isolated and combined declaration/shuffled thread contracts on Windows/Linux native and supported sanitizers, including actual instrumented Linux core",
+    "Reject result/deadline mutations and stale or modified derivative receipts, headers and libraries; retain baseline failures rather than relabeling them",
+    "Record unsupported sanitizer/translated-code coverage and run affected memory/CPU regressions before later title integration"
+  ],
+  "size": "bounded repair; split new defects",
+  "priority": 0,
+  "status": "todo"
+}

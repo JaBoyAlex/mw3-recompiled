@@ -28,9 +28,21 @@ target_compile_definitions(thread-platform-tests PRIVATE REX_TEST_REAL_MODULES)
 target_link_libraries(thread-platform-tests PRIVATE rex::sdk Catch2::Catch2WithMain)
 rexglue_apply_target_settings(thread-platform-tests)
 rexglue_configure_target(thread-platform-tests)
+# Combined orders expose interactions across both tranches while compiling
+# Catch2 only once per fresh profile when --suite all is selected.
+add_executable(thread-all-tests kernel.cpp platform.cpp
+  "${MW3_SDK_SOURCE}/tests/unit/base/thread_start_data_test.cpp"
+  "${MW3_SDK_SOURCE}/tests/unit/base/thread_time_test.cpp"
+  "${MW3_SDK_SOURCE}/tests/unit/base/thread_priority_test.cpp")
+target_include_directories(thread-all-tests PRIVATE
+  "${MW3_SDK_SOURCE}/src" "${MW3_SDK_SOURCE}/tests" "${MW3_SDK_SOURCE}/tests/unit")
+target_compile_definitions(thread-all-tests PRIVATE REX_TEST_REAL_MODULES)
+target_link_libraries(thread-all-tests PRIVATE rex::sdk Catch2::Catch2WithMain)
+rexglue_apply_target_settings(thread-all-tests)
+rexglue_configure_target(thread-all-tests)
 option(MW3_THREAD_SANITIZERS "Instrument test callbacks; SDK has its own receipt" OFF)
 if(MW3_THREAD_SANITIZERS)
-  foreach(target thread-platform-tests thread-kernel-tests)
+  foreach(target thread-platform-tests thread-kernel-tests thread-all-tests)
   if(WIN32)
     target_compile_options(${target} PRIVATE -fsanitize=undefined -fsanitize-trap=all -fno-sanitize=vptr)
     target_link_options(${target} PRIVATE -fsanitize=undefined -fsanitize-trap=all -fno-sanitize=vptr)
