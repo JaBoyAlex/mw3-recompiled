@@ -51,6 +51,8 @@ Paths relative to `~/.cache/mw3-recompiled/title-generation/`:
 
 | Artifact | SHA-256 |
 | --- | --- |
+| `a443708580e7cca756f652002d075062919ddd3a8a2e32e654a647ac17d99015/manifest.json`, final driver first generation | `0bb678bf0e0d92c81c77f251aacb845090b6da269fdd680abc764ee0df34f724` |
+| `attempt-c80e5f9b087f42ffa504291baf2d8b80/manifest.json`, final driver clean reproduction, all 326 match | `9882541f3c198d4ea6948a1614e3054a5f0d267828145b6331868895163fa265` |
 | `8ba54c6bb9c3250dc50b67f4d8c5d9bdf5259b42a42650b853de22b5c2406ac9/manifest.json`, first generation | `4ea00686affa0cf460155bc1f85e44ee21357312caf9670a9da724eef33491b8` |
 | `attempt-962805c2f3ee41898c73e9c08a20fb92/manifest.json`, clean reproduction | `4eb49f150127a88e9775c24fedb68530d17bd9bb31e724073beca841e0dcb2d9` |
 | `negative-a672da01145c4135962cc0432a184e45/manifest.json`, actual copied-input mutation | `a2c8cabbeaad0e1085555c12bb14eef508859fb5369fc3469a5ea0ff44ad18c5` |
@@ -58,7 +60,8 @@ Paths relative to `~/.cache/mw3-recompiled/title-generation/`:
 
 Windows `python tools/check.py --config Release` passes 78 Python cases (five
 explicit unavailable LLVM/symlink privilege skips) and native CTest. Linux
-Release ASan/UBSan and exact-head CI are required before integration. Eight
+`python3 tools/check.py --config Release --sanitizers` passes all 78 and native
+CTest. Exact-head CI is required before integration. Eight
 new game-free generation guard cases run in ordinary CI without game files or
 SDK access. Public code is original GPL-3.0-only Python/JSON/docs; no upstream
 source, game bytes, generated C++, SDKs or private logs are committed.
@@ -68,5 +71,7 @@ impact has been measured, and no release or product gate passes here.
 Initial Windows CI correctly failed the existing overlap guard fixture on its
 8.3 temporary-directory alias (`RUNNER~1` versus the resolved long name). The
 driver now resolves both comparison paths after refusing symlinks. This fixes
-the guard rather than skipping the fixture. Linux CI originally passed; fresh
-generation and the Windows/Linux matrix are repeated for the corrected driver.
+the guard rather than skipping the fixture. Its positive fixture now expects
+the canonical path too. Linux CI originally passed; fresh generation with the
+corrected driver reproduces all 326 files. The Windows/Linux matrix is repeated
+for the final head, and previous failed runs remain available in PR 47.
