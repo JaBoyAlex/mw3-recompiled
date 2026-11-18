@@ -4,7 +4,9 @@
   "phase": 2,
   "area": "threads",
   "depends_on": [
-    "MW3-009"
+    "MW3-009",
+    "MW3-042",
+    "MW3-043"
   ],
   "paths": [
     "tests/threads",
@@ -23,5 +25,5 @@
   ],
   "size": "1-3 days",
   "priority": 0,
-  "status": "todo"
+  "status": "blocked"
 }
