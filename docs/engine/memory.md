@@ -119,3 +119,10 @@ All five manifests report **FAIL**, with 36 passing/12 failing cases each.
 
 Self-reviewed. No independent review, gameplay correctness, aggregate SDK pass,
 performance improvement or game-linked redistribution approval is claimed.
+
+Final public checks: Windows `python tools/check.py --config Release` passes
+86 Python tests with five explicit LLVM/symlink skips and native CTest. Linux
+`python3 tools/check.py --config Release --sanitizers` passes 88 Python tests
+without skips and ASan/UBSan CTest. The catalog and repository provenance
+heuristic pass; the latter is not legal clearance. Exact-head CI is required
+before merge. Actual SDK integration results above intentionally remain failing.
