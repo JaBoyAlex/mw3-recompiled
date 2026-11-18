@@ -9,13 +9,13 @@
 #include <rex/kernel/object/object_table.h>
 #include <rex/kernel/guest_memory.h>
 #include <rex/kernel/types/xex.h>
+#include <rex/platform/dynlib.h>
 #include <atomic>
 #include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
-#include <dlfcn.h>
 
 bool VerifyProbeImportStops(rex::kernel::TitleRuntime&);
 namespace {
@@ -25,6 +25,7 @@ std::uint32_t header_address = 0, module_address = 0, cell_address = 0;
 std::atomic<unsigned> queries{0};
 using Function = void(*)(PPCContext&, u8*);
 Function original_header_query = nullptr;
+rex::platform::DynamicLibrary kernel_library;
 
 [[noreturn]] void Reject(const char* reason) {
   std::fprintf(stderr,"MW3_HEADER_GUARD_FAILED:%s\n",reason);
@@ -114,9 +115,8 @@ class HeaderProbe final : public rex::app::TitleApp {
     auto kernel=runtime.GetObjectTable().Get<rex::kernel::ModuleObject>(*kernel_handle);
     Require(bool(kernel) && kernel->GetVariable(0x0193)==cell_address,"module-handle export mismatch");
     VerifyHeader();
-    void* library=dlopen("librexkernel.so",RTLD_NOW|RTLD_NOLOAD);
-    Require(library!=nullptr,"SDK kernel not loaded");
-    original_header_query=reinterpret_cast<Function>(dlsym(library,"__imp__RtlImageXexHeaderField"));
+    Require(kernel_library.LoadNamed("rexkernel",rex::platform::SymbolResolution::kImmediate),"SDK kernel provider unavailable");
+    original_header_query=kernel_library.GetSymbol<Function>("__imp__RtlImageXexHeaderField");
     Require(original_header_query && original_header_query!=&__imp__RtlImageXexHeaderField,"SDK header provider missing/interposed");
     std::fprintf(stderr,"MW3_MODULE_HEADER_AUDIT_PASS:cell=%08x module=%08x header=%08x bytes=%u\n",
                  cell_address,module_address,header_address,size);

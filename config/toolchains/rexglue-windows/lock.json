@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "compiler": {
+    "version": "20.1.2",
+    "url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.2/clang%2Bllvm-20.1.2-x86_64-pc-windows-msvc.tar.xz",
+    "name": "clang+llvm-20.1.2-x86_64-pc-windows-msvc.tar.xz",
+    "size": 939423020,
+    "sha256": "8e771a685cd718303ea0d632a8a95ad7b3cb17068f3952fbefa64a77290324d8",
+    "archive_root": "clang+llvm-20.1.2-x86_64-pc-windows-msvc",
+    "authenticity": "Official LLVM release URL over TLS; locally recorded digest; no signature verification claimed"
+  },
+  "windows_sdk": "10.0.26100.0",
+  "msvc_tools": "14.44.35207",
+  "sources": [
+    {
+      "name": "rexglue-sdk",
+      "url": "https://github.com/rexglue/rexglue-sdk.git",
+      "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+      "submodules": true
+    },
+    {
+      "name": "headers",
+      "url": "https://github.com/KhronosGroup/Vulkan-Headers.git",
+      "commit": "409c16be502e39fe70dd6fe2d9ad4842ef2c9a53",
+      "submodules": false
+    },
+    {
+      "name": "vma",
+      "url": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git",
+      "commit": "c788c52156f3ef7bc7ab769cb03c110a53ac8fcb",
+      "submodules": false
+    },
+    {
+      "name": "loader",
+      "url": "https://github.com/KhronosGroup/Vulkan-Loader.git",
+      "commit": "fb78607414e154c7a5c01b23177ba719c8a44909",
+      "submodules": false
+    }
+  ],
+  "compatibility_patch": {
+    "path": "patches/rexglue-win32-procedure-types.patch",
+    "sha256": "2f036ec2b5c0c2f2a4ba63f61a33221f053a6d1237b9f99cc2662f2495f31866"
+  }
+}

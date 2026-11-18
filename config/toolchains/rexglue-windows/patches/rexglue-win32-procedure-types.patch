@@ -1,0 +1,118 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Original compatibility changes; upstream source notices are preserved.
+diff --git a/src/base/memory_win.cpp b/src/base/memory_win.cpp
+index fb9fff6..de6ac67 100644
+--- a/src/base/memory_win.cpp
++++ b/src/base/memory_win.cpp
+@@ -11,6 +11,7 @@
+ 
+ #include "platform_win.h"
+ 
++#include <bit>
+ #include <format>
+ #include <random>
+ #include <string_view>
+@@ -231,9 +232,9 @@ const PlaceholderFunctions& GetPlaceholderFunctions() {
+     PlaceholderFunctions resolved;
+     if (HMODULE kernelbase = GetModuleHandleW(L"kernelbase.dll")) {
+       resolved.alloc =
+-          reinterpret_cast<VirtualAlloc2Function>(GetProcAddress(kernelbase, "VirtualAlloc2"));
++          std::bit_cast<VirtualAlloc2Function>(GetProcAddress(kernelbase, "VirtualAlloc2"));
+       resolved.map =
+-          reinterpret_cast<MapViewOfFile3Function>(GetProcAddress(kernelbase, "MapViewOfFile3"));
++          std::bit_cast<MapViewOfFile3Function>(GetProcAddress(kernelbase, "MapViewOfFile3"));
+     }
+     if (!resolved.alloc || !resolved.map) {
+       REXSYS_ERROR("MapFileView needs VirtualAlloc2 and MapViewOfFile3 from Windows 10 1803");
+diff --git a/src/base/threading_win.cpp b/src/base/threading_win.cpp
+index 8283fbd..5395993 100644
+--- a/src/base/threading_win.cpp
++++ b/src/base/threading_win.cpp
+@@ -19,6 +19,7 @@ static_assert(REX_PLATFORM_WIN32, "This file is Windows-only");
+ 
+ #include <algorithm>
+ #include <array>
++#include <bit>
+ #include <chrono>
+ #include <cstring>
+ #include <mutex>
+@@ -30,7 +31,7 @@ static_assert(REX_PLATFORM_WIN32, "This file is Windows-only");
+ #define REX_LOG_LAST_ERROR() \
+   { REXLOG_ERROR("Win32 error 0x{:08X} in {}", GetLastError(), __FUNCTION__); }
+ 
+-using SetThreadDescriptionFn = HANDLE (*)(HANDLE hThread, PCWSTR lpThreadDescription);
++using SetThreadDescriptionFn = HRESULT (WINAPI*)(HANDLE hThread, PCWSTR lpThreadDescription);
+ 
+ namespace rex::platform {
+ 
+@@ -75,7 +76,7 @@ static void ApplyThreadName(HANDLE thread, const std::string_view name) {
+   auto kernel = GetModuleHandleW(L"kernel32.dll");
+   if (kernel) {
+     auto func =
+-        reinterpret_cast<SetThreadDescriptionFn>(GetProcAddress(kernel, "SetThreadDescription"));
++        std::bit_cast<SetThreadDescriptionFn>(GetProcAddress(kernel, "SetThreadDescription"));
+     if (func) {
+       int size_needed =
+           MultiByteToWideChar(CP_UTF8, 0, name.data(), static_cast<int>(name.size()), nullptr, 0);
+diff --git a/src/gpu/xenos/host/d3d12/d3d12_provider.cpp b/src/gpu/xenos/host/d3d12/d3d12_provider.cpp
+index d834fe7..54dc99d 100644
+--- a/src/gpu/xenos/host/d3d12/d3d12_provider.cpp
++++ b/src/gpu/xenos/host/d3d12/d3d12_provider.cpp
+@@ -9,6 +9,7 @@
+  * @modified    Tom Clay, 2026 - Adapted for ReXGlue runtime
+  */
+ 
++#include <bit>
+ #include <cstdlib>
+ 
+ #include <rex/assert.h>
+@@ -108,17 +109,17 @@ bool D3D12Provider::Initialize(i32 adapter_index_wanted) {
+     REXUI_FAIL(false, "Failed to load dxgi.dll or D3D12.dll");
+   }
+   bool libraries_loaded = true;
+-  libraries_loaded &= (pfn_create_dxgi_factory2_ = reinterpret_cast<PFNCreateDXGIFactory2>(
++  libraries_loaded &= (pfn_create_dxgi_factory2_ = std::bit_cast<PFNCreateDXGIFactory2>(
+                            GetProcAddress(library_dxgi_, "CreateDXGIFactory2"))) != nullptr;
+-  libraries_loaded &= (pfn_dxgi_get_debug_interface1_ = reinterpret_cast<PFNDXGIGetDebugInterface1>(
++  libraries_loaded &= (pfn_dxgi_get_debug_interface1_ = std::bit_cast<PFNDXGIGetDebugInterface1>(
+                            GetProcAddress(library_dxgi_, "DXGIGetDebugInterface1"))) != nullptr;
+   libraries_loaded &=
+-      (pfn_d3d12_get_debug_interface_ = reinterpret_cast<PFN_D3D12_GET_DEBUG_INTERFACE>(
++      (pfn_d3d12_get_debug_interface_ = std::bit_cast<PFN_D3D12_GET_DEBUG_INTERFACE>(
+            GetProcAddress(library_d3d12_, "D3D12GetDebugInterface"))) != nullptr;
+-  libraries_loaded &= (pfn_d3d12_create_device_ = reinterpret_cast<PFN_D3D12_CREATE_DEVICE>(
++  libraries_loaded &= (pfn_d3d12_create_device_ = std::bit_cast<PFN_D3D12_CREATE_DEVICE>(
+                            GetProcAddress(library_d3d12_, "D3D12CreateDevice"))) != nullptr;
+   libraries_loaded &=
+-      (pfn_d3d12_serialize_root_signature_ = reinterpret_cast<PFN_D3D12_SERIALIZE_ROOT_SIGNATURE>(
++      (pfn_d3d12_serialize_root_signature_ = std::bit_cast<PFN_D3D12_SERIALIZE_ROOT_SIGNATURE>(
+            GetProcAddress(library_d3d12_, "D3D12SerializeRootSignature"))) != nullptr;
+   if (!libraries_loaded) {
+     REXUI_FAIL(false, "Failed to get DXGI or Direct3D 12 functions");
+@@ -128,7 +129,7 @@ bool D3D12Provider::Initialize(i32 adapter_index_wanted) {
+   library_d3dcompiler_ = LoadLibraryW(L"D3DCompiler_47.dll");
+   if (library_d3dcompiler_) {
+     pfn_d3d_disassemble_ =
+-        reinterpret_cast<pD3DDisassemble>(GetProcAddress(library_d3dcompiler_, "D3DDisassemble"));
++        std::bit_cast<pD3DDisassemble>(GetProcAddress(library_d3dcompiler_, "D3DDisassemble"));
+     if (pfn_d3d_disassemble_ == nullptr) {
+       REXUI_DEBUG(
+           "Failed to get D3DDisassemble from D3DCompiler_47.dll, DXBC "
+@@ -143,7 +144,7 @@ bool D3D12Provider::Initialize(i32 adapter_index_wanted) {
+   pfn_dxilconv_dxc_create_instance_ = nullptr;
+   library_dxilconv_ = LoadLibraryW(L"dxilconv.dll");
+   if (library_dxilconv_) {
+-    pfn_dxilconv_dxc_create_instance_ = reinterpret_cast<DxcCreateInstanceProc>(
++    pfn_dxilconv_dxc_create_instance_ = std::bit_cast<DxcCreateInstanceProc>(
+         GetProcAddress(library_dxilconv_, "DxcCreateInstance"));
+     if (pfn_dxilconv_dxc_create_instance_ == nullptr) {
+       REXUI_DEBUG(
+@@ -159,7 +160,7 @@ bool D3D12Provider::Initialize(i32 adapter_index_wanted) {
+   pfn_dxcompiler_dxc_create_instance_ = nullptr;
+   library_dxcompiler_ = LoadLibraryW(L"dxcompiler.dll");
+   if (library_dxcompiler_) {
+-    pfn_dxcompiler_dxc_create_instance_ = reinterpret_cast<DxcCreateInstanceProc>(
++    pfn_dxcompiler_dxc_create_instance_ = std::bit_cast<DxcCreateInstanceProc>(
+         GetProcAddress(library_dxcompiler_, "DxcCreateInstance"));
+     if (pfn_dxcompiler_dxc_create_instance_ == nullptr) {
+       REXUI_DEBUG(

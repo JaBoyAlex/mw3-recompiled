@@ -28,6 +28,6 @@ target_include_directories(mw3-header-probe PRIVATE "${MW3_GENERATED_DIR}" "${MW
 target_compile_definitions(mw3-header-probe PRIVATE
   MW3_GENERATED_INIT="${MW3_GENERATED_PREFIX}_init.h"
   MW3_DATA_IMPORT_HEADER="${MW3_DATA_IMPORT_HEADER}")
-target_link_libraries(mw3-header-probe PRIVATE guest rex::sdk dl)
+target_link_libraries(mw3-header-probe PRIVATE guest rex::sdk)
 rexglue_apply_target_settings(mw3-header-probe)
 rexglue_configure_target(mw3-header-probe)
