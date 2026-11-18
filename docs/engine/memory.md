@@ -126,3 +126,7 @@ Final public checks: Windows `python tools/check.py --config Release` passes
 without skips and ASan/UBSan CTest. The catalog and repository provenance
 heuristic pass; the latter is not legal clearance. Exact-head CI is required
 before merge. Actual SDK integration results above intentionally remain failing.
+
+The lead extends 037's reservation to the root status summary after 040 closed,
+so future contributors see the retained failures and current public test counts.
+No other active owner overlaps this summary change.
