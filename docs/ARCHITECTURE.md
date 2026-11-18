@@ -1,6 +1,6 @@
 # Architecture decision: Xbox 360 AOT with selective native replacements
 
-Status: ReXGlue selected for private development by [MW3-008](adr/0002-runtime-selection.md). Optimization remains part of ongoing selection. Private Linux/WSL probes execute bounded SP/MP startup; no playable boot or Windows title execution is verified.
+Status: ReXGlue selected for private development by [MW3-008](adr/0002-runtime-selection.md). Optimization remains part of ongoing selection. Private native Windows/Linux probes execute bounded SP/MP startup through one audited header service; no playable boot is verified.
 
 ## Alternatives
 

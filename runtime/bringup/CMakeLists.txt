@@ -21,8 +21,21 @@ target_precompile_headers(guest PRIVATE "${MW3_GENERATED_DIR}/${MW3_GENERATED_PR
 add_executable(mw3-header-probe header_probe.cpp "${MW3_PRIVATE_TRAPS}" "${MW3_REPO}/src/xex.cpp")
 option(MW3_PROBE_SANITIZERS "Instrument the original host harness/parser, not generated guest objects" OFF)
 if(MW3_PROBE_SANITIZERS)
-  target_compile_options(mw3-header-probe PRIVATE -fsanitize=address,undefined -fno-sanitize=vptr -fno-omit-frame-pointer)
-  target_link_options(mw3-header-probe PRIVATE -fsanitize=address,undefined -fno-sanitize=vptr)
+  if(WIN32)
+    # The SDK's mandatory allocator shim collides with Windows ASan's new/delete
+    # imports. Preserve that failed experiment; don't force duplicate symbols
+    # or replace just one side of the cross-DLL allocator ABI.
+    set(host_sanitizers undefined)
+    # The packaged standalone UBSan C++ runtime also requires static CRT while
+    # this SDK requires dynamic CRT. Trap mode retains checks without linking
+    # an incompatible runtime. Calibrate its failure exit independently.
+    target_compile_options(mw3-header-probe PRIVATE -fsanitize-trap=all)
+    target_link_options(mw3-header-probe PRIVATE -fsanitize-trap=all)
+  else()
+    set(host_sanitizers address,undefined)
+  endif()
+  target_compile_options(mw3-header-probe PRIVATE -fsanitize=${host_sanitizers} -fno-sanitize=vptr -fno-omit-frame-pointer)
+  target_link_options(mw3-header-probe PRIVATE -fsanitize=${host_sanitizers} -fno-sanitize=vptr)
 endif()
 target_include_directories(mw3-header-probe PRIVATE "${MW3_GENERATED_DIR}" "${MW3_REPO}/include")
 target_compile_definitions(mw3-header-probe PRIVATE
