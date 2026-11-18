@@ -167,6 +167,15 @@ def stage_reference(reference, destination, identity, expected_manifest_sha256):
     inputs=receipt["inputs"]
     pins=json.loads((common.EXPERIMENT/"pins.json").read_text())
     base=pins["rexglue_memory_derivative"]
+    expected_patch=base["patch_sha256"]
+    if "memory_profile" in inputs["toolchain"]:
+        import prepare_runtime_memory as memory
+        patch,profile=memory.composition(False)
+        if (inputs["toolchain"]["memory_profile"]!=profile["profile"] or
+                inputs["toolchain"]["memory_lock_sha256"]!=common.sha(memory.LOCK)):
+            raise ValueError("unreviewed reference memory profile")
+        import hashlib
+        expected_patch=hashlib.sha256(patch).hexdigest()
     if (receipt["key"]!=reference.name or common.digest(inputs)!=reference.name or inputs["title"]!=identity
             or inputs["recipe"]!=common.validate_recipe(json.loads(common.RECIPE.read_text()))
             or inputs["recipe_sha256"]!=common.sha(common.RECIPE)
@@ -175,7 +184,7 @@ def stage_reference(reference, destination, identity, expected_manifest_sha256):
             or inputs["helper_sha256"]!={name:common.sha(common.EXPERIMENT/name) for name in ("prepare.py","mw2_tools.py","inspect_owned.py")}
             or inputs["toolchain"]["source"]["commit"]!=base["commit"]
             or inputs["toolchain"]["derivative"]["base_commit"]!=base["commit"]
-            or inputs["toolchain"]["derivative"]["patch_sha256"]!=base["patch_sha256"]):
+            or inputs["toolchain"]["derivative"]["patch_sha256"]!=expected_patch):
         raise ValueError("reference generation does not match reviewed title/source/recipe contract")
     common.read_cache(reference,reference.name,inputs)
     destination=common.no_symlink_path(destination)
@@ -223,12 +232,17 @@ def windows_probe(args, root, output, lock, clang, env, cmake, ninja, report):
     sdk_receipt=json.loads(args.sdk_report.read_text())
     sdk=Path(sdk_receipt["sdk_prefix"])
     source=root/"sources/rexglue-sdk"
-    actual=sdk_derivative(source,lock,output)
-    if (sdk_receipt.get("status")!="PASS" or sdk_receipt.get("source")!=actual
+    if "profile" in sdk_receipt:
+        import prepare_runtime_memory as memory
+        sdk,_=memory.verify_prepared(root,args.sdk_report)
+        if sdk_receipt["compiler"]!=report["compiler"]:raise ValueError("memory SDK compiler mismatch")
+    else:
+        actual=sdk_derivative(source,lock,output)
+        if (sdk_receipt.get("status")!="PASS" or sdk_receipt.get("source")!=actual
             or sdk_receipt.get("lock_sha256")!=common.sha(LOCK)
             or sdk_receipt.get("compiler")!=report["compiler"]
             or sdk_receipt["sdk_files"]!=common.snapshot(sdk)):
-        raise ValueError("native SDK receipt/source/package mismatch")
+            raise ValueError("native SDK receipt/source/package mismatch")
     for entry in lock["sources"]:
         if entry["name"]!="rexglue-sdk":common.verify_source(root/"sources"/entry["name"],entry)
     staged,receipt=stage_reference(args.reference_cache,root/"generated"/args.reference_cache.name,

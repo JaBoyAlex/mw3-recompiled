@@ -3,7 +3,10 @@
   "title": "Repair selected-runtime decommit access and validate SDK integration",
   "phase": 2,
   "area": "memory",
-  "depends_on": ["MW3-037", "MW3-040"],
+  "depends_on": [
+    "MW3-037",
+    "MW3-040"
+  ],
   "paths": [
     "config/toolchains/rexglue-memory",
     "tools/prepare_runtime_memory.py",
@@ -13,7 +16,9 @@
     "experiments/runtime-bakeoff/prepare_rexglue_memory.py",
     "config/toolchains/rexglue-windows/lock.json",
     "tools/prepare_windows_runtime.py",
-    "tools/recompile.py"
+    "tools/recompile.py",
+    "tools/test_runtime_memory.py",
+    "docs/STATUS.md"
   ],
   "goal": "Reject decommitted ranges in checked guest access and enforce decommit host protection without changing release policy or silently replacing the verified SDK baseline.",
   "acceptance": [
@@ -29,5 +34,11 @@
   ],
   "size": "bounded repair and integration; split additional defects",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "config/toolchains/rexglue-memory/validation-2026-11-18.md",
+    "docs/engine/memory.md",
+    "tools/prepare_runtime_memory.py",
+    "tools/test_runtime_memory.py"
+  ]
 }

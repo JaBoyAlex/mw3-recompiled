@@ -10,14 +10,28 @@ import shutil
 import subprocess
 import sys
 import uuid
+import xml.etree.ElementTree as ET
 
 import recompile as prep
 from run_conformance import geometry
+from host_checks import exact_filter,summarize
 
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/"tests/memory"
 SCENARIOS=("stack","aliases","boundaries","reservation","decommit-copy","decommit-view","decommit-store","release-policy",
-           "stress","bad-oracle","guard-read","readonly-write","released-read","decommitted-read")
+           "stress","bad-oracle","guard-read","readonly-write","released-read","decommitted-read",
+           "decommit-neighbors","decommit-invalid","physical-decommit","physical-decommitted-read")
+
+
+def upstream_status(code,checked,path):
+    tree=ET.parse(path);reasons=["".join(n.itertext()).strip() for n in tree.iter("Skip")]
+    if checked["failed"]:return "FAIL",reasons
+    if code==0:return "PASS",reasons
+    totals=tree.getroot().find("OverallResults")
+    if (code==4 and reasons and totals is not None and totals.get("failures")=="0"
+            and totals.get("successes")=="0" and int(totals.get("skips","0"))>0):
+        return "SKIP",reasons
+    return "FAIL",reasons
 
 
 def classify(case,code,text,windows=False):
@@ -25,7 +39,7 @@ def classify(case,code,text,windows=False):
     failed="MEMORY_CONTRACT_FAIL:" in text
     if any(x in text for x in ("ERROR: AddressSanitizer","ERROR: LeakSanitizer","runtime error:","UndefinedBehaviorSanitizer:")):
         return "FAIL"
-    faults=("guard-read","readonly-write","released-read","decommitted-read")
+    faults=("guard-read","readonly-write","released-read","decommitted-read","physical-decommitted-read")
     if case in faults:
         fault=(code&0xffffffff)==0xc0000005 if windows else code in (-11,-7)
         armed=text.count("MEMORY_FAULT_ARMED:"+case+" ")==1
@@ -53,6 +67,9 @@ def layouts(metadata):
 
 def linux_sdk(root,report_path,sanitizers):
     receipt=json.loads(report_path.read_text())
+    if "profile" in receipt:
+        import prepare_runtime_memory as memory
+        return memory.verify_prepared(root,report_path,allow_sanitized=sanitizers)
     if not receipt.get("core_sanitizers"):
         sdk,evidence=prep.toolchain(root,report_path)
         return sdk,evidence
@@ -73,7 +90,9 @@ def linux_sdk(root,report_path,sanitizers):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    for name in ("root","sdk-report","metadata","output-root"):parser.add_argument("--"+name,required=True,type=Path)
+    for name in ("root","sdk-report","output-root"):parser.add_argument("--"+name,required=True,type=Path)
+    parser.add_argument("--metadata",type=Path,help="required for the hash-bound synthetic/SP/MP matrix")
+    parser.add_argument("--upstream",action="store_true",help="build original upstream heap/access tests against the actual SDK DLL; no game metadata needed")
     parser.add_argument("--sanitizers",action="store_true")
     args=parser.parse_args()
     report=dict(schema_version=1,evidence_class="original-synthetic-memory-contract",owned_title_executed=False,
@@ -89,9 +108,15 @@ def main():
             clang,compiler=win.compiler(root,lock["compiler"],False)
             env,cmake,ninja,host=win.msvc_environment(lock,clang)
             receipt=json.loads(args.sdk_report.read_text());sdk=Path(receipt["sdk_prefix"])
-            actual=win.sdk_derivative(root/"sources/rexglue-sdk",lock,output)
+            if "profile" in receipt:
+                import prepare_runtime_memory as memory
+                sdk,evidence=memory.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
+                actual=receipt["source"]
+            else:
+                actual=win.sdk_derivative(root/"sources/rexglue-sdk",lock,output)
             if (receipt.get("status")!="PASS" or receipt.get("source")!=actual or receipt.get("compiler")!=compiler
-                    or receipt.get("lock_sha256")!=prep.sha(win.LOCK) or receipt["sdk_files"]!=prep.snapshot(sdk)):
+                    or (receipt.get("windows_lock_sha256") if "profile" in receipt else receipt.get("lock_sha256"))!=prep.sha(win.LOCK)
+                    or receipt["sdk_files"]!=prep.snapshot(sdk)):
                 raise ValueError("Windows SDK receipt/source/artifact mismatch")
             report.update(compiler=compiler,host=host,sdk=dict(source=actual,sdk_files=receipt["sdk_files"]))
             compiler_path=clang/"bin/clang++.exe"
@@ -109,19 +134,71 @@ def main():
             extra=["-DCMAKE_CXX_FLAGS=-march=x86-64-v2 --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13",
                    "-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=/usr/bin/ld.lld-20 -Wl,--threads=2"]
         report.update(sdk_report_sha256=prep.sha(args.sdk_report),sanitizers=("windows-ubsan-trap" if windows else "linux-asan-ubsan") if args.sanitizers else "none")
-        shapes=layouts(args.metadata)
+        if args.upstream and args.sanitizers:raise ValueError("focused upstream target is native-only; use the contract matrix for supported sanitizers")
+        if not args.upstream and not args.metadata:raise ValueError("memory layout matrix requires verified metadata")
+        shapes={"upstream":dict(PPC_IMAGE_BASE=0x82000000,PPC_IMAGE_SIZE=0x100000,PPC_CODE_BASE=0x82090000,PPC_CODE_SIZE=0x10000)} if args.upstream else layouts(args.metadata)
         for layout,shape in shapes.items():
             lane=output/layout;lane.mkdir();build=lane/"build"
             command=[cmake,"-S",SOURCE,"-B",build,"-G","Ninja","-DCMAKE_BUILD_TYPE=Release",
                      "-DCMAKE_CXX_COMPILER="+compiler_path.as_posix(),"-DCMAKE_PREFIX_PATH="+sdk.as_posix(),
                      "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG","-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
                      "-DMW3_MEMORY_SANITIZERS="+("ON" if args.sanitizers else "OFF"),*extra]
+            if args.upstream:
+                prepared=json.loads(args.sdk_report.read_text())
+                source=root/"sources"/("rexglue-decommit" if "profile" in prepared else "rexglue-sdk")
+                command += ["-DMW3_UPSTREAM_MEMORY_TESTS=ON","-DMW3_SDK_SOURCE="+source.as_posix()]
             command += [f"-D{k}={hex(v)}" for k,v in shape.items()]
             report.setdefault("builds",[]).append(dict(layout=layout,geometry=shape,configure_command=list(map(str,command))))
-            for index,call in enumerate((command,[cmake,"--build",build,"--parallel","2"])):
+            target="upstream-memory-tests" if args.upstream else "memory-contract"
+            for index,call in enumerate((command,[cmake,"--build",build,"--target",target,"--parallel","2"])):
                 with (lane/f"build-{index}.log").open("wb") as log:
                     subprocess.run(list(map(str,call)),env=env,stdout=log,stderr=subprocess.STDOUT,check=True,timeout=180)
-            binary=build/("memory-contract.exe" if windows else "memory-contract")
+            binary=build/(target+(".exe" if windows else ""))
+            if args.upstream:
+                report["evidence_class"]="upstream-original-memory-tests-against-packaged-kernel"
+                child={k:v for k,v in env.items() if not k.startswith(("REX_","LD_","ASAN_","UBSAN_","LSAN_"))}
+                if not windows:child["LD_LIBRARY_PATH"]=str(sdk/"lib")
+                child.update(SDL_VIDEODRIVER="dummy",SDL_AUDIODRIVER="dummy")
+                (lane/"listing-profile/tmp").mkdir(parents=True);(lane/"listing-profile/config").mkdir()
+                child.update(TMPDIR=str(lane/"listing-profile/tmp"),TMP=str(lane/"listing-profile/tmp"),TEMP=str(lane/"listing-profile/tmp"),
+                             XDG_CONFIG_HOME=str(lane/"listing-profile/config"),REX_APP_ROOT=str(lane/"listing-profile/app"),
+                             REX_APP_USER_ROOT=str(lane/"listing-profile/user"),REX_APP_LOG_ROOT=str(lane/"listing-profile/logs"))
+                listing=subprocess.check_output([str(binary),"--list-tests","--reporter","xml"],env=child,timeout=30)
+                (lane/"listing.xml").write_bytes(listing)
+                names=[entry.findtext("Name") for entry in ET.fromstring(listing).findall("TestCase")]
+                if not names or len(names)!=len(set(names)):raise ValueError("invalid focused SDK case list")
+                for index,name in enumerate(names):
+                    case=lane/str(index);case.mkdir();(case/"tmp").mkdir();(case/"config").mkdir()
+                    child.update(TMPDIR=str(case/"tmp"),TMP=str(case/"tmp"),TEMP=str(case/"tmp"),XDG_CONFIG_HOME=str(case/"config"))
+                    child.update(REX_APP_ROOT=str(case/"app"),REX_APP_USER_ROOT=str(case/"user"),REX_APP_LOG_ROOT=str(case/"logs"))
+                    call=[str(binary),exact_filter(name),"--reporter","xml","--out",str(case/"results.xml")]
+                    with (case/"run.log").open("wb") as log:
+                        result=subprocess.run(call,cwd=case,env=child,stdout=log,stderr=subprocess.STDOUT,timeout=45,
+                                              creationflags=subprocess.CREATE_NO_WINDOW if windows else 0)
+                    checked=summarize(case/"results.xml")
+                    if checked["cases"]!=1:raise ValueError("focused SDK filter did not select exactly one case")
+                    status,reasons=upstream_status(result.returncode,checked,case/"results.xml")
+                    row=dict(case=name,status=status,skip_reasons=reasons,
+                             returncode=result.returncode,command=call,xml_sha256=prep.sha(case/"results.xml"),
+                             log_sha256=prep.sha(case/"run.log"),**checked)
+                    report["results"].append(row)
+                    (output/"manifest.json").write_text(json.dumps(report,indent=2)+"\n")
+                    print(json.dumps(dict(case=name,status=row["status"])),flush=True)
+                report["focused_sdk_tests"]=True
+                report["binary_sha256"]=prep.sha(binary)
+                report["upstream_sources"]={name:prep.sha(source/"tests/unit"/name) for name in
+                    ("test_memory.cpp","kernel/heap_allocation_test.cpp","kernel/access_violation_test.cpp")}
+                if not windows:
+                    linked=subprocess.check_output(["ldd",str(binary)],env=child,text=True)
+                    (lane/"linked-libraries.txt").write_text(linked)
+                    if str(sdk/"lib/librexkernel.so") not in linked:raise ValueError("focused SDK test did not load the repaired kernel")
+                else:
+                    linked=subprocess.check_output([str(clang/"bin/llvm-readobj.exe"),"--coff-imports",str(binary)],env=child,text=True)
+                    (lane/"linked-libraries.txt").write_text(linked)
+                    if "rexkernel.dll" not in linked.lower() or "QueryProtect@BaseHeap" not in linked:
+                        raise ValueError("focused SDK test does not import the kernel access query")
+                report["linkage_sha256"]=prep.sha(lane/"linked-libraries.txt")
+                continue
             for scenario in SCENARIOS:
                 for seed in ((1,0x12345678,0xffffffff) if scenario=="stress" else (0x12345678,)):
                     case=lane/(scenario+"-"+str(seed));case.mkdir();(case/"tmp").mkdir();(case/"config").mkdir()
@@ -153,7 +230,8 @@ def main():
         else:
             _,after=linux_sdk(root,args.sdk_report,args.sanitizers)
             if after!=report["sdk"]:raise ValueError("SDK preparation changed during tests")
-        report["status"]="PASS" if all(r["status"]=="PASS" for r in report["results"]) else "FAIL"
+        allowed=("PASS","SKIP") if args.upstream else ("PASS",)
+        report["status"]="PASS" if all(r["status"] in allowed for r in report["results"]) and any(r["status"]=="PASS" for r in report["results"]) else "FAIL"
         (output/"manifest.json").write_text(json.dumps(report,indent=2)+"\n")
         return int(report["status"]!="PASS")
     except (OSError,ValueError,KeyError,StopIteration,subprocess.SubprocessError) as error:

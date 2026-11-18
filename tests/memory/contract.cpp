@@ -160,6 +160,57 @@ void Decommitted(GuestMemory& memory,const std::string& scenario) {
   else Require(!memory.GetView().TryLoad<uint32_t>(at),"MemoryView accepted decommitted page");
   Ok(memory.Free(at),"decommitted release failed");
 }
+void DecommitNeighbors() {
+  auto* heap=address_space->LookupHeap(0x10000000);
+  const uint32_t page=heap->GetPageSize(),rw=kMemoryProtectRead|kMemoryProtectWrite;
+  uint32_t at=0;
+  Require(heap->Alloc(page*5,page,kMemoryAllocationReserve|kMemoryAllocationCommit,rw,false,&at),"neighbor allocation failed");
+  MemoryView view(*address_space);
+  for(unsigned i=0;i<5;++i) view.Store<uint32_t>(at+i*page,0xabcd0000u+i);
+  Require(heap->Decommit(at+2*page-1,2),"unaligned two-page decommit failed");
+  Require(!view.TryLoad<uint32_t>(at+page) && !view.TryLoad<uint32_t>(at+2*page),"partial request did not cover both pages");
+  for(unsigned i:{0u,3u,4u}) Require(view.TryLoad<uint32_t>(at+i*page)==0xabcd0000u+i,"decommit changed neighboring page");
+  Require(heap->QueryRangeAccess(at,at+5*page-1)==rex::memory::PageAccess::kNoAccess,"range query crossed decommitted hole");
+  Require(heap->Decommit(at+page,2*page),"repeated decommit failed");
+  Require(!heap->Protect(at+page,page,rw),"protection revived uncommitted page");
+  Require(heap->AllocFixed(at+page,2*page,page,kMemoryAllocationCommit,rw),"neighbor recommit failed");
+  Require(view.TryStore<uint32_t>(at+page,0x12345678),"neighbor recommit not writable");
+  Require(heap->Release(at),"neighbor release failed");
+}
+void DecommitInvalid(GuestMemory& memory) {
+  const uint32_t at=Allocate(memory);
+  auto* heap=address_space->LookupHeap(at);
+  auto view=memory.GetView();view.Store<uint32_t>(at,0x12345678);
+  Require(!heap->Decommit(at,0),"zero decommit accepted");
+  Require(!heap->Decommit(heap->GetHeapBase()-1,2),"below-heap decommit accepted");
+  Require(!heap->Decommit(heap->GetHeapBase()+heap->GetHeapSize()-1,2),"past-heap decommit accepted");
+  Require(!heap->Decommit(0xfffffff0u,0x100),"wrapping decommit accepted");
+  Require(view.TryLoad<uint32_t>(at)==0x12345678,"invalid decommit changed live data");
+  Ok(memory.Free(at),"invalid-range fixture release failed");
+  Require(!heap->Decommit(at,1),"unreserved decommit accepted");
+}
+void PhysicalDecommit(GuestMemory& memory) {
+  const auto budget=address_space->GetTitlePages();
+  const uint32_t page=0x10000,at=Allocate(memory,3*page,page,GuestHeap::kPhysical);
+  auto* heap=address_space->LookupHeap(at);
+  auto view=memory.GetView();
+  Require(address_space->GetTitlePages()==budget+48,"physical allocation budget differs");
+  Require(!heap->Decommit(at,0) && !heap->Decommit(heap->GetHeapBase()-1,2),"invalid physical decommit accepted");
+  Require(address_space->GetTitlePages()==budget+48,"invalid physical decommit changed usage");
+  view.Store<uint32_t>(at+2*page,0x89abcdef);
+  Require(heap->Decommit(at+page-1,2),"physical partial decommit failed");
+  Require(address_space->GetTitlePages()==budget+16,"physical decommit budget differs");
+  Require(heap->Decommit(at,2*page),"physical repeated decommit failed");
+  Require(address_space->GetTitlePages()==budget+16,"repeated physical decommit changed usage");
+  Require(!memory.GetReadOnlySpan(at,1) && !memory.GetReadOnlySpan(at+page,1),"physical pages remain checked-readable");
+  Require(view.TryLoad<uint32_t>(at+2*page)==0x89abcdef,"physical neighbor changed");
+  Require(view.Load<uint32_t>(at+0x20000000u+2*page)==0x89abcdef,"live C alias changed");
+  Require(heap->AllocFixed(at,2*page,page,kMemoryAllocationCommit|kMemoryAllocationTitle,kMemoryProtectRead|kMemoryProtectWrite),"physical recommit failed");
+  Require(address_space->GetTitlePages()==budget+48,"physical recommit budget differs");
+  Require(view.TryStore<uint32_t>(at,0x12345678),"physical recommit not writable");
+  Ok(memory.Free(at),"physical fixture release failed");
+  Require(address_space->GetTitlePages()==budget,"physical release leaked budget");
+}
 void Stress(GuestMemory& memory,uint32_t seed,bool mutate) {
   struct Block {uint32_t at,size,word;};
   std::vector<Block> blocks;
@@ -210,6 +261,9 @@ int main(int argc,char** argv) {
     else if(scenario=="boundaries") Boundaries(memory);
     else if(scenario=="reservation") Reservation();
     else if(scenario=="decommit-copy" || scenario=="decommit-view" || scenario=="decommit-store") Decommitted(memory,scenario);
+    else if(scenario=="decommit-neighbors") DecommitNeighbors();
+    else if(scenario=="decommit-invalid") DecommitInvalid(memory);
+    else if(scenario=="physical-decommit") PhysicalDecommit(memory);
     else if(scenario=="release-policy") {
       const uint32_t at=Allocate(memory);Ok(memory.Free(at),"policy fixture free failed");
       Require(!memory.GetReadOnlySpan(at,1),"checked API accepted released page");
@@ -218,12 +272,12 @@ int main(int argc,char** argv) {
       std::printf("MEMORY_RELEASE_DEFAULT_HOST_ACCESS:%u\n",unsigned(access));
     }
     else if(scenario=="stress" || scenario=="bad-oracle") Stress(memory,seed,scenario=="bad-oracle");
-    else if(scenario=="guard-read" || scenario=="readonly-write" || scenario=="released-read" || scenario=="decommitted-read") {
+    else if(scenario=="guard-read" || scenario=="readonly-write" || scenario=="released-read" || scenario=="decommitted-read" || scenario=="physical-decommitted-read") {
       uint32_t at=stack_low-1;
       if(scenario!="guard-read") {
-        at=Allocate(memory);
+        at=Allocate(memory,0x10000,0x10000,scenario=="physical-decommitted-read"?GuestHeap::kPhysical:GuestHeap::kTitle);
         if(scenario=="released-read") Ok(memory.Free(at),"fault fixture release failed");
-        else if(scenario=="decommitted-read") Require(address_space->LookupHeap(at)->Decommit(at,0x10000),"fault fixture decommit failed");
+        else if(scenario=="decommitted-read" || scenario=="physical-decommitted-read") Require(address_space->LookupHeap(at)->Decommit(at,0x10000),"fault fixture decommit failed");
         else Ok(memory.Protect(at,0x10000,GuestProtect::kReadOnly),"fault fixture protect failed");
       }
       auto* pointer=runtime.GetMembase().TranslateVirtual<volatile uint8_t*>(at);

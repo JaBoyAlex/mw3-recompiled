@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "profile": "decommit-v1",
+  "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+  "patch_path": "decommit.patch",
+  "patch_sha256": "27792fb66bc8b6bac0ad11557c6325980e7dcdb337d2c5f837bc1d714db84141"
+}
