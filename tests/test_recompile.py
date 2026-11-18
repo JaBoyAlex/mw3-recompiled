@@ -105,7 +105,7 @@ class GenerationGuards(unittest.TestCase):
         (repo / ".gitignore").write_text(".local/\n")
         owned = self.root / "owned"
         owned.mkdir()
-        self.assertEqual(r.private_cache(repo / ".local/generated", owned), repo / ".local/generated")
+        self.assertEqual(r.private_cache(repo / ".local/generated", owned), (repo / ".local/generated").resolve())
         for output in (repo / "public", owned / "cache", self.root):
             with self.subTest(output=output), self.assertRaises(ValueError):
                 r.private_cache(output, owned)
