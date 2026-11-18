@@ -189,6 +189,8 @@ def sdk_system_libraries(sdk):
     system_libraries = {}
     for name in re.findall(r"(?:=>\s+)?(/\S+)\s+\(", linked):
         path = Path(name).resolve()
+        if path.name.startswith("librex") and not path.is_relative_to(sdk.resolve()):
+            raise ValueError("SDK library resolved outside the verified package")
         if not path.is_relative_to(sdk):
             system_libraries[str(path)] = sha(path)
     if not system_libraries:

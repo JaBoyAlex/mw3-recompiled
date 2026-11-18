@@ -27,3 +27,23 @@ endif()
 target_link_libraries(memory-contract PRIVATE rex::sdk)
 rexglue_apply_target_settings(memory-contract)
 rexglue_configure_target(memory-contract)
+
+option(MW3_UPSTREAM_MEMORY_TESTS "Compile focused pinned upstream tests against SDK DLLs" OFF)
+if(MW3_UPSTREAM_MEMORY_TESTS)
+  if(NOT DEFINED MW3_SDK_SOURCE)
+    message(FATAL_ERROR "Missing verified SDK test/Catch2 source")
+  endif()
+  set(CATCH_INSTALL_DOCS OFF CACHE BOOL "" FORCE)
+  set(CATCH_INSTALL_EXTRAS OFF CACHE BOOL "" FORCE)
+  add_subdirectory("${MW3_SDK_SOURCE}/thirdparty/catch2" "${CMAKE_BINARY_DIR}/catch2" EXCLUDE_FROM_ALL)
+  # Do not reuse unit_tests: upstream embeds kernel objects in that executable.
+  # These original test sources call the actual packaged kernel DLL instead.
+  add_executable(upstream-memory-tests
+    "${MW3_SDK_SOURCE}/tests/unit/test_memory.cpp"
+    "${MW3_SDK_SOURCE}/tests/unit/kernel/heap_allocation_test.cpp"
+    "${MW3_SDK_SOURCE}/tests/unit/kernel/access_violation_test.cpp")
+  target_include_directories(upstream-memory-tests PRIVATE "${MW3_SDK_SOURCE}/tests" "${MW3_SDK_SOURCE}/tests/unit")
+  target_link_libraries(upstream-memory-tests PRIVATE rex::sdk Catch2::Catch2WithMain)
+  rexglue_apply_target_settings(upstream-memory-tests)
+  rexglue_configure_target(upstream-memory-tests)
+endif()

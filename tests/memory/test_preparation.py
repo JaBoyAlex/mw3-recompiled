@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/"tools"))
 import prepare_runtime_memory as memory
@@ -46,6 +47,14 @@ class MemoryPreparationGuards(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"recorded memory patch changed"):
                 memory.source_identity(root,output,existing=True)
             self.assertEqual(path.read_bytes(),b"changed original fixture")
+
+    def test_generator_cannot_load_an_older_external_sdk_library(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);sdk=root/"sdk";sdk.mkdir();old=root/"librexkernel.so"
+            old.write_text("original inert fixture, never loaded\n")
+            listing=f"librexkernel.so => {old.as_posix()} (0x1234)\n"
+            with patch.object(common.subprocess,"run",return_value=SimpleNamespace(stdout=listing)),self.assertRaisesRegex(ValueError,"outside the verified package"):
+                common.sdk_system_libraries(sdk)
 
 
 if __name__=="__main__":unittest.main()
