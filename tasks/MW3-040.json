@@ -1,0 +1,29 @@
+{
+  "id": "MW3-040",
+  "title": "Prepare native Windows SDK and guarded SP/MP execution",
+  "phase": 2,
+  "area": "windows",
+  "depends_on": [
+    "MW3-009",
+    "MW3-036"
+  ],
+  "paths": [
+    "config/toolchains/rexglue-windows",
+    "tools/prepare_windows_runtime.py",
+    "tests/test_windows_runtime.py",
+    "docs/engine/windows-bringup.md"
+  ],
+  "goal": "Build the pinned selected SDK with a capable native Windows compiler and execute the verified guarded modules without weakening host security.",
+  "acceptance": [
+    "Pin compiler, headers/import libraries, transitive sources and configuration; use isolated outputs and reproducible preparation evidence",
+    "Compile the task-036 guarded harness and verified generated modules; verify bindings and reproduce the bounded SP/MP checkpoints without claiming playable boot",
+    "Keep SDK/game binaries private, preserve security settings and record blocked tools rather than bypassing antivirus; coordinate any shared preparation-driver changes separately"
+  ],
+  "validation": [
+    "Run Windows native positive/negative host fixtures and three independent guarded startup attempts per title",
+    "Compare import results/stops with Linux evidence and record platform divergences, unsupported checks and actual artifacts"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

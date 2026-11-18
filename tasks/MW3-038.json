@@ -1,0 +1,27 @@
+{
+  "id": "MW3-038",
+  "title": "Build a selected-translator PPC differential correctness oracle",
+  "phase": 2,
+  "area": "cpu",
+  "depends_on": [
+    "MW3-009"
+  ],
+  "paths": [
+    "tests/ppc",
+    "tools/test_rexglue_ppc.py",
+    "docs/engine/ppc-validation.md"
+  ],
+  "goal": "Validate the selected ReXGlue emission path with original synthetic PPC programs and an independent expected-results oracle, including the exact-math recipe.",
+  "acceptance": [
+    "Cover arithmetic/CR/XER, endian memory, branches/calls/ABI and floating/vector edge cases supported by the selected translator; enumerate untested VMX128/nonlocal behavior",
+    "Use original instruction fixtures and independent expected results; a native host callback or copied translator implementation is not a differential oracle",
+    "Bind generator/config/compiler identities, retain counterexamples, and detect a deliberate incorrect-result mutation"
+  ],
+  "validation": [
+    "Generate and execute seeded plus fixed edge cases and confirm independent result agreement",
+    "Run the oracle mutation and supported sanitizer/platform checks; do not claim full ISA or gameplay parity"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

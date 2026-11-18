@@ -1,0 +1,33 @@
+{
+  "id": "MW3-036",
+  "title": "Audit the first header query and guarded native startup seam",
+  "phase": 2,
+  "area": "kernel",
+  "depends_on": [
+    "MW3-009"
+  ],
+  "paths": [
+    "tools/runtime_probe.py",
+    "runtime/bringup",
+    "include/mw3/xex.hpp",
+    "src/xex.cpp",
+    "tests/xex_tests.cpp",
+    "tests/test_runtime_probe.py",
+    "docs/engine/startup-imports.md",
+    "docs/BUILDING.md",
+    "docs/STATUS.md"
+  ],
+  "goal": "Validate RtlImageXexHeaderField and the actually used module-handle data import against each exact owned module before admitting that one read-only service.",
+  "acceptance": [
+    "Independent bounded optional-header reader covers missing, immediate, inline and offset/variable fields with overflow, duplicate and truncated-input refusal",
+    "Verify private generation cache and every function binding before launch; permit only the reviewed header query, compare its result with the independent reader, and stop on every other function import",
+    "Audit the used XexExecutableModuleHandle cell/header pointer; keep the other data imports explicitly unapproved and preserve original inputs"
+  ],
+  "validation": [
+    "Run parser negative cases on Windows/Linux and Linux ASan/UBSan",
+    "Reproduce SP/MP first-query arguments, independently predicted result and next diagnostic stop in three private processes each; retain failures and a deliberate binding/pointer rejection"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

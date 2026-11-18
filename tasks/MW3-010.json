@@ -1,26 +1,30 @@
 {
   "id": "MW3-010",
-  "title": "Bring up guest memory, kernel and thread lifecycle",
+  "title": "Verify the guest kernel and controlled title-lifecycle gate",
   "phase": 2,
   "area": "kernel",
   "depends_on": [
-    "MW3-009"
+    "MW3-036",
+    "MW3-037",
+    "MW3-038",
+    "MW3-039",
+    "MW3-040",
+    "MW3-041"
   ],
   "paths": [
-    "runtime/kernel",
-    "runtime/memory",
-    "tests/kernel"
+    "docs/gates/native-kernel-acceptance.md"
   ],
   "goal": "Reach a controlled title entry and clean shutdown with real guest memory and synchronization semantics.",
   "acceptance": [
     "Physical alias coherence, endian access, TLS/r13, stack guards, atomics and wait semantics tested",
-    "Unsupported imports fail with bounded diagnostics; no success-valued dummy implementations"
+    "Unsupported imports fail with bounded diagnostics; no success-valued dummy implementations",
+    "Require merged child acceptance and actual native Windows/Linux title checkpoint plus orderly teardown evidence; completion is not playable boot or full kernel parity"
   ],
   "validation": [
     "Stress create/wait/cancel/shutdown and adversarial guest pointers",
     "Record first real title checkpoint"
   ],
-  "size": "epic; split before claiming",
+  "size": "evidence gate; implement only in scoped children",
   "priority": 0,
   "status": "todo"
 }

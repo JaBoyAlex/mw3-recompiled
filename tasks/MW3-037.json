@@ -1,0 +1,27 @@
+{
+  "id": "MW3-037",
+  "title": "Stress selected-runtime memory and guest-pointer boundaries",
+  "phase": 2,
+  "area": "memory",
+  "depends_on": [
+    "MW3-009"
+  ],
+  "paths": [
+    "tests/memory",
+    "tools/test_runtime_memory.py",
+    "docs/engine/memory.md"
+  ],
+  "goal": "Exercise actual selected SDK memory services with synthetic and hash-bound MW3 geometry before trusting guest pointers or allocator behavior.",
+  "acceptance": [
+    "Test virtual/physical aliases, endian access, allocation/release/alignment, reserve/commit/protect, stack guards, 32-bit wrap and invalid guest ranges",
+    "Use a standalone game-free test project and isolated profiles; no shared SDK patch or scheduler/interface changes without a separate agreed task",
+    "Preserve failed assertions and identify SDK limitations; synthetic geometry tests are not real title memory or performance evidence"
+  ],
+  "validation": [
+    "Run seeded allocator/range stress and meaningful negative pointer/guard cases with bounded subprocesses",
+    "Run Linux native plus supported ASan/UBSan checks; document Windows coverage or its dependency on MW3-040"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

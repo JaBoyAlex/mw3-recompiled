@@ -1,0 +1,27 @@
+{
+  "id": "MW3-039",
+  "title": "Stress selected-runtime threads, waits and lifecycle",
+  "phase": 2,
+  "area": "threads",
+  "depends_on": [
+    "MW3-009"
+  ],
+  "paths": [
+    "tests/threads",
+    "tools/test_runtime_threads.py",
+    "docs/engine/threads.md"
+  ],
+  "goal": "Exercise actual selected SDK thread/TLS/synchronization semantics beyond the initial native callback contracts.",
+  "acceptance": [
+    "Test TLS/r13 and stack bounds, create/suspend/resume/terminate, events/semaphores/mutexes, timeout/cancel paths, atomics/order and repeated teardown",
+    "Use deterministic barriers and bounded waits instead of sleeps hiding races; preserve resource/handle accounting and distinct per-process profiles",
+    "Investigate the retained aggregate-suite shared-state failures and report unresolved causes; do not turn process isolation into a claimed fix"
+  ],
+  "validation": [
+    "Run seeded contention and create/wait/cancel/shutdown stress with leak/deadline checks",
+    "Run supported sanitizers and mutation/timeout negatives; document host callbacks versus any translated instructions separately"
+  ],
+  "size": "1-3 days",
+  "priority": 0,
+  "status": "todo"
+}

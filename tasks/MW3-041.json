@@ -1,0 +1,32 @@
+{
+  "id": "MW3-041",
+  "title": "Integrate controlled title lifecycle and kernel gate evidence",
+  "phase": 2,
+  "area": "kernel-integration",
+  "depends_on": [
+    "MW3-036",
+    "MW3-037",
+    "MW3-038",
+    "MW3-039",
+    "MW3-040"
+  ],
+  "paths": [
+    "runtime/lifecycle",
+    "tools/verify_kernel_gate.py",
+    "tests/lifecycle",
+    "docs/gates/native-kernel.md"
+  ],
+  "goal": "Reconcile child evidence and achieve orderly shutdown after an explicitly bounded real-title checkpoint on Linux and native Windows.",
+  "acceptance": [
+    "Record exact SP/MP generation/runtime identities and reviewed import/data-variable coverage, with every remaining service failing diagnostically",
+    "Replace abrupt process-exit evidence with a deliberately bounded diagnostic stop followed by real thread/runtime teardown and verified resource release",
+    "Keep the parent gate open for any failing child, missing platform evidence or unreviewed service needed by the checkpoint; split newly discovered implementation work rather than widening this task silently"
+  ],
+  "validation": [
+    "Repeat title load/checkpoint/diagnostic-stop/shutdown in isolated profiles, including interruption and malformed-pointer failures",
+    "Reconcile all child cases and rerun affected regression/sanitizer checks; no graphics, playable boot or full-kernel compatibility claim"
+  ],
+  "size": "bounded integration; split discovered blockers",
+  "priority": 0,
+  "status": "todo"
+}
