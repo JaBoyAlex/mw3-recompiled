@@ -17,6 +17,20 @@ import recompile as prep
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/'tests/ppc'
 
+def source_snapshot():
+    return {n:v for n,v in prep.snapshot(SOURCE).items() if '__pycache__' not in Path(n).parts}
+
+def reference_bundle(path, destination):
+    receipt=json.loads((path/'manifest.json').read_text())
+    if (receipt.get('status')!='PASS' or receipt.get('evidence_class')!='original-synthetic-ppc-oracle'
+            or receipt.get('script_sha256')!=prep.sha(__file__) or receipt.get('sources')!=source_snapshot()):
+        raise ValueError('stale or unsuccessful synthetic reference')
+    if set(receipt['assembly'])!={'fixtures.o','fixtures.elf','fixtures.bin','fixtures.map'}:
+        raise ValueError('unexpected reference assembly inventory')
+    if prep.snapshot(path/'bins')!=receipt['assembly']:raise ValueError('reference assembly changed')
+    for name in receipt['assembly']:shutil.copyfile(path/'bins'/name,destination/name)
+    return receipt
+
 def bindings(output,symbols):
     read=[];write=[]
     for prefix,limit,member in [('r',32,'u64'),('f',32,'u64')]:
@@ -36,8 +50,9 @@ def bindings(output,symbols):
         read.append(f'if(key=="{n}") return ctx.xer.{n};')
         write.append(f'if(key=="{n}") {{ ctx.xer.{n}=static_cast<u8>(value);return; }}')
     for n in ['lr','ctr']:
-        read.append(f'if(key=="{n}") return ctx.{n}.u64;')
-        write.append(f'if(key=="{n}") {{ ctx.{n}.u64=value;return; }}')
+        field='ctx.lr' if n=='lr' else 'ctx.ctr.u64'
+        read.append(f'if(key=="{n}") return {field};')
+        write.append(f'if(key=="{n}") {{ {field}=value;return; }}')
     for name,lines in [('read_register.inc',read),('write_register.inc',write)]:
         (output/name).write_text('\n'.join(lines)+'\n',encoding='utf-8')
     lines=['#pragma once','#include <string>','#include <stdexcept>','#include <rex/kernel/heap.h>']
@@ -66,10 +81,11 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('root','sdk-report','output-root'):parser.add_argument('--'+name,required=True,type=Path)
     parser.add_argument('--sanitizers',action='store_true')
+    parser.add_argument('--reference',type=Path,help='Windows: successful canonical Linux synthetic fixture preparation')
     parser.add_argument('--seed',type=lambda n:int(n,0),default=0x20110360)
     args=parser.parse_args();output=None
     report=dict(schema_version=1,evidence_class='original-synthetic-ppc-oracle',owned_title_executed=False,
-                performance_measured=False,script_sha256=prep.sha(__file__),sources=prep.snapshot(SOURCE),results=[])
+                performance_measured=False,script_sha256=prep.sha(__file__),sources=source_snapshot(),results=[])
     try:
         output=prep.private_cache(args.output_root,ROOT/'game')/uuid.uuid4().hex;output.mkdir(parents=True)
         print(json.dumps(dict(output=str(output))),flush=True)
@@ -99,7 +115,8 @@ def main():
             extra=['-DCMAKE_CXX_FLAGS=-march=x86-64-v2 --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13',
                    '-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=/usr/bin/ld.lld-20 -Wl,--threads=2']
         suffix='.exe' if windows else ''
-        tools={n:llvm/(n+suffix) for n in ('clang','clang++','ld.lld','llvm-objcopy','llvm-nm','llvm-objdump')}
+        names=('clang','clang++','llvm-readobj') if windows else ('clang','clang++','ld.lld','llvm-objcopy','llvm-nm','llvm-objdump')
+        tools={n:llvm/(n+suffix) for n in names}
         if not windows:
             # These three metadata utilities come from the existing LLVM 18
             # host preparation. Assembly, linking and host compilation use 20.
@@ -115,10 +132,18 @@ def main():
             register_locals=False,forward_stack_stores=False,
             limitation='Original bounded fixture analysis; not the full-title discovery/import pipeline or full ISA.')
         bins=output/'bins';generated=output/'generated';bins.mkdir();generated.mkdir()
-        run('assemble',[tools['clang'],'--target=powerpc64-unknown-linux-gnu','-mcpu=pwr7','-maltivec','-c',SOURCE/'fixtures.s','-o',bins/'fixtures.o'],env)
-        run('link-ppc',[tools['ld.lld'],'-m','elf64ppc','-Ttext=0x82010000','-e','test_addc',bins/'fixtures.o','-o',bins/'fixtures.elf'],env)
-        run('binary',[tools['llvm-objcopy'],'--only-section=.text','-O','binary',bins/'fixtures.elf',bins/'fixtures.bin'],env)
-        nm=run('symbols',[tools['llvm-nm'],'--numeric-sort',bins/'fixtures.o'],env)
+        reference=None
+        if windows:
+            if not args.reference:raise ValueError('Windows LLVM lacks PowerPC; canonical synthetic reference is required')
+            reference=reference_bundle(args.reference,bins)
+            report['reference_manifest_sha256']=prep.sha(args.reference/'manifest.json')
+            nm=(bins/'fixtures.map').read_text()
+        else:
+            if args.reference:raise ValueError('canonical Linux preparation must assemble its own original inputs')
+            run('assemble',[tools['clang'],'--target=powerpc64-unknown-linux-gnu','-mcpu=pwr7','-maltivec','-c',SOURCE/'fixtures.s','-o',bins/'fixtures.o'],env)
+            run('link-ppc',[tools['ld.lld'],'-m','elf64ppc','-Ttext=0x82010000','-e','test_addc',bins/'fixtures.o','-o',bins/'fixtures.elf'],env)
+            run('binary',[tools['llvm-objcopy'],'--only-section=.text','-O','binary',bins/'fixtures.elf',bins/'fixtures.bin'],env)
+            nm=run('symbols',[tools['llvm-nm'],'--numeric-sort',bins/'fixtures.o'],env)
         symbols={};map_lines=[]
         for line in nm.splitlines():
             fields=line.split()
@@ -127,7 +152,7 @@ def main():
                 map_lines.append(f'{offset:08x} T {fields[2]}')
         if len(symbols)!=14:raise ValueError('unexpected fixture symbol inventory')
         (bins/'fixtures.map').write_text('\n'.join(map_lines)+'\n',encoding='utf-8')
-        run('disassembly',[tools['llvm-objdump'],'-dr',bins/'fixtures.elf'],env)
+        if not windows:run('disassembly',[tools['llvm-objdump'],'-dr',bins/'fixtures.elf'],env)
         child={k:v for k,v in env.items() if not k.startswith(('REX_','LD_','ASAN_','UBSAN_','LSAN_'))}
         if not windows:child['LD_LIBRARY_PATH']=str(sdk/'lib')
         # The upstream CLI hardcodes stack forwarding on. Build a small test
@@ -146,6 +171,9 @@ def main():
         second=output/'generated-repeat';second.mkdir()
         run('generate-repeat',[generator,bins/'fixtures.bin',bins/'fixtures.map',second],child)
         if baseline!=prep.snapshot(second):raise ValueError('synthetic generation not reproducible')
+        if reference is not None:
+            if baseline!=reference['generated']:raise ValueError('native Windows emission differs from canonical reference')
+            report['generation_matches_reference']=True
         report.update(generated=baseline,assembly=prep.snapshot(bins),generation_reproduced=True,symbols=symbols)
         bindings(generated,symbols)
         run('configure',[cmake,'-S',SOURCE,'-B',output/'build','-G','Ninja','-DCMAKE_BUILD_TYPE=Release',
@@ -167,6 +195,9 @@ def main():
         if not windows:
             linked=run('linkage',['ldd',binary],child)
             if str(sdk/'lib/librexkernel.so') not in linked:raise ValueError('wrong kernel loaded')
+        else:
+            linked=run('linkage',[tools['llvm-readobj'],'--coff-imports',binary],env)
+            if 'rexkernel.dll' not in linked.lower():raise ValueError('runner does not import the kernel DLL')
         for label,data in [('oracle',cases),('mutation',copy.deepcopy(cases))]:
             if label=='mutation':data[0]['out']['r3']^=1
             path=output/(label+'.json');path.write_text(json.dumps(data),encoding='utf-8')
@@ -177,12 +208,14 @@ def main():
             report['results'].append(row);print(json.dumps(row),flush=True)
         _,after=memory.verify_prepared(root,args.sdk_report)
         if after!=evidence:raise ValueError('SDK changed during tests')
-        if report['script_sha256']!=prep.sha(__file__) or report['sources']!=prep.snapshot(SOURCE):
+        if report['script_sha256']!=prep.sha(__file__) or report['sources']!=source_snapshot():
             raise ValueError('oracle source changed during tests')
         if report['generator_sha256']!=prep.sha(generator) or report['binary_sha256']!=prep.sha(binary):
             raise ValueError('executed binary changed during tests')
         if any(report['tools'][n]['sha256']!=prep.sha(p) for n,p in tools.items()):raise ValueError('compiler utility changed during tests')
         if report['production_guest_policy_sha256']!=prep.sha(production):raise ValueError('production guest policy changed during tests')
+        if reference is not None and report['reference_manifest_sha256']!=prep.sha(args.reference/'manifest.json'):
+            raise ValueError('synthetic reference receipt changed during tests')
         report['status']='PASS' if all(r['status']=='PASS' for r in report['results']) else 'FAIL'
         (output/'manifest.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
         return int(report['status']!='PASS')

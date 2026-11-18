@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'tools'))
 import test_rexglue_ppc as driver
@@ -22,3 +23,16 @@ class ResultGuards(unittest.TestCase):
         self.assertFalse(driver.classify(0,log(),cases,True))
         row['mismatches'][0]['register']='ca'
         self.assertFalse(driver.classify(1,log(),cases,True))
+    def test_reference_refuses_failure_stale_source_and_changed_inputs(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder);(path/'bins').mkdir();(path/'copy').mkdir()
+            for n in ('fixtures.o','fixtures.elf','fixtures.bin','fixtures.map'):(path/'bins'/n).write_bytes(b'original synthetic')
+            receipt=dict(status='PASS',evidence_class='original-synthetic-ppc-oracle',
+                script_sha256=driver.prep.sha(driver.__file__),sources=driver.source_snapshot(),assembly=driver.prep.snapshot(path/'bins'))
+            manifest=path/'manifest.json';manifest.write_text(json.dumps(receipt))
+            self.assertEqual(driver.reference_bundle(path,path/'copy'),receipt)
+            for field,value in [('status','FAIL'),('sources',{}),('script_sha256','0'*64)]:
+                bad=dict(receipt);bad[field]=value;manifest.write_text(json.dumps(bad))
+                with self.assertRaises(ValueError):driver.reference_bundle(path,path/'copy')
+            manifest.write_text(json.dumps(receipt));(path/'bins/fixtures.bin').write_bytes(b'changed')
+            with self.assertRaises(ValueError):driver.reference_bundle(path,path/'copy')
