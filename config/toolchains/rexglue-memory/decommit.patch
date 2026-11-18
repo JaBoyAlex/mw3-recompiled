@@ -1,0 +1,105 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Original decommit repair; upstream source notices are preserved.
+diff --git a/src/kernel/memory.cpp b/src/kernel/memory.cpp
+index 4ca5049..8cb6db4 100644
+--- a/src/kernel/memory.cpp
++++ b/src/kernel/memory.cpp
+@@ -918,8 +918,10 @@ rex::memory::PageAccess BaseHeap::GetHostPageGuestAccess(u32 host_page_number) c
+   bool has_read = false;
+   bool has_write = false;
+   bool has_committed = false;
++  bool has_reserved = false;
+   for (u32 page_number = guest_page_start; page_number <= guest_page_end; ++page_number) {
+     const auto& page_entry = page_table_[page_number];
++    has_reserved |= (page_entry.state & kernel::kMemoryAllocationReserve) != 0;
+     if (!(page_entry.state & kernel::kMemoryAllocationCommit)) {
+       continue;
+     }
+@@ -937,7 +939,7 @@ rex::memory::PageAccess BaseHeap::GetHostPageGuestAccess(u32 host_page_number) c
+ 
+   rex::memory::PageAccess access;
+   // A released physical alias stays accessible unless protect_on_release is set, for the GPU.
+-  if (!has_committed && heap_type_ == kernel::HeapType::kGuestPhysical &&
++  if (!has_committed && !has_reserved && heap_type_ == kernel::HeapType::kGuestPhysical &&
+       !GetRuntimeSettings().protect_on_release.Get()) {
+     access = rex::memory::PageAccess::kReadWrite;
+   } else if (!has_read) {
+@@ -1385,15 +1387,28 @@ bool BaseHeap::Decommit(u32 address, u32 size) {
+ }
+ 
+ bool BaseHeap::DecommitLocked(u32 address, u32 size) {
+-  u32 page_count = GetPageCount(size, page_size_, page_size_shift_);
+-  u32 start_page_number = (address - heap_base_) >> page_size_shift_;
+-  u32 end_page_number = start_page_number + page_count - 1;
+-  start_page_number = std::min(static_cast<u32>(page_table_.size()) - 1, start_page_number);
+-  end_page_number = std::min(static_cast<u32>(page_table_.size()) - 1, end_page_number);
++  const u64 end = static_cast<u64>(address) + size;
++  if (!size || address < heap_base_ || end > static_cast<u64>(heap_base_) + heap_size_) {
++    REXSYS_FAIL(false, "BaseHeap::Decommit range is outside its heap");
++  }
++  const u32 start_page_number = (address - heap_base_) >> page_size_shift_;
++  const u32 end_page_number = static_cast<u32>((end - 1 - heap_base_) >> page_size_shift_);
+ 
+   std::lock_guard<std::recursive_mutex> heap_lock(heap_mutex_);
+ 
+-  // Mapped memory cannot be decommitted.
++  for (u32 page_number = start_page_number; page_number <= end_page_number; ++page_number) {
++    if (!(page_table_[page_number].state & kernel::kMemoryAllocationReserve)) {
++      REXSYS_FAIL(false, "BaseHeap::Decommit range contains an unreserved page");
++    }
++  }
++  // Keep the shared backing mapping; revoke this view's host access before
++  // publishing the decommit. Smaller guest pages use host-page reconciliation.
++  if (page_size_ >= memory_->system_page_size_ &&
++      !rex::memory::Protect(TranslateRelative(start_page_number << page_size_shift_),
++                            (end_page_number - start_page_number + 1) << page_size_shift_,
++                            rex::memory::PageAccess::kNoAccess, nullptr)) {
++    REXSYS_FAIL(false, "BaseHeap::Decommit failed to protect its host pages");
++  }
+ 
+   u32 released = 0;
+   for (u32 page_number = start_page_number; page_number <= end_page_number; ++page_number) {
+@@ -1709,6 +1724,10 @@ bool BaseHeap::QueryProtect(u32 address, u32* out_protect) {
+     return false;
+   }
+   const PageEntry page_entry = LoadPageEntry(page_table_[page_number]);
++  if (!(page_entry.state & kernel::kMemoryAllocationCommit)) {
++    *out_protect = 0;
++    return false;
++  }
+   *out_protect = page_entry.current_protect;
+   return true;
+ }
+@@ -1725,6 +1744,9 @@ rex::memory::PageAccess BaseHeap::QueryRangeAccess(u32 low_address, u32 high_add
+   {
+     std::lock_guard<std::recursive_mutex> heap_lock(heap_mutex_);
+     for (u32 i = low_page_number; i <= high_page_number; ++i) {
++      if (!(page_table_[i].state & kernel::kMemoryAllocationCommit)) {
++        return rex::memory::PageAccess::kNoAccess;
++      }
+       u32 page_protect = page_table_[i].current_protect;
+       if (!(page_protect & kernel::kMemoryProtectRead)) {
+         all_readable = false;
+@@ -1906,6 +1928,22 @@ bool PhysicalHeap::AllocSystemHeap(u32 size, u32 alignment, u32 allocation_type,
+ 
+ bool PhysicalHeap::Decommit(u32 address, u32 size) {
+   std::lock_guard lock(memory_->watch_mutex_);
++  std::lock_guard<std::recursive_mutex> heap_lock(heap_mutex_);
++
++  const u64 end = static_cast<u64>(address) + size;
++  if (!size || address < heap_base_ || end > static_cast<u64>(heap_base_) + heap_size_) {
++    REXSYS_FAIL(false, "PhysicalHeap::Decommit range is outside its heap");
++  }
++  const u32 first = (address - heap_base_) >> page_size_shift_;
++  const u32 last = static_cast<u32>((end - 1 - heap_base_) >> page_size_shift_);
++  for (u32 page = first; page <= last; ++page) {
++    if (!(page_table_[page].state & kernel::kMemoryAllocationReserve)) {
++      REXSYS_FAIL(false, "PhysicalHeap::Decommit range contains an unreserved page");
++    }
++  }
++  // Decommit the same complete guest pages in parent and alias views.
++  address = heap_base_ + (first << page_size_shift_);
++  size = (last - first + 1) << page_size_shift_;
+ 
+   u32 parent_address = GetPhysicalAddress(address);
+   if (!parent_heap_->DecommitLocked(parent_address, size)) {

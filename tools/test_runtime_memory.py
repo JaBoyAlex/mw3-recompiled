@@ -17,7 +17,8 @@ from run_conformance import geometry
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/"tests/memory"
 SCENARIOS=("stack","aliases","boundaries","reservation","decommit-copy","decommit-view","decommit-store","release-policy",
-           "stress","bad-oracle","guard-read","readonly-write","released-read","decommitted-read")
+           "stress","bad-oracle","guard-read","readonly-write","released-read","decommitted-read",
+           "decommit-neighbors","decommit-invalid","physical-decommit","physical-decommitted-read")
 
 
 def classify(case,code,text,windows=False):
@@ -25,7 +26,7 @@ def classify(case,code,text,windows=False):
     failed="MEMORY_CONTRACT_FAIL:" in text
     if any(x in text for x in ("ERROR: AddressSanitizer","ERROR: LeakSanitizer","runtime error:","UndefinedBehaviorSanitizer:")):
         return "FAIL"
-    faults=("guard-read","readonly-write","released-read","decommitted-read")
+    faults=("guard-read","readonly-write","released-read","decommitted-read","physical-decommitted-read")
     if case in faults:
         fault=(code&0xffffffff)==0xc0000005 if windows else code in (-11,-7)
         armed=text.count("MEMORY_FAULT_ARMED:"+case+" ")==1
@@ -53,6 +54,9 @@ def layouts(metadata):
 
 def linux_sdk(root,report_path,sanitizers):
     receipt=json.loads(report_path.read_text())
+    if "profile" in receipt:
+        import prepare_runtime_memory as memory
+        return memory.verify_prepared(root,report_path,allow_sanitized=sanitizers)
     if not receipt.get("core_sanitizers"):
         sdk,evidence=prep.toolchain(root,report_path)
         return sdk,evidence
@@ -89,9 +93,15 @@ def main():
             clang,compiler=win.compiler(root,lock["compiler"],False)
             env,cmake,ninja,host=win.msvc_environment(lock,clang)
             receipt=json.loads(args.sdk_report.read_text());sdk=Path(receipt["sdk_prefix"])
-            actual=win.sdk_derivative(root/"sources/rexglue-sdk",lock,output)
+            if "profile" in receipt:
+                import prepare_runtime_memory as memory
+                sdk,evidence=memory.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
+                actual=receipt["source"]
+            else:
+                actual=win.sdk_derivative(root/"sources/rexglue-sdk",lock,output)
             if (receipt.get("status")!="PASS" or receipt.get("source")!=actual or receipt.get("compiler")!=compiler
-                    or receipt.get("lock_sha256")!=prep.sha(win.LOCK) or receipt["sdk_files"]!=prep.snapshot(sdk)):
+                    or (receipt.get("windows_lock_sha256") if "profile" in receipt else receipt.get("lock_sha256"))!=prep.sha(win.LOCK)
+                    or receipt["sdk_files"]!=prep.snapshot(sdk)):
                 raise ValueError("Windows SDK receipt/source/artifact mismatch")
             report.update(compiler=compiler,host=host,sdk=dict(source=actual,sdk_files=receipt["sdk_files"]))
             compiler_path=clang/"bin/clang++.exe"

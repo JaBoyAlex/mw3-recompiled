@@ -142,6 +142,13 @@ def read_cache(directory, key, inputs):
 
 
 def toolchain(root, report_path):
+    report = json.loads(report_path.read_text())
+    if "profile" in report:
+        import prepare_runtime_memory as memory
+        sdk, evidence = memory.verify_prepared(root, report_path)
+        return sdk, dict(evidence, system_libraries=sdk_system_libraries(sdk),
+                         host=dict(system=platform.system(), machine=platform.machine(), python=sys.version),
+                         pins_sha256=sha(EXPERIMENT / "pins.json"))
     lock = json.loads((EXPERIMENT / "pins.json").read_text())
     source = verify_source(root / "sources/rexglue-sdk", next(s for s in lock["sources"] if s["name"] == "rexglue-sdk"))
     for name in ("headers", "vma"):
@@ -166,6 +173,13 @@ def toolchain(root, report_path):
              if not name.startswith("bin/logs/")}
     if "bin/rexglue" not in files:
         raise ValueError("SDK code generator missing")
+    return sdk, dict(source=source, derivative=derivative, preparation_sha256=sha(report_path),
+                     sdk_files=files, sdk_tree_sha256=digest(files), system_libraries=sdk_system_libraries(sdk),
+                     host=dict(system=platform.system(), machine=platform.machine(), python=sys.version),
+                     pins_sha256=sha(EXPERIMENT / "pins.json"))
+
+
+def sdk_system_libraries(sdk):
     env = {k: v for k, v in os.environ.items() if not k.startswith("LD_")}
     env["LD_LIBRARY_PATH"] = str(sdk / "lib")
     linked = subprocess.run(["ldd", str(sdk / "bin/rexglue")], env=env,
@@ -179,10 +193,7 @@ def toolchain(root, report_path):
             system_libraries[str(path)] = sha(path)
     if not system_libraries:
         raise ValueError("generator system-library inventory empty")
-    return sdk, dict(source=source, derivative=derivative, preparation_sha256=sha(report_path),
-                     sdk_files=files, sdk_tree_sha256=digest(files), system_libraries=system_libraries,
-                     host=dict(system=platform.system(), machine=platform.machine(), python=sys.version),
-                     pins_sha256=sha(EXPERIMENT / "pins.json"))
+    return system_libraries
 
 
 def manifest_text(role, owned, recipe):
