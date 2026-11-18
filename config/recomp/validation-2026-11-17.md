@@ -64,3 +64,9 @@ SDK access. Public code is original GPL-3.0-only Python/JSON/docs; no upstream
 source, game bytes, generated C++, SDKs or private logs are committed.
 Self-review only; no independent reviewer available. No gameplay-performance
 impact has been measured, and no release or product gate passes here.
+
+Initial Windows CI correctly failed the existing overlap guard fixture on its
+8.3 temporary-directory alias (`RUNNER~1` versus the resolved long name). The
+driver now resolves both comparison paths after refusing symlinks. This fixes
+the guard rather than skipping the fixture. Linux CI originally passed; fresh
+generation and the Windows/Linux matrix are repeated for the corrected driver.

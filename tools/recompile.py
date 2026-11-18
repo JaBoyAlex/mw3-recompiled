@@ -59,7 +59,9 @@ def no_symlink_path(path):
     path = Path(os.path.abspath(path))
     if any(p.is_symlink() for p in (path, *path.parents)):
         raise ValueError("symlink in private output path")
-    return path
+    # Resolve Windows short-name aliases too, so both sides of every overlap
+    # comparison identify the same directory (RUNNER~1 versus runneradmin).
+    return path.resolve()
 
 
 def private_cache(path, owned):
