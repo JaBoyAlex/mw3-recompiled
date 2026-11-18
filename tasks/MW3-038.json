@@ -9,7 +9,8 @@
   "paths": [
     "tests/ppc",
     "tools/test_rexglue_ppc.py",
-    "docs/engine/ppc-validation.md"
+    "docs/engine/ppc-validation.md",
+    "docs/STATUS.md"
   ],
   "goal": "Validate the selected ReXGlue emission path with original synthetic PPC programs and an independent expected-results oracle, including the exact-math recipe.",
   "acceptance": [
@@ -23,5 +24,12 @@
   ],
   "size": "1-3 days",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "docs/engine/ppc-validation.md: original instruction fixtures, independent integer/rational expected state, exact-math/register/stack policy and production guest wraparound flags",
+    "Six final Windows/Linux native/sanitizer/held-out-seed runs: 2,410 cases each PASS; six full deliberate-result mutation runs each reject exactly the changed result",
+    "Two clean emissions per run and all six native cross-host outputs match; retained generator/runner, compile-command, input/case/log hashes rechecked against receipts",
+    "Windows Release tools/check.py: 98 Python tests, five explicit skips, native CTest PASS; Linux Release --sanitizers: 100 Python tests, no skips, ASan/UBSan CTest PASS",
+    "Synthetic subset only; SDK cores/generator uninstrumented, Windows uses UBSan traps; VMX128/nonlocal/full ISA/retail-console/performance/gameplay not certified; self-review only"
+  ]
 }
