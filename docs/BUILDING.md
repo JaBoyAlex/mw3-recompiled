@@ -70,3 +70,24 @@ but are not claimed byte-identical between attempts. Both attempts and failures
 remain private. No generated code is edited as maintained source. The current
 SDK receipt is local provenance, not a signed build attestation or redistribution
 approval; compiler/build timestamps can change SDK binaries and cache keys.
+
+## Guarded header-service probe
+
+This is a private Linux/WSL research harness, not a game launcher. Use the
+generation cache entry's complete hash directory as `GENERATION_ENTRY` and the
+canonical analysis output as `TITLE_METADATA`. The driver revalidates those
+inputs, compiles the private module, verifies every function binding, and admits
+only the audited header query. An exit-86 next-import stop is expected evidence,
+not successful boot. See [the exact checkpoint and limits](engine/startup-imports.md).
+
+```sh
+python3 tools/runtime_probe.py --owned "$OWNED_PAIR" --cache-entry "$GENERATION_ENTRY" --bakeoff-root "$BAKEOFF_CACHE" --sdk-report "$NATIVE_PREPARATION_REPORT" --metadata "$TITLE_METADATA" --output-root "$PRIVATE_PROBE_ROOT" --role sp --execute
+```
+
+Repeat with `--role mp`. Each executed probe runs three positive processes and
+deliberate wrong-binding, changed-pointer and incorrect-result cases in private
+profiles. `--host-sanitizers` instruments the original host/parser/traps, while
+generated guest objects and the linked SDK remain uninstrumented. It does not
+use the validation-only SDK for generation. The header reader also runs under
+the ordinary game-free native parser tests, including Linux ASan/UBSan. Keep
+private outputs/logs and binaries outside Git; no original input is changed.
