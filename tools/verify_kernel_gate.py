@@ -13,6 +13,7 @@ import uuid
 
 import recompile as common
 import prepare_runtime_stop as stop
+import prepare_runtime_xma as xma
 import runtime_probe as audit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,16 +78,20 @@ def main():
     for name in ("root", "sdk-report", "owned", "metadata", "output-root"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--role", choices=("sp", "mp"), required=True)
+    parser.add_argument("--sdk-profile", choices=("stop", "xma"), default="stop")
     parser.add_argument("--generation", type=Path, help="immutable generation receipt, required on Windows")
     parser.add_argument("--expected-generation-sha256")
     parser.add_argument("--sanitizers", action="store_true")
     args = parser.parse_args()
+    verifier = xma if args.sdk_profile == "xma" else stop
     output = None
     report = dict(schema_version=1, status="IN_PROGRESS", playable=False, guest_executed=False,
                   script_sha256=common.sha(__file__), role=args.role, results=[],
-                  host_sources=common.snapshot(HOST), host_sanitizers=args.sanitizers)
+                  host_sources=common.snapshot(HOST), host_sanitizers=args.sanitizers,
+                  sdk_profile=args.sdk_profile)
     report["supporting_sources"] = {str(path.relative_to(ROOT)): common.sha(path) for path in (
         ROOT / "src/xex.cpp", ROOT / "include/mw3/xex.hpp", Path(common.__file__), Path(stop.__file__),
+        Path(xma.__file__), xma.LOCK, xma.LOCK.parent / "packet.patch",
         Path(audit.__file__), ROOT / "experiments/runtime-bakeoff/rexglue_probe.py",
         ROOT / "runtime/bringup/analysis-lock.json", common.DEFAULT, common.RECIPE)}
     try:
@@ -100,7 +105,7 @@ def main():
         print(json.dumps(dict(output=str(output))), flush=True)
         shutil.copytree(HOST, output / "maintained-host")
         shutil.copy2(__file__, output / "maintained-driver.py")
-        sdk, evidence = stop.verify_prepared(args.root.resolve(), args.sdk_report)
+        sdk, evidence = verifier.verify_prepared(args.root.resolve(), args.sdk_report)
         report.update(identity=identity, sdk=evidence, sdk_report_sha256=common.sha(args.sdk_report))
         recipe = common.validate_recipe(json.loads(common.RECIPE.read_text()))
         windows = sys.platform == "win32"
@@ -214,7 +219,7 @@ def main():
             report["results"].append(row)
             print(json.dumps({key: row[key] for key in ("case", "status", "returncode")}), flush=True)
             (output / "manifest.json").write_text(json.dumps(report, indent=2) + "\n")
-        _, after = stop.verify_prepared(args.root.resolve(), args.sdk_report)
+        _, after = verifier.verify_prepared(args.root.resolve(), args.sdk_report)
         if after != evidence or common.sha(binary) != report["binary_sha256"]:
             raise ValueError("SDK or executed binary changed")
         if common.snapshot(execution) != report["execution_files"]:
