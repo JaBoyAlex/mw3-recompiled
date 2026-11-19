@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 // Original synthetic callbacks into the actual SDK kernel DLL, not MW3 code.
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 #include <rex/app/app.h>
 #include <rex/kernel/export.h>
 #include <rex/kernel/guest_memory.h>
@@ -15,6 +16,7 @@
 #include <rex/logging/log_category.h>
 #include <rex/kernel/types/thread.h>
 #include <rex/ppc/image.h>
+#include <rex/ppc/call.h>
 #include "kernel/test_access.h" // Exported upstream seam for real-DLL resource inspection.
 #include "kernel/guest_stack.h"
 #include <algorithm>
@@ -25,6 +27,7 @@
 #include <filesystem>
 #include <functional>
 #include <memory>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -65,8 +68,9 @@ void ChildEntry(PPCContext& ctx,u8* base) {
 const PPCFuncMapping mappings[]={{entry,&Entry},{child_entry,&ChildEntry},{0,nullptr}};
 const rex::ppc::PPCImage image{code,0x10000,0x82000000,0x100000,mappings};
 struct TestApp : rex::app::App {TestApp():App("mw3_thread_contract") {}};
-u32 Call(PPCContext& ctx,u8* base,std::string_view name,std::initializer_list<u64> args) {
-  const auto exports=k::GetExports(k::ExportModule::kXboxkrnl);
+u32 Call(PPCContext& ctx,u8* base,std::string_view name,std::initializer_list<u64> args,
+         k::ExportModule module=k::ExportModule::kXboxkrnl) {
+  const auto exports=k::GetExports(module);
   auto found=std::find_if(exports.begin(),exports.end(),[&](const auto& e){return e.name==name;});
   if(found==exports.end() || !found->fn) throw Failure("unknown kernel function in synthetic contract: "+std::string(name));
   PPCRegister* registers[]={&ctx.r3,&ctx.r4,&ctx.r5,&ctx.r6,&ctx.r7,&ctx.r8,&ctx.r9,&ctx.r10};
@@ -99,7 +103,7 @@ struct Fixture {
       catch(...) {std::fputs("THREAD_RUNTIME_CLEANUP_FAILED\n",stderr);std::fflush(stderr);std::_Exit(3);}
     }
   }
-  void Run(State& state,bool suspended=false,bool termination=false) {
+  void Run(State& state,bool suspended=false,bool termination=false,u32 expected_exit=42) {
     State* empty=nullptr;
     Check(active.compare_exchange_strong(empty,&state),"overlapping synthetic contract state");
     struct Binding {~Binding(){active.store(nullptr,std::memory_order_release);}} binding;
@@ -124,7 +128,7 @@ struct Fixture {
     const bool completed=state.completed.load(std::memory_order_acquire);
     auto pin=runtime->GetThreadRegistry().FindByHandle(handle);Ok(pin,"completed guest handle missing");
     auto object=runtime->GetGuestMemory().Load<k::X_KTHREAD>(pin->GetGuestObject());Ok(object,"completed guest object unreadable");
-    const bool status=object->terminated==1 && object->exit_status==(termination?42u:0u);
+    const bool status=object->terminated==1 && object->exit_status==(termination?expected_exit:0u);
     pin.Reset();k::CloseOwned(runtime->GetObjectTable(),handle);
     for(auto leftover:handles) k::CloseOwned(runtime->GetObjectTable(),leftover);
     const bool no_leaks=handles.empty();handles.clear();active.store(nullptr,std::memory_order_release);
@@ -156,6 +160,35 @@ void Context(k::TitleRuntime& runtime,PPCContext& ctx,u32 expected_cookie=cookie
   Check(!runtime.GetGuestMemory().GetReadOnlySpan(guard+k::kGuestStackPageSize-1,1),"guest stack guard end readable");
   std::printf("THREAD_STACK allocation=%08x limit=%08x top=%08x\n",guard,u32(pcr->stack_end_ptr),u32(pcr->stack_base_ptr));
 }
+u32 RequestStopInsideThunk(u32 exit) {
+  k::KernelThread::GetCallingThread()->RequestStop(static_cast<std::int32_t>(exit));
+  return 0x5a;
+}
+}
+
+TEST_CASE("original kernel: a stop after a native thunk body preserves the requested exit", "[mw3][kernel][cancel][boundary]") {
+  State state;Fixture fixture(0);
+  state.body=[&](PPCContext& ctx,u8* base) {
+    Context(*fixture.runtime,ctx);state.armed.store(true,std::memory_order_release);
+    ctx.r3.u32=77;
+    rex::ppc::GuestToHostThunk<&RequestStopInsideThunk>(ctx,base);
+    state.returned.store(true,std::memory_order_release);
+  };
+  REQUIRE_NOTHROW(fixture.Run(state,false,true,77));REQUIRE_NOTHROW(fixture.Finish());
+}
+
+TEST_CASE("original kernel: an explicit exit keeps its value despite a pending stop", "[mw3][kernel][exit]") {
+  unsigned cycle=0;
+  for(const std::int32_t exit:{0,42,-17,std::numeric_limits<std::int32_t>::min()}) {
+    State state;Fixture fixture(cycle++);
+    state.body=[&](PPCContext& ctx,u8*) {
+      Context(*fixture.runtime,ctx);state.armed.store(true,std::memory_order_release);
+      auto* thread=k::KernelThread::GetCallingThread();thread->RequestStop(77);
+      thread->Exit(exit);state.returned.store(true,std::memory_order_release);
+    };
+    REQUIRE_NOTHROW(fixture.Run(state,false,true,static_cast<u32>(exit)));
+    REQUIRE_NOTHROW(fixture.Finish());
+  }
 }
 
 TEST_CASE("original kernel: guest context and object semantics survive repeated teardown", "[mw3][kernel]") {
@@ -339,6 +372,7 @@ TEST_CASE("original kernel: a stop wakes a blocked guest wait with its requested
 }
 
 TEST_CASE("original kernel: a pending stop at an import preserves the requested exit", "[mw3][kernel][cancel][boundary]") {
+  const bool use_xam=GENERATE(false,true);
   auto gate=rex::platform::Event::CreateManualResetEvent(false);REQUIRE(gate);
   std::atomic<bool> returned=false;
   u32 ready=0,child=0;State state;Fixture fixture(0);
@@ -350,7 +384,9 @@ TEST_CASE("original kernel: a pending stop at an import preserves the requested 
     // Native-only fixture barrier deliberately holds the child outside the
     // guest thunk until RequestStop has completed. No sleep or scheduler guess.
     Check(rex::platform::Wait(gate.get(),false,std::chrono::seconds(3))==rex::platform::WaitResult::kSuccess,"boundary host gate deadline");
-    Call(ctx,base,"NtYieldExecution",{});returned.store(true,std::memory_order_release);
+    if(use_xam) Call(ctx,base,"XGetLanguage",{},k::ExportModule::kXAM);
+    else Call(ctx,base,"NtYieldExecution",{});
+    returned.store(true,std::memory_order_release);
   };
   state.body=[&](PPCContext& ctx,u8* base) {
     Context(*fixture.runtime,ctx);auto view=fixture.runtime->GetGuestMemory().GetView();
@@ -367,7 +403,8 @@ TEST_CASE("original kernel: a pending stop at an import preserves the requested 
     auto object=fixture.runtime->GetGuestMemory().Load<k::X_KTHREAD>(pin->GetGuestObject());Ok(object,"boundary exit metadata missing");
     const u32 actual=object->exit_status;Check(object->terminated==1,"boundary child still running");pin.Reset();
     for(auto handle:{child,ready}) {Check(Call(ctx,base,"NtClose",{handle})==0,"boundary close failed");std::erase(fixture.handles,handle);}
-    std::printf("THREAD_BOUNDARY_STOP requested=77 actual=%u returned=%u\n",actual,unsigned(returned.load()));
+    std::printf("THREAD_BOUNDARY_STOP service=%s requested=77 actual=%u returned=%u\n",
+      use_xam?"XGetLanguage":"NtYieldExecution",actual,unsigned(returned.load()));
     Check(actual==77 && !returned.load(std::memory_order_acquire),"pending stop lost its requested exit at an import boundary");
   };
   REQUIRE_NOTHROW(fixture.Run(state));Ok(fixture.runtime->GetGuestMemory().Free(scratch),"boundary scratch release failed");

@@ -1,0 +1,84 @@
+--- a/include/rex/platform/thread.h
++++ b/include/rex/platform/thread.h
+@@ -357,4 +357,8 @@
+   i32 exit_code = 0;
+ };
+ 
++/** A cooperative stop whose exit is owned by the receiving kernel thread.
++ * Keeps explicit ThreadStop{exit_code} and its existing ABI unchanged. */
++struct ThreadStopRequested final : ThreadStop {};
++
+ }  // namespace rex
+--- a/include/rex/ppc/call.h
++++ b/include/rex/ppc/call.h
+@@ -698,7 +698,7 @@
+ 
+   detail::CheckHookContext(ctx, __PRETTY_FUNCTION__);
+   if (StopAtEntry && ctx.stop_requested && ctx.stop_requested->load(std::memory_order_acquire)) {
+-    throw rex::ThreadStop{};
++    throw rex::ThreadStopRequested{};
+   }
+ #if !REX_PLATFORM_WIN32
+   const rex::platform::HostCallDepth host_call_depth;
+@@ -717,7 +717,7 @@
+     StoreHostResult(ctx, base, hidden_pointer, v);
+   }
+   if (ctx.stop_requested && ctx.stop_requested->load(std::memory_order_acquire)) {
+-    throw rex::ThreadStop{};
++    throw rex::ThreadStopRequested{};
+   }
+ }
+ 
+--- a/include/rex/ppc/hook.h
++++ b/include/rex/ppc/hook.h
+@@ -416,7 +416,7 @@
+ 
+   detail::CheckHookContext(ctx, name);
+   if (ctx.stop_requested && ctx.stop_requested->load(std::memory_order_acquire)) {
+-    throw rex::ThreadStop{};
++    throw rex::ThreadStopRequested{};
+   }
+ #if !REX_PLATFORM_WIN32
+   const rex::platform::HostCallDepth host_call_depth;
+@@ -480,7 +480,7 @@
+     StoreHostResult(ctx, base, 0, result);
+   }
+   if (ctx.stop_requested && ctx.stop_requested->load(std::memory_order_acquire)) {
+-    throw rex::ThreadStop{};
++    throw rex::ThreadStopRequested{};
+   }
+ }
+ 
+--- a/src/kernel/kernel_thread.cpp
++++ b/src/kernel/kernel_thread.cpp
+@@ -461,6 +461,8 @@
+     int exit_code = 0;
+     try {
+       exit_code = Execute();
++    } catch (const rex::ThreadStopRequested&) {
++      exit_code = stop_exit_code_.load(std::memory_order_acquire);
+     } catch (const rex::ThreadStop& stop) {
+       exit_code = stop.exit_code;
+     }
+--- a/src/kernel/shim/threading.cpp
++++ b/src/kernel/shim/threading.cpp
+@@ -87,6 +87,8 @@
+ 
+   try {
+     args->start_fn(ctx, mem->GetVirtualMembase());
++  } catch (const rex::ThreadStopRequested&) {
++    // RequestStop already recorded the exit. Preserve it when returning to main.
+   } catch (const rex::ThreadStop& stop) {
+     thread->RequestStop(stop.exit_code);
+   }
+--- a/src/kernel/xboxkrnl/xboxkrnl_threading.cpp
++++ b/src/kernel/xboxkrnl/xboxkrnl_threading.cpp
+@@ -1051,7 +1051,7 @@
+        !lock->owner_pcr.CompareExchange(expected, pcr_addr, std::memory_order_acquire);
+        expected = 0) {
+     if (stoppable && KernelThread::IsStopPending()) {
+-      throw rex::ThreadStop{};
++      throw rex::ThreadStopRequested{};
+     }
+     rex::platform::MaybeYield();
+   }
