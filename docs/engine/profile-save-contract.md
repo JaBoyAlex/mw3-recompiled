@@ -175,15 +175,31 @@ stage+commit+load of a verified 64 KiB synthetic payload. `profile-tests benchma
 <private-parent>` performs three warmup generations then 24 measured operations;
 `benchmark-history` preloads 200 generations then measures 24. Every sample
 includes file flushing, no-replace rename, supported directory sync, integrity
-checks and byte-equality load. Histories grow during each run. The p95 below is
-the nearest-rank 23rd ordered sample of 24; no frame/GPU/input-latency claim.
+checks and byte-equality load. Histories grow during each run. The median is
+the mean of ordered samples 12 and 13; p95 is the nearest-rank 23rd sample of 24.
+All 24 observations are emitted/retained per process, independently recomputed
+with Python `statistics`/sorting, and associated with measurement binary hashes.
+There is no frame/GPU/input-latency claim.
 
 | Local filesystem / initial generations | Run medians (ms) | Run p95 (ms) | Maximum (ms) |
 | --- | --- | --- | --- |
-| Windows NTFS / 3 | 21.461, 22.660, 22.026 | 24.996, 29.816, 26.045 | 31.450 |
-| Windows NTFS / 200 | 53.951, 67.213, 61.725 | 61.882, 89.656, 72.491 | 91.390 |
-| WSL ext4 / 3 | 11.069, 11.003, 10.546 | 13.306, 13.350, 13.057 | 15.574 |
-| WSL ext4 / 200 | 11.841, 11.753, 11.719 | 15.100, 13.225, 13.772 | 15.175 |
+| Windows NTFS / 3 | 19.839, 18.144, 20.349 | 24.038, 22.211, 24.901 | 27.222 |
+| Windows NTFS / 200 | 48.770, 51.208, 49.026 | 54.846, 72.434, 54.539 | 125.487 |
+| WSL ext4 / 3 | 10.863, 10.450, 10.441 | 13.114, 13.144, 11.918 | 14.540 |
+| WSL ext4 / 200 | 11.711, 11.532, 12.149 | 13.084, 13.579, 14.510 | 15.995 |
+
+Measurement executable SHA-256 (original public harness, no game-linked bytes):
+
+| Profile | SHA-256 |
+| --- | --- |
+| Windows MSVC Release | `21882e58984cfd55eade15e02fe4562e7e159df7592f4c434f34d97fd88de228` |
+| Linux GCC Release | `f02d2ea93c66455c347e106a30993beee07fa8d2625beb41bbe27d9c177b3449` |
+
+Self-review caught an earlier benchmark report labeling the 13th sample as the
+median. That report/figures in initial PR commit `108e561` are superseded: the
+calculation was corrected, raw sample emission added and all three processes
+per scenario/OS rerun for this table. Storage implementation/semantics did not
+change. The 125.487 ms Windows sample is retained, not filtered as an outlier.
 
 These are synthetic local costs, with ordinary host scheduling/cache variance,
 not an OS/framework ranking, gameplay speedup or deployment latency budget.

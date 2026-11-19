@@ -346,8 +346,11 @@ void measure(const fs::path& root, int warmup) {
         require(p.load("save").payload == payload, "benchmark must retain correctness");
         timings.push_back(std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - begin).count());
     }
+    std::cout << "SYNTHETIC samples_ms=";
+    for (const auto ms : timings) std::cout << ms << ',';
+    std::cout << '\n';
     std::sort(timings.begin(), timings.end());
-    std::cout << "SYNTHETIC 64KiB stage+commit+load ms median=" << timings[12]
+    std::cout << "SYNTHETIC 64KiB stage+commit+load ms median=" << (timings[11] + timings[12]) / 2.0
               << " p95=" << timings[22] << " max=" << timings.back() << " count=24 warmup=" << warmup << '\n';
 }
 void benchmark(const fs::path& root) { measure(root, 3); }
