@@ -31,5 +31,11 @@
   ],
   "size": "bounded integration; split discovered blockers",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "docs/gates/native-kernel.md",
+    "config/toolchains/rexglue-xma/validation.json",
+    "docs/engine/xma-lifecycle.md",
+    "tools/verify_kernel_gate.py"
+  ]
 }
