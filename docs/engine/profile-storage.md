@@ -188,6 +188,13 @@ checks pass 145 Python tests with one Windows-only skip and CTest 1/1.
 These public checks do not run the private SDK matrix automatically. Self-review
 is recorded; no independent reviewer or hardware/console validation is claimed.
 
+The first Windows CI run exposed a test-only path comparison: the SDK package
+verifier canonicalizes `RUNNER~1` to `runneradmin`, while the assertion compared
+that path with its short spelling. The assertion now compares canonical paths.
+The runtime harness and driver bytes above are unchanged. Private receipts
+retain the exact earlier guard-test snapshot; they are not rewritten to imply
+that the later assertion edit ran in those processes.
+
 ## Required handoff
 
 Before relying on an SDK host-directory mount as a profile boundary, the lead

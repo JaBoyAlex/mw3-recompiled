@@ -37,7 +37,8 @@ class ResultGuards(unittest.TestCase):
             validation = root / "approval.json"
             validation.write_text(json.dumps(dict(status="PASS", sdk_preparations=[
                 dict(receipt_sha256=driver.common.sha(receipt), core_sanitizers=False)])))
-            self.assertEqual(driver.verify_package(receipt, validation, lock)[0], sdk)
+            # Windows CI may spell Temp with RUNNER~1; compare canonical paths.
+            self.assertEqual(driver.verify_package(receipt, validation, lock)[0], sdk.resolve())
             (sdk / "module").write_text("modified")
             with self.assertRaisesRegex(ValueError, "package changed"):
                 driver.verify_package(receipt, validation, lock)
