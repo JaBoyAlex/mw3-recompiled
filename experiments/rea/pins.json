@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "rea_source_commit": "e9c72dbd1fa6b318cb3e455c92df064eed62333a",
+  "rea_package_version": "6.9.0",
+  "ghidra_version": "12.1.4",
+  "node_version": "24.22.1",
+  "jdk_version": "21.0.13.1+2",
+  "archives": {
+    "node-v24.22.1-linux-x64.tar.xz": ["sha256", "6c172a9ab6718f7b801fb5a7bd486af2ee5e32758086a04b84fcce2aa77095e6"],
+    "rea-agents-6.9.0.tgz": ["sha512", "2aa0e7d5447904ca87a10dcc1809cfb968922b081d15acf52ffb94360acab7ed56f243ed8183fc01610e5c817594320e055c8fb98208b2dda26a6a3559fdebf2"],
+    "OpenJDK21U-jdk_x64_linux_hotspot_21.0.13.1_2.tar.gz": ["sha256", "bb8a93f9ae6e7a693b2b721e85dbeff26ae1a77447985a8d7afcdd9c7cf6222e"],
+    "ghidra_12.1.4_PUBLIC_20260921.zip": ["sha256", "ddac49f903da9d5bac833e5cc79395098b9c33cfd3279be5f31bd00387d2d4db"]
+  }
+}
