@@ -1,0 +1,23 @@
+{
+  "id": "MW3-047",
+  "title": "Audit emitted PPC load-reserve/store-conditional state transitions",
+  "phase": 2,
+  "area": "cpu-reservations",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-038", "MW3-039"],
+  "paths": ["tests/ppc_reservations", "tools/test_ppc_reservations.py", "docs/engine/ppc-reservations.md"],
+  "goal": "Close a documented CPU-oracle investigation gap by exercising actual selected-translator word/doubleword reservation instructions with original game-free sequences and an independent state-transition oracle, retaining incompatibilities without modifying the SDK or startup harness.",
+  "acceptance": [
+    "Generate and execute original aligned lwarx/stwcx. and ldarx/stdcx. fixtures through the unchanged approved selected translator and native SDK; bind exact input, configuration, generator, compiler, emitted output, runner and loaded core identities",
+    "Use an independent sequence oracle for big-endian loaded/stored data, conditional-store memory/CR0 consistency, XER SO propagation, no established reservation, consumption after either conditional-store outcome, context isolation and serialized intervening same-location writes including ABA. Do not demand success where spurious reservation loss is permitted or assign deterministic outcomes to architecturally undefined mismatched-address cases",
+    "Retain every demonstrated counterexample and distinguish investigation completion from passing reservation compatibility. Keep fixtures, runners, writable memory and processes private/isolated; no shared SDK repair, existing CPU/thread interface, title/startup admission, production atomic policy or game-derived code change",
+    "Require strict fresh-process nonce/case/typed completion and provenance checks, meaningful incorrect-result/incomplete/timeout controls and resource cleanup. Original expected-state fixtures or host callback models alone cannot establish emitted instruction correctness"
+  ],
+  "validation": [
+    "Run seeded fixed-edge sequences, at least three independent comparable processes, repeated/reordered cases and a held-out seed on Windows/Linux using supported host/generated sanitizers; preserve failures and document uninstrumented SDK coverage",
+    "Measure actual emitted instruction/sequence costs with raw samples and tails, document warmup and one-machine/instrumentation limits, and consider correctness before performance without claiming general ordering, Xenon reservation granules, full ISA or gameplay parity",
+    "Run public game-free checks and positive/negative oracle/evidence guards; publish exact commands, source/package/tool/binary/receipt identities, skips, self-review status and an actionable separately scoped repair/integration handoff"
+  ],
+  "size": "bounded original emitted-instruction diagnostic; no SDK repair or guest startup integration"
+}
