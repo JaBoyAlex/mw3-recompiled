@@ -30,9 +30,11 @@ is not sanitizer-instrumented. Linux core coverage retains native XAM and
 disabled vptr instrumentation. Self-review is recorded; no independent review
 is claimed. No game-linked binaries, SDKs or private traces are published.
 
-The discovered lifecycle blocker is resolved. **041 still needs formal child
-evidence reconciliation; parent kernel gate 010 remains open.** First-frame
-011 remains an epic that must be split before implementation claims. Its next
+The discovered lifecycle blocker is resolved and
+[041 acceptance](gates/native-kernel.md) is merged. **The scoped
+[kernel checkpoint gate 010](gates/native-kernel-acceptance.md) passes; Phase 2
+and all product gates remain incomplete.** First-frame 011 remains an epic
+that must be split before implementation claims. Its next
 foundations are complete private content preparation (045) and allocation
 import ABI contracts (046). The current owned directory contains only the two
 XEX files. No full game-content preparation or later startup is verified.

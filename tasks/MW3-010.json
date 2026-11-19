@@ -12,7 +12,8 @@
     "MW3-041"
   ],
   "paths": [
-    "docs/gates/native-kernel-acceptance.md"
+    "docs/gates/native-kernel-acceptance.md",
+    "docs/STATUS.md"
   ],
   "goal": "Reach a controlled title entry and clean shutdown with real guest memory and synchronization semantics.",
   "acceptance": [
@@ -26,5 +27,10 @@
   ],
   "size": "evidence gate; implement only in scoped children",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "docs/gates/native-kernel-acceptance.md",
+    "docs/gates/native-kernel.md",
+    "config/toolchains/rexglue-xma/validation.json"
+  ]
 }
