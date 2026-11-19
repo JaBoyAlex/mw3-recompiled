@@ -1,0 +1,27 @@
+{
+  "id": "MW3-061",
+  "title": "Audit selected-SDK host audio stream and headless device contracts",
+  "phase": 2,
+  "area": "audio-diagnostics",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-010", "MW3-044", "MW3-060"],
+  "paths": [
+    "tests/host_platform/sdk_audio",
+    "tools/test_sdk_audio.py",
+    "docs/engine/sdk-audio.md"
+  ],
+  "goal": "Investigate actual selected-SDK host stream ownership, bounded queues/callbacks and SDL dummy-device lifecycle with original PCM, before title playback is available; retain demonstrated failures and a repair handoff without changing shared SDK or guest services.",
+  "acceptance": [
+    "Execute the actual dynamically loaded approved audio system and selected SDL audio provider where requested, binding exact package, compiler, configuration and loaded-library hashes; do not substitute audio implementations or manufacture device success",
+    "Exercise original PCM through bounded stream capacity, invalid/closed/reopened stream identities, queue limits, played-callback ownership, underrun counters, close/reopen and repeated shutdown; use silent timer and real SDL dummy-device configurations explicitly distinguished",
+    "Require fresh-process completion, unchanged other-stream counters, resource recovery and meaningful wrong-result/incomplete-process controls; retain any SDK contract failures instead of weakening expectations or silently repairing shared code",
+    "Keep private profiles/output/process handles isolated and changes within this diagnostic lane; no guest service admission, proprietary codec/save input, audible/title playback certification, physical device loss claim or shared SDK/interface edit"
+  ],
+  "validation": [
+    "Run isolated, repeated and reordered original cases on Windows/Linux using supported host sanitizers and exact approved native SDK packages; record uninstrumented SDK coverage and unavailable backend/hardware checks explicitly",
+    "Validate result/package/library identities against duplicate, stale, wrong-case, malformed, partial and wrong-output controls; crash/timeouts cannot pass ordinary cases",
+    "Measure original host submission/callback/lifecycle costs over at least three independent processes, retaining failures and timing limits; run public checks and publish actionable separate repair/integration prerequisites without marking MW3-082 or any gameplay/audio gate complete"
+  ],
+  "size": "bounded game-free selected-SDK audio investigation; title/device/SDK repairs stay separate"
+}
