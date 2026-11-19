@@ -4,9 +4,16 @@
   "phase": 2,
   "area": "input-users",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-080", "MW3-084"],
-  "paths": ["tests/host_platform/input_users", "tools/test_input_users.py", "docs/engine/input-users.md"],
+  "status": "done",
+  "depends_on": [
+    "MW3-080",
+    "MW3-084"
+  ],
+  "paths": [
+    "tests/host_platform/input_users",
+    "tools/test_input_users.py",
+    "docs/engine/input-users.md"
+  ],
   "goal": "Exercise the actual selected SDK input-system module above the verified SDL3 provider, distinguishing real virtual-device routing from SDK user-0 fallback and documenting the ownership integration boundary before physical/title input admission.",
   "acceptance": [
     "Load the real verified input-system and SDL3 provider modules through versioned interfaces, with original owned host context, private configuration and exact SDK/source/compiler/loaded-library identities; embed no SDK module or guest implementation",
@@ -19,5 +26,15 @@
     "Require actual loaded input-system/provider/SDL/base identities, bounded owned dispatcher/handle cleanup and exact complete result records; reject deliberate wrong routing, stale/duplicate/partial results, wrong libraries and late children",
     "Run public game-free checks and report physical controllers, independent Linux hardware, guest services and actual MW3 input unexecuted; this investigation cannot complete MW3-083 or MW3-012"
   ],
-  "size": "bounded SDK user-routing investigation; no runtime or SDK repair"
+  "size": "bounded SDK user-routing investigation; no runtime or SDK repair",
+  "evidence": [
+    "Original real-module input-system/provider investigation: four distinct SDK user routes, state/packet/capability/vibration behavior, invalid users, hotplug/reentrant callbacks, nested UI blocking/held-button consumption, explicit shared mode and separately classified user-0 fallback; no SDK implementation or guest code embedded",
+    "Five Windows/Linux native/host-sanitizer/participating-base profiles preserve 80 exact process observations: 60 positive cases and ten exact wrong-routing controls accepted, ten held-discovery correctness failures retained. Every suite reports LIMITATION and exit 1, not SDK correctness PASS",
+    "Each failure proves SDL button=1/X=3072 for assigned virtual product 3 while SDK user 0 reports button=0/X=0 after discovery and another pump; established-connection cases pass. All 24 attachment orders exercise complete module/driver/SDL lifetimes",
+    "Artifact audit verifies all 80 nonce-bound actual input-system/provider/SDL/base identities and logs, five binaries/compile-command records, identical staged source/runner versions and unchanged SDK packages. Exact hashes/compiler/configuration and limitations in docs/engine/input-users.md",
+    "Fifteen public evidence guards pass without an SDK, including fallback/shared count spoofing, exact loader/nonces, duplicate/stale/partial results, wrong routing, retained-failure classification, wrong libraries and actual incomplete/late owned children",
+    "Public checks PASS: Windows Release 181 Python tests/eight documented existing platform/tool/link skips plus CTest 1/1; Linux Release ASan/UBSan 181 tests/two Windows-junction skips plus CTest 1/1",
+    "Separate MW3-086 scope repairs provider initial snapshot in a private derived profile; current SDK is deliberately unchanged. Existing SDK-facing C++23 convention, public C++20 core and original GPL fixture/runner provenance retained",
+    "Owner self-review only; physical controllers, independent Linux hardware, guest services and MW3 input NOT RUN. Participating base instrumentation does not instrument native HID/provider/SDL; Windows core ASan/vptr unavailable. No title performance, split-screen/Survival or distribution claim; main allocation/audio lanes untouched"
+  ]
 }
