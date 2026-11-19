@@ -4,9 +4,20 @@
   "phase": 2,
   "area": "input-snapshot",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-080", "MW3-084", "MW3-085"],
-  "paths": ["config/toolchains/rexglue-input-snapshot", "tools/prepare_runtime_input.py", "tools/test_input_users.py", "tools/test_sdk_input.py", "tests/host_platform/input_snapshot", "docs/engine/input-snapshot.md"],
+  "status": "done",
+  "depends_on": [
+    "MW3-080",
+    "MW3-084",
+    "MW3-085"
+  ],
+  "paths": [
+    "config/toolchains/rexglue-input-snapshot",
+    "tools/prepare_runtime_input.py",
+    "tools/test_input_users.py",
+    "tools/test_sdk_input.py",
+    "tests/host_platform/input_snapshot",
+    "docs/engine/input-snapshot.md"
+  ],
   "goal": "Repair the reproduced SDK cache-initialization gap where SDL reports already-held controls but the first assigned SDK user reads zeros, using an isolated reviewed provider profile while preserving every existing SDK package and input contract.",
   "acceptance": [
     "Retain MW3-085's Windows/Linux held-discovery failures and actual SDL-versus-SDK values; audit provider creation, current-state reads, event normalization and threading before choosing the minimal repair",
@@ -20,5 +31,15 @@
     "Run supported host and participating-library sanitizers, independently reconcile actual loaded library/source/binary/receipt identities and cleanup, and document unavailable instrumentation and physical hardware explicitly",
     "Reject stale parents, wrong patch/package/replacement identities, changed unaffected files and incomplete/late/wrong outputs; run public game-free checks and record performance impact without a title benchmark claim"
   ],
-  "size": "bounded host-provider repair and isolated profile; no title service admission"
+  "size": "bounded host-provider repair and isolated profile; no title service admission",
+  "evidence": [
+    "Original licensed provider patch preserves current SDL input at first SDK discovery through existing normalization, held-only alias aggregation, early add-event handle ownership, post-enqueue revision publication and synchronized pending-handle shutdown; no guest mapping or assignment interface changes",
+    "Three private exact-identity preparations replace only rexhid-sdl3 DLL/so, preserving complete verified XMA parents and every unaffected artifact; canonical source/header, patch, recipe, tool, compiler, actual CMake/Ninja/cache and loaded-library hashes in docs/engine/input-snapshot.md",
+    "All fifteen final Windows/Linux native, host-sanitizer and participating-base/provider sanitizer suites PASS/exit 0: 150 processes, 130 positives and 20 exact deliberate rejection controls; all ten original held-discovery failures now pass with unchanged assertions and contract sources",
+    "The unchanged original native Windows/Linux MW3-085 executables also pass held-discovery against the new provider, independently separating library repair from rebuilding the fixture; original baseline LIMITATION receipts/failures remain frozen",
+    "Artifact audit reconciles all 150 logs, 15 binaries/compile-command records, frozen sources/runners and SDK identities, with 140 actual loaded-library records. Ten unchanged raw negative controls lack a pre-failure module record and are explicitly limited to exact command/package/binary/diagnostic evidence",
+    "Five actual private invalid patch/parent/provider/unaffected-library/replacement-list controls are rejected; private hardlink entries are broken before mutation and original SDKs/parents verified unchanged. Twelve new public game-free synthetic receipt/admission/lifecycle guards pass",
+    "Public checks PASS: Windows Release 193 Python tests/eight existing documented platform/link/tool skips plus CTest 1/1; Linux Release ASan/UBSan 193 tests/two Windows-junction skips plus CTest 1/1. No sanitizer finding in exercised coverage; native HID-system/SDL, vptr and Windows core/provider instrumentation limits retained",
+    "Owner self-review only. New profile is explicit opt-in in completed 084/085 runners; default XMA and main allocation/audio SDKs/worktrees/processes untouched. Physical controllers, controls held before SDL first open, mapping reloads, independent Linux hardware, guest/title input and gameplay remain unverified; no title performance or distribution claim; MW3-083/MW3-012 remain open"
+  ]
 }

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "profile": "input-snapshot-v1",
+  "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+  "parent_xma_lock_sha256": "3da03a6f845b63d307e11c128ee00c52e1399dc5e7dfc8323a4cbb2f7e4a9b76",
+  "patch_path": "snapshot.patch",
+  "patch_sha256": "4d98804ce6667f7a06295b1610a9cbbe9a89f0b70a296279b60b2792f7a0453c",
+  "source_files": {
+    "src/hid/sdl3/sdl3_input_driver.cpp": "6a4cc6b84040a5438dc1b266d069ee2cf84a428a820cff330e9a0c758c0cbfa0",
+    "src/hid/sdl3/sdl3_input_driver.h": "c004c88f9f1c081f0d3658f1309b520fb531b0e9890840ee292b81080f5bd826"
+  },
+  "derived_source_sha256": "a1f62327c578c9ee95e7fc796a33d7109f6fa7d2cdbaed97d73cf6254bf063c7"
+}
