@@ -1,34 +1,96 @@
-# Status — 2026-11-18
+# Status — 2026-11-19
 
-**Not playable. No MW3 gameplay, rendering, audio, Steam networking, DLSS or Reflex has been implemented or validated.** Four-player Survival is a requested planned extension, not an existing capability.
+**Not playable. No menu, rendered MW3 frame or playable mode has been verified.**
+Private native Windows and Linux/WSL modules execute a bounded portion of owned
+Campaign/Multiplayer startup through one audited header service, then stop at
+guarded NtAllocateVirtualMemory. This is actual translated title execution,
+with deliberately limited service coverage. It is not a game launcher.
 
-Implemented foundation:
+The baseline is MW3 **2011**, Xbox 360 USA/Korea Rev 1, bound to the exact
+[owned-input manifest](../config/titles/mw3-xbox360-rev1.json). The owner's
+informal “1.1” preference is not a verified title update. PC files are optional.
 
-- C++20 native bounded XEX metadata inspector and synthetic parser tests.
-- Python owned-file SHA-256 inventory and bounded XDVDFS inspection; private executable extraction without overwriting originals.
-- Dependency-DAG task catalog, filtered ready-task search, copyable prompts, issue export/idempotent sync and serialized-claim workflow definition.
-- Game-free build/check driver, Windows/Linux CI definitions, three repository agent skills, contribution/architecture/research/testing/legal documentation.
-- Schema-2 timing/memory/loading/latency export validation with exact provenance, verified private trace hashes, equal-run/noise handling and peak-memory budgets; no real engine instrumentation or MW3 benchmark yet.
-- Nine pinned upstream research checkouts; official REA included. Research pins do not imply integrated/runtime-ready dependencies.
-- Verified CPU/shader host preparation on Ubuntu/WSL, with pinned transitive sources/compiler/DXC and identical generated outputs from two clean builds.
-- Exact owned SP/MP pair verification that rejects missing, mixed, modified and wrong-format inputs.
-- Complete ABI helper-ladder scanning with independent instruction decoding, bounded `.pdata` inventory and explicit unresolved LR/CTR branch reports.
-- Pre-normalization import audit, complete value/thunk grouping, variable-import identification and unwind/context-service cross-references.
+## Current integration checkpoint
 
-Verified locally: the Linux game-free suite passes all 100 Python tests, native CTest and ASan/UBSan checks. Windows Release metadata builds/CTest and the 98-test suite pass with five explicit unavailable-tool/permission skips (LLVM oracle and four symlink cases). The scanner's 2,363 synthetic checks pass on both hosts. All five originally detected switch tables have independent register/default/label/range checks; additional runtime-bakeoff candidates have range checks only. The canonical host toolchain passed 547 executable synthetic PPC checks, a failing oracle mutation, and DXIL/SPIR-V compilation in two clean builds. The owner-restored Windows analyzer passed a synthetic input; a newer native copy remains blocked by Defender. No security setting was changed. See [toolchain evidence](../config/toolchains/validation-2026-11-17.md) and [measurement validation](../qa/benchmarks/validation-2026-11-17.md).
+MW3-044 is merged in [PR 70](https://github.com/JaBoyAlex/mw3-recompiled/pull/70).
+It fixes the demonstrated XMA packet-ownership leak without changing decoding
+algorithms or admitting another guest service. Its matrix passes **56 bounded
+owned-title processes and 20 focused game-free processes**. The original
+42 MB-per-pool leak and six original title-sanitizer failures remain retained.
+All 76 processes' reported kernel-library hashes were checked. The repaired
+Campaign comparison retains identical game inputs, generation, host source and
+compiler, with the exact original SDK as parent. See
+[lifecycle evidence and limitations](engine/xma-lifecycle.md).
 
-Actual owned-title analysis finds all nine ABI helper families uniquely in each executable; the table-driven decoder agrees with every instruction. Bounded `.pdata` parsing identifies 15,024 Campaign / 15,951 Multiplayer entries, including 310 / 322 with handler metadata. The import audit reads 529 / 537 original records, classifying 258 / 262 function pairs and **13 kernel data variables per image**, with no unknown header-declared ordinals/types. Function identities agree with the normalizing loader; an independent Python struct reader confirms raw header identities/versions and all record addresses. Runtime support/version compatibility remains unverified. Two fresh sanitized observed-loader builds produce identical metadata; prepared archives remain uninstrumented. Five detected switch tables and 29 targets per executable are **all in BINK video code**, providing no measured main-engine switch coverage. See [the executable map](engine/executables.md). Thousands of indirect branch sites and further direct-call targets remain unclassified. **Private ReXGlue SP/MP modules now execute bounded startup on native Windows and Linux/WSL through one audited header service, then stop at guarded NtAllocateVirtualMemory. This is not playable boot.** See [runtime evidence](../experiments/runtime-bakeoff/validation-2026-11-17.md).
+Public checks for that implementation pass 116 Python tests on Windows with
+five explicit LLVM/symlink skips, and 118 on Linux with no skips. Native parser
+CTest and Linux ASan/UBSan checks pass. Windows uses native runtime libraries
+and supported host UBSan traps; core ASan is unavailable. Generated guest code
+is not sanitizer-instrumented. Linux core coverage retains native XAM and
+disabled vptr instrumentation. Self-review is recorded; no independent review
+is claimed. No game-linked binaries, SDKs or private traces are published.
 
-Repository: [JaBoyAlex/mw3-recompiled](https://github.com/JaBoyAlex/mw3-recompiled), private initial research repository. [Initial CI](https://github.com/JaBoyAlex/mw3-recompiled/actions/runs/44049711442) passed all five Windows/Linux Debug/Release and sanitizer jobs. [Task publication](https://github.com/JaBoyAlex/mw3-recompiled/actions/runs/44049774225) succeeded and created the initial 35 labeled issues with dependencies/prompts; tasks 036–041 now split the next kernel milestone and are published with dependency-aware prompts. No branch-protection rule or trusted private game runner is configured. No game-linked binaries or SDKs are published. [Friends can begin independent work now](FRIENDS-START-HERE.md).
+The discovered lifecycle blocker is resolved. **041 still needs formal child
+evidence reconciliation; parent kernel gate 010 remains open.** First-frame
+011 remains an epic that must be split before implementation claims. Its next
+foundations are complete private content preparation (045) and allocation
+import ABI contracts (046). The current owned directory contains only the two
+XEX files. No full game-content preparation or later startup is verified.
 
-MW3-002/006/007 are merged through green CI. The **initial executable inventory is complete**, with unresolved runtime semantics carried by [the handoff](../config/analysis/HANDOFF.md); this is not native execution or full flow recovery. The [license assessment](legal/runtime-and-distribution-assessment.md) (003) is complete: both candidates can undergo bounded private research, but actual SDK/game-linked releases remain unapproved and some file provenance needs resolution. The [measurement contract](../qa/benchmarks/schema-v2.md) (005) is complete. Runtime comparison (008) selects ReXGlue for continued private development. Common native service tests pass 51 ReXGlue cases; the MW2 runtime fails nine layout/termination cases and its title output is rejected before execution. A reviewed Linux host-range reservation repair passes occupied-page and all nine partial-mapping-failure tests. The instrumented ReXGlue core passes 21 ASan/UBSan cases with three explicit address-fixture skips. Both owned startup stops reproduce with the repaired core. The original two-runtime title-execution requirement is explicitly revised to fail-fast preflight rejection; no comparative gameplay performance result is claimed. Stop the MW2 runtime adaptation while retaining its useful analysis tools. See [the decision](adr/0002-runtime-selection.md) and [evidence](../experiments/runtime-bakeoff/conformance-2026-11-17.md). Reproducible private generation (009) is verified: both clean generations match all 326 C++/header files (155 SP / 171 MP); cache integrity, actual copied-input mutation, dirty dependency and validation-only SDK refusal checks pass. Ancillary paths/stamps/logs are hashed per attempt, not claimed byte-identical. See [generation evidence](../config/recomp/validation-2026-11-17.md). The first header service (036) is now audited: both canonical SP/MP modules match the independent header reader and continue to NtAllocateVirtualMemory, which remains guarded. The 24-case native/host-sanitizer matrix passes, including present-field probes and wrong binding/pointer/result rejection; the actually used module-handle cell/header chain is checked against the owned header. See [startup service evidence](engine/startup-imports.md). Twelve other data variables and all later function services remain unaudited. Bounded native Windows bring-up (040) is verified: 12 native and 12 host-only UBSan trap cases pass, plus 255 isolated SDK tests. Windows ASan linking remains incompatible with the SDK allocator; Linux host ASan/UBSan coverage remains separate. See [Windows evidence](engine/windows-bringup.md). Orderly title teardown remains unfinished. Kernel gate 010 is split into independently claimable tasks 036–041; see [the small-team lane plan](engine/BRINGUP-PLAN.md). This planning split completes no runtime/product gate. Release clearance (031), reference cases (004) and Steam AppID/SDK authorization (019) remain open. All product execution/gameplay/network/enhancement/release gates remain open.
+## Completed foundation and bounded evidence
 
-Select independent work using `python tools/project.py list --ready`, checking GitHub ownership before claiming. Every future status update must separate actual title execution from source inspection and synthetic tests.
+- C++20 game-free XEX inspector, bounded synthetic parser tests, owned-file
+  SHA-256 identity checks, XDVDFS inventory and exclusive executable extraction.
+- Dependency-DAG task catalog, searchable ready tasks, copyable prompts,
+  idempotent issue publication and serialized path-based claims. GitHub issue
+  assignees define ownership; local readiness alone is insufficient.
+- Pinned/reproducible CPU and shader host-tool preparation, private title
+  generation, ABI helper-ladder and switch analysis, original import/data
+  classification and independent header/layout checks. All 326 generated
+  C++/header files reproduce; ancillary paths/stamps are not claimed identical.
+- [Runtime selection](adr/0002-runtime-selection.md): continue private ReXGlue
+  development. The related MW2 runtime is rejected for these title outputs;
+  retain its useful analysis tools. No comparative gameplay performance result
+  exists. [The scorecard](research/scorecard.md) defines measured reconsideration
+  and migration gates.
+- [Memory contracts/repair](engine/memory.md): five native/sanitizer profiles
+  pass 300 cases; original decommit failures remain retained. Strict mapping,
+  alias and release checks do not establish every kernel memory-import ABI.
+- [Selected-translator CPU oracle](engine/ppc-validation.md): 2,410 original
+  synthetic cases per run across six native/sanitizer/held-out runs, with
+  rejected result mutations and matching generation. This is a selected ISA
+  subset; VMX128, reservation-instruction and nonlocal/exception gaps remain.
+- [Thread acceptance](engine/threads.md): isolated/repeated contracts, actual
+  kernel/XAM stop boundaries, TLS/r13, waits, stacks, interlocked interfaces and
+  cancellation checks pass with the stop repair. Fibers/APCs, translated
+  reservation semantics and general race freedom are not established.
+- [Native Windows bring-up](engine/windows-bringup.md) and the
+  [audited header service](engine/startup-imports.md) bind both executable
+  identities. Twelve other kernel data variables and subsequent function
+  services remain unaudited. Unknown imports fail diagnostically.
+- [REA evaluation](research/rea-evaluation.md) records tested provider limits;
+  its PPC analysis results do not establish XEX/VMX128 or native runtime support.
+- [Measurement contracts](../qa/benchmarks/schema-v2.md) validate provenance,
+  noise and memory-budget reporting. No MW3 gameplay benchmark exists.
 
-Baseline memory investigation (037) supplied an original game-free harness on three hash-bound layouts. Across five native/sanitizer profiles, its original SDK produced 240 subprocess results: 180 PASS and **60 retained FAIL** results: checked reads/writes and raw reads remain possible after decommit. This is not a passing memory gate. The separately scoped repair (042) was added as a dependency of lifecycle integration 041. Strict release protection works when the upstream option is enabled; its default mapping policy is separate. See [memory contracts and exact receipts](engine/memory.md). No additional title service has been admitted.
+## Product and delivery work still ahead
 
-The isolated decommit repair (042) now passes 300 memory cases across five native/sanitizer profiles. Focused original upstream tests import the actual repaired kernel: Windows 30 PASS/1 explicit page-size SKIP, Linux 28 PASS/1 SKIP. Two clean generations match all 326 C++/header files and the previous outputs; native Windows/Linux SP/MP startup passes 24 bounded positive/rejection processes. NtAllocateVirtualMemory remains guarded, and normal title teardown, thread/lifecycle 039 remain unfinished. See [exact repair evidence](../config/toolchains/rexglue-memory/validation-2026-11-18.md). Historical baseline failures remain retained; staged old unit-test binaries were excluded after discovering embedded kernel objects. No gameplay, performance or release gate passes from this repair.
+Original Campaign, Special Ops, Survival, Multiplayer and console split-screen
+parity remain unverified. Four-player Survival is an explicitly requested
+extension with its own feasibility/regression work. Steam invites, private
+lobbies, authorized SDR/CGNAT tests, renderer modernization, DLSS/DLAA, Reflex,
+optimization, installer recovery and release acceptance remain future work.
+See the [architecture](ARCHITECTURE.md) and [roadmap](ROADMAP.md).
 
-The selected-translator CPU oracle (038) now passes 2,410 original synthetic cases in each of six native/sanitizer/held-out-seed runs across Windows and Linux, with all six deliberate-result mutations correctly rejected. Two generations per run and native cross-host output agree byte for byte. The conservative exact-math/register policy and production guest wraparound flags are bound; executed generator binaries are retained per attempt. This covers a selected ISA subset, not retail-console equivalence or all nine exact-math algorithms. VMX128, exception/nonlocal behavior and other stated gaps remain untested. See [CPU validation](engine/ppc-validation.md). Thread/lifecycle 039 and controlled real-title teardown 041 remain the next kernel dependencies; MW3 remains unplayable.
+MW3-031 completes the scoped [source/local-build delivery decision](legal/distribution.md).
+It does not approve game-linked executable/SDK distribution or a release.
+Reference cases 004 and authorized Steam AppID/SDK access 019 remain open.
+RecompLauncher-compatible easy installation is planned; integration and the
+Mojo! Recomp reference remain deferred. Plutonium/XLink Kai interoperability
+and Open-IW5 remain deferred considerations, not current implementation work.
 
-The synthetic thread suite reproduced a runtime defect on Windows and Linux when a cancellation at an import boundary replaced requested exit 77 with zero. MW3-043 tags cooperative stops separately from explicit exits and provides an isolated SDK profile with rebuilt kernel and XAM thunks. The game-free regression suite exercises both module boundaries. See [thread evidence](engine/threads.md) and the [stop repair profile](../config/toolchains/rexglue-stop/README.md).
+[Contributor setup](FRIENDS-START-HERE.md) uses the live backlog rather than a
+fixed list of completed tasks. Select with `python tools/project.py list --ready`,
+check GitHub ownership/dependencies, claim through task-admin and use a separate
+branch/worktree. Every future report must distinguish source inspection,
+synthetic tests, actual title checkpoints and verified gameplay.

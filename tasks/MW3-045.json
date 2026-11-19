@@ -1,0 +1,23 @@
+{
+  "id": "MW3-045",
+  "title": "Prepare complete owned disc content for native startup",
+  "phase": 2,
+  "area": "content-preparation",
+  "depends_on": ["MW3-002"],
+  "paths": ["tools/prepare_content.py", "tests/content", "docs/engine/content-preparation.md"],
+  "goal": "Extend the read-only disc inventory into an exclusive, streamed private content preparation tool; the current private directory contains only the two XEX files and cannot supply a complete game scene.",
+  "acceptance": [
+    "Reuse the bounded Disc reader and supported-build manifest without changing their shared contracts; verify source ISO identity and both root executable hashes before content preparation",
+    "Preflight every relative path, extent, entry/byte budget, Windows reserved-name/normalization collision and destination ancestor; reject traversal, links/reparse redirection and pre-existing destinations without overwriting inputs",
+    "Stream all supported content to a fresh private output with bounded memory, preserve failed attempts, and publish a complete identity/tool/file-hash manifest only after verifying the prepared files and unchanged source",
+    "Keep immutable content and writable profiles distinct; no content, game bytes, keys, SDKs or private manifests enter Git"
+  ],
+  "validation": [
+    "Use original synthetic images for nested/empty files, malformed extents, cycles, path/Windows-name collisions, byte-budget exhaustion and redirected/pre-existing destinations",
+    "Run game-free Windows/Linux checks and parser diagnostics; use actual filesystem link/reparse cases where supported and report unavailable privilege cases explicitly",
+    "After source review, privately prepare the owner's supported Rev 1 ISO, reconcile the full inventory/file hashes and unchanged ISO hash, and verify failure cases do not overwrite existing files; no game execution claim"
+  ],
+  "size": "bounded original preparation tool",
+  "priority": 0,
+  "status": "todo"
+}

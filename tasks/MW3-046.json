@@ -1,0 +1,23 @@
+{
+  "id": "MW3-046",
+  "title": "Audit and exercise the selected kernel's allocation import ABI",
+  "phase": 2,
+  "area": "memory-api",
+  "depends_on": ["MW3-039", "MW3-042", "MW3-044"],
+  "paths": ["tests/startup_memory", "tools/test_startup_memory.py", "docs/engine/startup-memory.md"],
+  "goal": "Test the actual NtAllocateVirtualMemory/NtFreeVirtualMemory import boundary before the lead admits the next guarded startup service; direct address-space tests do not establish the import ABI.",
+  "acceptance": [
+    "Bind exact SDK, prototype, export binding and compiler identities; review implemented behavior and independent source/contract evidence before choosing expectations, marking missing retail evidence explicitly",
+    "Use original game-free guest callbacks into the actual selected kernel library, not embedded kernel objects or success stubs, to test argument/result endian handling, reserve/commit/decommit/release and alias/accounting invariants",
+    "Exercise null, unaligned, out-of-range and wrapping in/out pointers, invalid size/type/protection and release-state failures without corrupting neighbouring guest memory or returning success for unsupported behavior",
+    "Retain baseline failures and result mutations, and split any demonstrated SDK repair into an agreed child scope; this task changes no SDK, shared harness, guest service allowlist or generated game code"
+  ],
+  "validation": [
+    "Run isolated and repeated orders on native Windows/Linux and supported host/core sanitizers, checking actual loaded library identities and resource recovery",
+    "Reject an intentionally wrong result and an incomplete/late process; report supported skips and distinguish original contract tests from actual MW3 calls",
+    "Run public game-free checks; publish exact evidence and unresolved differences, with no later startup, gameplay or full kernel-parity claim"
+  ],
+  "size": "bounded ABI contracts; split SDK repairs",
+  "priority": 0,
+  "status": "todo"
+}
