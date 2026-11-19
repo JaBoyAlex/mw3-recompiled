@@ -1,17 +1,39 @@
 # Thread and lifecycle validation
 
-MW3-039 remains open. The baseline exposed a repeatable cancellation defect
-at a native import boundary. MW3-043 supplies an isolated SDK repair for that
-defect. The [repair validation](../../config/toolchains/rexglue-stop/validation.md)
-covers kernel and XAM imports, thunk return, and explicit exits. The sections
-below retain the original synthetic baseline and its failures.
+MW3-039 completes its scoped synthetic thread acceptance after the merged
+MW3-043 repair. The final suite passes on five Windows/Linux profiles. The
+[repair validation](../../config/toolchains/rexglue-stop/validation.md) supplies
+the exact receipts and commands for kernel and XAM import boundaries, thunk
+return and explicit exits. Earlier failures below remain part of the record.
+
+## Acceptance review
+
+| Criterion | Observed coverage |
+| --- | --- |
+| Thread/TLS/stack/synchronization contracts | Native callbacks enter the actual SDK. Cases cover startup context and r13, stack bounds/guards, eight live guest TLS blocks, counted suspension, termination metadata, events/semaphores/mutants and contended interlocked lists. |
+| Bounded contention and teardown | Gates coordinate eight TLS children and four list producers/consumers. Per-process private roots, finite deadlines, explicit unload/destruction and handle/page recovery are checked. An audit of all five final profiles finds 120 passing accounting observations per profile with equal before/after page counts. |
+| Aggregate investigation | The retained 261-case suite and reduced predecessor pair below identify settings contamination and flawed peak/history assertions. Original aggregate failures and unresolved cases stay recorded. |
+| Negative checks and supported sanitizers | Each final profile passes 19 isolated cases, three combined orders and two deliberate-failure detectors. Coverage includes Windows native/host UBSan and Linux native/host ASan+UBSan/core ASan+UBSan. |
+
+The final selection contains ten platform/reference cases and nine kernel
+cases, for 19 cases. Five profiles provide 380 ordinary case evaluations and
+ten expected negative results. Their maintained sources match the merged
+implementation. The acceptance review rechecked every log/XML/binary hash and
+the loaded XAM library against the recorded package.
+
+This completion covers the task's explicit native-callback contracts. PPC
+reservation instructions, TSan, complete fiber/APC behavior and console
+differential captures remain unverified. Controlled real-title shutdown is
+the next integration task, MW3-041. The report field
+`kernel_contracts_complete=false` conservatively describes full kernel
+coverage and remains accurate after this scoped acceptance.
 
 ## Maintained contracts
 
 The driver builds against actual verified SDK DLLs, without embedding old
 kernel implementation objects. Select --suite platform, kernel, or all.
 The combined suite checks interactions and builds Catch2 once per fresh profile.
-Its 17 cases comprise ten platform/reference and seven guest-kernel cases.
+The initial baseline had 17 cases. The repaired final selection has 19 cases.
 Each runs alone, then all run in declaration order and shuffled orders with
 seeds 1 and 0x12345678. Two further processes deliberately reject a wrong
 cancellation result and missing stop/wake. Detector checks require exit 42,
@@ -145,8 +167,8 @@ base/PPC/kernel; unchanged graphics/module dependencies and Catch2 stay native.
 --sanitizers permits an explicitly instrumented SDK receipt. The manifest records
 whether the core or only callbacks are instrumented. Full commands and tool,
 source and package hashes remain in each receipt. Actual owned-title orderly
-shutdown remains MW3-041, blocked by unfinished thread acceptance and its repair.
-No performance or release gate passes.
+shutdown is tracked by MW3-041. These commands reproduce the retained baseline;
+the passing repaired-profile commands are in the linked validation record.
 
 | Profile | Private directory | Manifest SHA-256 |
 | --- | --- | --- |
