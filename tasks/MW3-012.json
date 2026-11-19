@@ -4,24 +4,28 @@
   "phase": 2,
   "area": "platform",
   "depends_on": [
-    "MW3-010"
+    "MW3-010",
+    "MW3-011",
+    "MW3-080",
+    "MW3-081",
+    "MW3-082",
+    "MW3-083"
   ],
   "paths": [
-    "runtime/audio",
-    "runtime/input",
-    "runtime/storage",
-    "tests/platform"
+    "docs/gates/platform-acceptance.md",
+    "tests/host_platform/__init__.py"
   ],
   "goal": "Supply audible and stable audio, independent controllers and isolated local profiles.",
   "acceptance": [
     "Document XMA/media decoder provenance and mixing behavior",
-    "Four distinguishable input slots; saves confined to isolated profile roots; corrupted saves fail safely"
+    "Four distinguishable input slots; saves confined to isolated profile roots; corrupted saves fail safely",
+    "Require merged scoped child evidence plus actual title audio/input/save observations; host-only routing/storage contracts cannot pass the platform or original-gameplay gates"
   ],
   "validation": [
     "Audio underrun and long-session tests",
     "Controller disconnect/reconnect and save rollback tests"
   ],
-  "size": "epic; split before claiming",
+  "size": "evidence gate; implementation is scoped in children",
   "priority": 0,
   "status": "todo"
 }
