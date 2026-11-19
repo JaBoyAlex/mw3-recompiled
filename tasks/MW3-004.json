@@ -21,5 +21,13 @@
   ],
   "size": "1-3 days",
   "priority": 0,
-  "status": "todo"
+  "status": "blocked",
+  "evidence": [
+    "Partial implementation in qa/reference and docs/reference.md: 37 stable case contracts, 23 source-classed facts and ten explicit inventory records; no console behavior reported as observed",
+    "Official English Xbox 360 publisher manual pinned to c281bfbd9e5f5b9d4088fe763677b08a48ce8d803c5f8dd230733b7d795ceaca; cover/menu/controls/pause pages rendered and visually checked; manual/PDF images stay private",
+    "Original evidence checker rejects unknown/incomplete coverage, source-class confusion, wrong build/update/DLC context, stale/missing cases, mismatched artifacts and synthetic/extension substitutions; gameplay_certified remains false",
+    "BLOCKER: owner reports no existing exact-build console observations. Required mission/map/checkpoint/difficulty inventories and manual-versus-owned-console behavior cross-check remain outstanding; task is not done",
+    "QA contract tests: 20 PASS on Windows with one explicit symlink-privilege skip; 20 PASS on Linux without skips. Root Windows Release: 138 tests/seven skips and CTest 1/1; Linux Release ASan/UBSan: 138 tests/one Windows-only skip and CTest 1/1",
+    "Scope is reference tooling/docs only; no game execution, production service use, runtime/SDK/shared-interface change or independent review claimed"
+  ]
 }
