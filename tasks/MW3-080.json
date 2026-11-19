@@ -4,7 +4,7 @@
   "phase": 2,
   "area": "input-model",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "depends_on": [
     "MW3-010"
   ],
@@ -26,5 +26,14 @@
     "Run deterministic repeated/permuted event orders on native Windows/Linux and supported address/undefined sanitizers; record an intentionally wrong-result rejection",
     "Run the public game-free checks and bind compiler/source/test identities; report unavailable physical controllers and unexecuted title/guest mappings explicitly"
   ],
-  "size": "bounded original host input component"
+  "size": "bounded original host input component",
+  "evidence": [
+    "Original runtime/input/slot_router.hpp and .cpp: fixed four-slot ownership, explicit reserve/attach/release, duplicate/takeover rejection, neutral disconnect, session/generation tokens and atomic normalized-frame validation; no SDK/guest input mapping",
+    "Seven native contract cases plus exact wrong-result and missing/unknown-case rejection controls; all 24 slot orders repeated 32 times (768 original synthetic scenarios), unchanged-state checks, malformed/nonfinite frames and sequence wrap rejection",
+    "Windows MSVC 19.44.35229.0 Release: public checks PASS, 141 Python tests with seven documented pre-existing platform/tool/privilege skips and parser CTest 1/1; nested input CTest 7/7 and controls PASS",
+    "Linux/WSL Ubuntu 24.04 GCC 13.3.0 Release ASan/UBSan: public checks PASS, 141 Python tests with one Windows-junction skip and parser CTest 1/1; nested input CTest 7/7 and controls PASS",
+    "Separate native Windows x64 MSVC Release ASan: input CTest 7/7 and exact wrong-result rejection PASS; source/test/compiler/binary hashes and reproducible commands recorded in docs/engine/input-slots.md",
+    "Single-thread caller ownership and unique-session/device contracts documented; generation exhaustion reviewed but not forced; Windows undefined instrumentation unavailable; physical controllers, title/guest input and independent physical Linux hardware NOT RUN",
+    "Owner self-review only; no title performance/gameplay, retail player-limit, original split-screen or four-player Survival claim; main active allocation/profile-SDK lanes untouched"
+  ]
 }
