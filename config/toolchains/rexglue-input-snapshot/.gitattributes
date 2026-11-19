@@ -1,0 +1,4 @@
+# Preserve the exact lock bytes used by cross-platform private receipts.
+lock.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Unified diff context uses one space on otherwise empty lines.
+snapshot.patch whitespace=-blank-at-eol

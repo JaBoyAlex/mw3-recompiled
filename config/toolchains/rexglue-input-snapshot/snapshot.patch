@@ -1,0 +1,102 @@
+--- a/src/hid/sdl3/sdl3_input_driver.cpp
++++ b/src/hid/sdl3/sdl3_input_driver.cpp
+@@ -171,7 +171,11 @@
+   std::atomic<size_t> unflushed{0};
+ 
+   std::mutex event_mutex;
+-  std::vector<SDL_Event> pending;
++  struct PendingEvent {
++    SDL_Event event;
++    std::shared_ptr<SDL_Gamepad> opened;
++  };
++  std::vector<PendingEvent> pending;
+ 
+   std::mutex mutex;
+   std::vector<Controller> controllers;
+@@ -212,22 +216,29 @@
+     SDL_FlushEvents(SDL_EVENT_JOYSTICK_AXIS_MOTION, SDL_EVENT_FINGER_DOWN - 1);
+     unflushed = 0;
+   }
++  // Open while SDL reports the add: opening later resets already-held triggers.
++  // The queued reference lasts until discovery takes its own handle, or shutdown.
++  std::shared_ptr<SDL_Gamepad> opened;
++  if (event.type == SDL_EVENT_GAMEPAD_ADDED) {
++    opened = {SDL_OpenGamepad(event.gdevice.which), SDL_CloseGamepad};
++  }
++  std::lock_guard<std::mutex> guard(event_mutex);
++  pending.push_back({event, std::move(opened)});
++  // Publish after enqueueing so a reader observing this revision can drain it.
+   if (event.type == SDL_EVENT_GAMEPAD_ADDED || event.type == SDL_EVENT_GAMEPAD_REMOVED) {
+     ++revision;
+   }
+-  std::lock_guard<std::mutex> guard(event_mutex);
+-  pending.push_back(event);
+ }
+ 
+ std::unique_lock<std::mutex> SDL3InputDriver::State::DrainAndLock() {
+-  std::vector<SDL_Event> events;
++  std::vector<PendingEvent> events;
+   {
+     std::lock_guard<std::mutex> guard(event_mutex);
+     events.swap(pending);
+   }
+   std::unique_lock<std::mutex> guard(mutex);
+-  for (const SDL_Event& event : events) {
+-    ProcessEventLocked(event);
++  for (const PendingEvent& queued : events) {
++    ProcessEventLocked(queued.event);
+   }
+   return guard;
+ }
+@@ -293,6 +304,29 @@
+     SDL_SetGamepadPlayerIndex(gamepad, free_index);
+   }
+   controllers.push_back(controller);
++
++  // SDL may already hold input before this queued add is drained. Initialize
++  // through the event handlers so startup and subsequent input normalize alike.
++  SDL_Event initial{};
++  initial.type = SDL_EVENT_GAMEPAD_AXIS_MOTION;
++  initial.gaxis.which = event.gdevice.which;
++  for (int axis = 0; axis < SDL_GAMEPAD_AXIS_COUNT; ++axis) {
++    initial.gaxis.axis = static_cast<Uint8>(axis);
++    initial.gaxis.value = SDL_GetGamepadAxis(gamepad, static_cast<SDL_GamepadAxis>(axis));
++    OnAxisLocked(initial);
++  }
++  initial = {};
++  initial.type = SDL_EVENT_GAMEPAD_BUTTON_DOWN;
++  initial.gbutton.which = event.gdevice.which;
++  initial.gbutton.down = true;
++  for (int button = 0; button < SDL_GAMEPAD_BUTTON_COUNT; ++button) {
++    if (!SDL_GetGamepadButton(gamepad, static_cast<SDL_GamepadButton>(button))) {
++      continue;
++    }
++    // Several physical buttons map to one bit; released aliases must not clear it.
++    initial.gbutton.button = static_cast<Uint8>(button);
++    OnButtonLocked(initial);
++  }
+ }
+ 
+ void SDL3InputDriver::State::OnGamepadRemovedLocked(const SDL_Event& event) {
+@@ -472,6 +506,13 @@
+   state_->context->GetSettingsRegistry().Unregister(*this);
+   std::shared_ptr<State> state = std::move(state_);
+   const Result<void> ran = state->context->RunOnUIThread([state]() {
++    if (state->events_up) {
++      SDL_RemoveEventWatch(&State::EventWatch, state.get());
++    }
++    {
++      std::lock_guard<std::mutex> guard(state->event_mutex);
++      state->pending.clear();
++    }
+     {
+       std::lock_guard<std::mutex> guard(state->mutex);
+       for (State::Controller& controller : state->controllers) {
+@@ -484,7 +525,6 @@
+       state->gamepad_up = false;
+     }
+     if (state->events_up) {
+-      SDL_RemoveEventWatch(&State::EventWatch, state.get());
+       SDL_QuitSubSystem(SDL_INIT_EVENTS);
+       state->events_up = false;
+     }

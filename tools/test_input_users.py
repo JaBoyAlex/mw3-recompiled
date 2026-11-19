@@ -12,6 +12,7 @@ import sys
 import uuid
 
 import prepare_runtime_xma as xma
+import prepare_runtime_input as input_profile
 import recompile as common
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -122,22 +123,24 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("root", "sdk-report", "output-root"):
         parser.add_argument("--" + name, required=True, type=Path)
+    parser.add_argument("--sdk-profile", choices=("xma", "input"), default="xma")
     parser.add_argument("--sanitizers", action="store_true")
     parser.add_argument("--repeat", type=int, default=2, choices=range(1, 9))
     args = parser.parse_args()
     output = None
+    verifier = xma if args.sdk_profile == "xma" else input_profile
     report = dict(schema_version=1, status="IN_PROGRESS", game_free=True, guest_executed=False,
                   physical_devices=False, script_sha256=common.sha(__file__),
                   host_sanitizers=args.sanitizers, results=[])
     try:
-        sdk, identity = xma.verify_prepared(args.root.resolve(), args.sdk_report, allow_sanitized=args.sanitizers)
+        sdk, identity = verifier.verify_prepared(args.root.resolve(), args.sdk_report, allow_sanitized=args.sanitizers)
         output = common.private_cache(args.output_root, ROOT / "game") / uuid.uuid4().hex
         output.mkdir(parents=True)
         print(json.dumps(dict(output=str(output))), flush=True)
         shutil.copytree(SOURCE, output / "maintained-source", ignore=shutil.ignore_patterns("__pycache__"))
         shutil.copy2(__file__, output / "maintained-driver.py")
         host_sources = common.snapshot(output / "maintained-source")
-        report.update(sdk=identity, host_sources=host_sources, repeat=args.repeat)
+        report.update(sdk=identity, sdk_profile=args.sdk_profile, host_sources=host_sources, repeat=args.repeat)
         windows = sys.platform == "win32"
         if windows:
             import prepare_windows_runtime as win
@@ -209,7 +212,7 @@ def main():
                            known_limitation=limitation, command=command, log_sha256=common.sha(lane / "run.log"), record=record, loaded=observed)
                 report["results"].append(row)
                 print(json.dumps({key: row[key] for key in ("case", "repeat", "status", "returncode")}), flush=True)
-        _, after = xma.verify_prepared(args.root.resolve(), args.sdk_report, allow_sanitized=args.sanitizers)
+        _, after = verifier.verify_prepared(args.root.resolve(), args.sdk_report, allow_sanitized=args.sanitizers)
         if (after != identity or common.sha(binary) != report["binary_sha256"] or
                 common.snapshot(output / "maintained-source") != host_sources or common.sha(__file__) != report["script_sha256"]):
             raise ValueError("verified source, SDK or binary changed")
