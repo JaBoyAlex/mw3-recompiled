@@ -33,6 +33,8 @@ def snapshot(path):
 
 
 def library_record(nonce, text):
+    if type(nonce) is not str or not re.fullmatch(r'[0-9a-f]{32}', nonce):
+        raise ValueError('invalid nonce')
     value = capture.one_record(text, LIBRARIES)
     if (not isinstance(value, dict) or set(value) != {'nonce', 'loaded'} or value['nonce'] != nonce or
             not isinstance(value['loaded'], dict) or set(value['loaded']) != {'rexkernel', 'rexbase'} or

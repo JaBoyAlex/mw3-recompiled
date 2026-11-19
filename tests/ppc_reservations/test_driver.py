@@ -60,6 +60,7 @@ class ReservationEvidenceTests(unittest.TestCase):
         for code, bad in [(0, log), (43, log + log), (43, log + text(value)),
                 (43, log.replace(NONCE, '2' * 32)), (43, log + 'runtime error: invalid')]:
             self.assertFalse(driver.incomplete_control(NONCE, code, bad))
+        self.assertFalse(driver.incomplete_control('bad', 43, log.replace(NONCE, 'bad')))
         self.assertIsNone(driver.classify(rows, NONCE, 43, log))
 
     def test_actual_owned_child_timeout_after_plausible_output_is_refused(self):
@@ -68,9 +69,11 @@ class ReservationEvidenceTests(unittest.TestCase):
             log = Path(folder) / 'run.log'
             code = driver.capture.run_process([sys.executable, '-c',
                 'import sys,time;print(sys.argv[1],flush=True);time.sleep(10)', text(value)],
-                cwd=folder, env=dict(os.environ), log=log, timeout=0.2)
+                cwd=folder, env=dict(os.environ), log=log, timeout=1)
             self.assertEqual(code, -999)
-            self.assertIsNone(driver.classify(rows, NONCE, code, log.read_text()))
+            captured = log.read_text()
+            self.assertIn(driver.PREFIX, captured)
+            self.assertIsNone(driver.classify(rows, NONCE, code, captured))
 
     def test_stale_or_changed_reference_refused(self):
         with tempfile.TemporaryDirectory() as folder:

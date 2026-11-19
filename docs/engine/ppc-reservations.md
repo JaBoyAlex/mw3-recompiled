@@ -185,6 +185,11 @@ A Python timeout test initially expected 124 instead of the existing helper
 sentinel -999; the assertion was corrected after reading that contract.
 None of these fixture errors is counted among the final 28 outcomes.
 
+A previously sealed set precedes final review of the timeout-output assertion
+and incomplete-control nonce format. It remains retained separately; the final
+receipts below were refreshed for the exact maintained source hashes and are
+not pooled with the earlier set.
+
 
 ## Exact provenance
 
@@ -198,10 +203,10 @@ output, private trace, game content, key or credential is committed.
 
 | Profile | Private attempt ID | Manifest SHA-256 | Runner SHA-256 |
 | --- | --- | --- | --- |
-| windows-native | `feea993f8ff142b9a460bb04a63add29` | `be420000de5a47a9900fe3e57e073eb4ba3f86992e68907fcc387852d5d0dd0e` | `edf71e95375dccc5f2f2065c803d0e76c417add84f686d270fbcea8984d8eebd` |
-| windows-ubsan | `7856c06d5aa34759ae25f741c3f54e8b` | `60e3f5aa27564c5216787cb05f8925c805e11a999a9aec205d2366a06f3efacf` | `681b81aa437596b13f474ea596fafa3fca168f1911c8725cc2eaf17ff7c8902e` |
-| linux-native | `b5373508542d4256b8c8551ca70a2da1` | `f99fbd98df64517971824007a3b94906077c29abd7e9a44247125de039894925` | `f8a5d6eeb7e39d7da39513b4388db1d3e84317fe37655a420c587efa79dd8869` |
-| linux-asan | `a632f65267c6439a9dbac7f86f5b0fa4` | `dd70368611fddfc509c539f6ea48b37f846a146b0648554146e01a6a95c41d4c` | `888ced26c0eb067e3685e4f2fbed176139537c8e0618119a6e2e78f71e8160fd` |
+| windows-native | `5456f3ddfa63436ebe7aa5958212c7ba` | `fe751e90349efa0f3d0aea2fc98348f215b1be503e7266ee0619eb1e0b56cacc` | `afca121054fbfd773dd9298d3746188a30559cc23f3bc8d67a9dff2184b3e477` |
+| windows-ubsan | `d1cc0849dd924ac9bf105fa6baf18b86` | `f6c50f5d291dfc8ad1b1d91e2f50e250668e5df3a09c4301298836f146616820` | `4b7f6e4351d2d30e12a27031c7fba8963f83ac700474a9026888e1a151d2a027` |
+| linux-native | `757a5932b3c047f4939acb369077ae4f` | `dd9c5b9f6cbe81878b7b1a161d5ca851cc697e626940b03aafcfbe54a84a4dc2` | `f8a5d6eeb7e39d7da39513b4388db1d3e84317fe37655a420c587efa79dd8869` |
+| linux-asan | `13e1c1fcb154457d9dcc51ba173c67f8` | `aa97c87c0571b9a6034cf68e6df4167ed1d4ab936743cf4df82fb49b6ea42d6e` | `6289100f92bb2c56ff5e63a203310b1e5adbad7c7fc97c295464577600fa9552` |
 
 All retained artifacts, case/log files, current sources and loaded libraries
 were rehashed after execution. Both platforms use Clang 20.1.2, Release
@@ -212,8 +217,8 @@ objects; supported sanitizer calibration checks remain separate.
 
 | Profile | Generator binary SHA-256 |
 | --- | --- |
-| windows-native | `fabfa2c571912ba80bc2fc50226e6163fa31cc71b975b73b4e95c19e2e52dda2` |
-| windows-ubsan | `0a6024a19955b7eff03ce44d9cb2737fe993575d270fd713801408362029cfa9` |
+| windows-native | `a2ad714cd14dc9f28d1ba910e6bfb5cbad4d298fef497d68c761963de01256b1` |
+| windows-ubsan | `0a107df6693c7109c68381d4fd338b0ede3706d4dfae8b58538327f87b577b75` |
 | linux-native | `790bffa833828becde89a24e5f2e2c9c1d0755d5a63976abb469300aa3044005` |
 | linux-asan | `790bffa833828becde89a24e5f2e2c9c1d0755d5a63976abb469300aa3044005` |
 
@@ -242,9 +247,9 @@ package or integration of later thread/allocation repairs.
 | `tests/ppc_reservations/fixtures.s` | `02b90489150dc39a992a82ba319289cbf23d611000fd31a5f3c62187ceb534e1` |
 | `tests/ppc_reservations/oracle.py` | `6517b9401e6d671aeb96a9d6ad62d29263adc7868914b8cc1e57a57888bb8281` |
 | `tests/ppc_reservations/runner.cpp` | `9e1cd8f26ff6e86b9a220e757902e0dbf9ff30cead37e4402e13d6d63dcf66fc` |
-| `tests/ppc_reservations/test_driver.py` | `09d0cb1b735e41c8baa1a7582dc547c8964dd6f174fc323e3ac7e9b0992baf72` |
+| `tests/ppc_reservations/test_driver.py` | `504b6bc98ca1f6773439e508b0dd2daf445a719655eca76fecb89de217b18650` |
 | `tests/ppc_reservations/test_oracle.py` | `be9db633f522cea3137c6014d3237bdc669ae790499f1334860aa32dd41b5f05` |
-| `tools/test_ppc_reservations.py` | `89f002763a385c9922d8e385583c1d2ae971166408c4153df40ad48af70ceefe` |
+| `tools/test_ppc_reservations.py` | `d748f104414ad3644d1f6f98791f8f65a54882ef3f21ea2c22305296107cbe7b` |
 
 The two emitted-file hashes agree across all four profiles:
 
@@ -263,21 +268,24 @@ Windows 11 build 26300 / WSL Ubuntu 24.04. Background activity is uncontrolled.
 They are not a controlled OS comparison, instruction microbenchmark or MW3
 frame-time/input-latency/performance result.
 
-| Native profile/dispatch | Three medians (ns) | Three p95 (ns) | Three maxima (ns) |
+| Profile/dispatch | Three medians (ns) | Three p95 (ns) | Three maxima (ns) |
 | --- | --- | --- | --- |
-| windows-native load | 0.0, 0.0, 0.0 | 100, 100, 100 | 2500, 2500, 1300 |
-| windows-native store | 0.0, 0.0, 0.0 | 100, 100, 100 | 200, 600, 200 |
-| linux-native load | 24.0, 26.0, 25.0 | 65, 69, 64 | 636, 6305, 290 |
-| linux-native store | 27.0, 27.0, 27.0 | 63, 47, 55 | 405, 285, 623 |
+| windows-native load | 0.0, 0.0, 0.0 | 100, 100, 100 | 2800, 2300, 1600 |
+| windows-native store | 0.0, 0.0, 0.0 | 100, 100, 100 | 600, 800, 300 |
+| windows-ubsan load | 0.0, 0.0, 0.0 | 100, 100, 100 | 2700, 2400, 2200 |
+| windows-ubsan store | 0.0, 0.0, 0.0 | 100, 100, 100 | 500, 800, 400 |
+| linux-native load | 25.0, 25.0, 27.0 | 48, 65, 43 | 409, 6052, 8355 |
+| linux-native store | 27.0, 28.0, 29.0 | 52, 60, 47 | 248, 353, 236 |
+| linux-asan load | 112.5, 104.0, 111.5 | 232, 207, 219 | 566, 477, 11829 |
+| linux-asan store | 111.0, 103.0, 117.0 | 212, 203, 241 | 8799, 744, 5208 |
 
-Windows medians of zero reflect 100ns quantization of short intervals,
+Windows medians of zero reflect 100 ns quantization of short intervals,
 **not zero instruction cost**. Median native Windows cost is unresolved
 at this resolution; a future eligible performance comparison needs batched
 windows and matched correctness work. Nearest-rank p95 and central-mean
 medians are recomputed independently from all retained raw samples. Tails
-are kept, including Linux native load maximum 6,305 ns. Sanitizer costs are
-separate: Linux host/generated load medians 102–118 ns and store 107–113 ns;
-maximum store 36,516 ns is retained, not silently trimmed.
+are kept. Native and sanitizer costs remain separate. Per-run maxima
+and sanitizer distributions are retained rather than silently trimmed.
 
 Decision: keep the bounded diagnostic and require a separately agreed
 correctness repair before treating this path as reservation-equivalent.
