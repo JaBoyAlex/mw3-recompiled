@@ -1,0 +1,29 @@
+{
+  "id": "MW3-062",
+  "title": "Protect host audio stream lifetimes before raw SDK submission",
+  "phase": 2,
+  "area": "audio-ownership",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-061"],
+  "paths": [
+    "runtime/audio/streams",
+    "tests/host_platform/audio_streams",
+    "tools/test_audio_streams.py",
+    "docs/engine/audio-streams.md"
+  ],
+  "goal": "Provide original bounded host owner/session admission so closed audio tokens cannot reach a reused raw SDK stream, without revising the SDK ABI or admitting guest services.",
+  "acceptance": [
+    "Define a standalone C++20 eight-stream ownership gate with opaque instance/session-bound tokens and explicit nonzero host owner IDs; reject invalid, closed, moved, foreign-instance and wrong-owner commands before any backend call, including raw-ID reuse",
+    "Serialize public operations on the creating host thread; SDK callbacks only record bounded per-binding credits through detached lifetime state, never reenter a backend or call arbitrary clients. Old callbacks cannot credit a replacement, and exhaustion fails diagnostically without wrapping identifiers/counters",
+    "Use an explicit narrow backend port, preserve backend refusal/errors and earlier valid owners on ordinary failure, bound frame spans to the established original host PCM shape, and release owned streams on close/owner-close/shutdown without per-submit ownership allocations or PCM copies",
+    "Prove admission against the actual unchanged approved SDK in explicit timer and SDL dummy modes: retain the raw stale-ID baseline, reject that stale host token before SDK Submit, and show the replacement/other owner still progresses with correct cleanup",
+    "Keep SDK-specific glue in the diagnostic lane; no shared SDK/profile, input, allocation, startup, existing runtime interface, guest ABI, profile authentication or title playback change. Any production integration or broader interface change requires a separate agreed task"
+  ],
+  "validation": [
+    "Run original positive/negative native contracts on Windows/Linux, including partial-open/submit failure, active raw-ID collision, close/reopen, owner/instance isolation, delayed callbacks, bounded exhaustion, frame bounds and wrong-thread calls; distinguish model faults from actual SDK observations",
+    "Run supported public-core and SDK-facing host sanitizers, actual SDK isolated/repeated/reordered cases, strict nonce/library/result controls and resource recovery; identify uninstrumented library coverage and physical/title checks not run",
+    "Measure token admission/submission/callback progress over at least three independent comparable processes, retain tails and correctness work, run public checks, and publish exact source/compiler/package/library/binary identities with material limits"
+  ],
+  "size": "bounded original host lifetime gate plus actual-SDK diagnostic bridge; no shared ABI repair or title binding"
+}
