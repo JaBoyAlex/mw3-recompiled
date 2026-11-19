@@ -102,10 +102,11 @@ def verify_loaded(value, sdk, build, windows):
     return result
 
 
-def reference_bundle(path, destination, sources):
+def reference_bundle(path, destination, sources, profile='baseline'):
     receipt = json.loads((path / 'manifest.json').read_text(encoding='utf-8'))
     if (receipt.get('task') != 'MW3-047' or not receipt.get('investigation_complete') or
             receipt.get('sources') != sources or receipt.get('script_sha256') != common.sha(__file__) or
+            receipt.get('generator_profile', 'baseline') != profile or
             set(receipt.get('assembly', {})) != {'fixtures.o', 'fixtures.elf', 'fixtures.bin', 'fixtures.map'} or
             snapshot(path / 'bins') != receipt['assembly']):
         raise ValueError('stale or incomplete fixture reference')
@@ -120,6 +121,7 @@ def main():
         parser.add_argument('--' + key, required=True, type=Path)
     parser.add_argument('--reference', type=Path, help='Windows: completed canonical Linux fixture receipt, including retained failures')
     parser.add_argument('--sanitizers', action='store_true')
+    parser.add_argument('--flags-report', type=Path, help='Explicit verified conditional-store SO generator; baseline remains the default')
     args = parser.parse_args()
     output = None
     report = dict(schema=1, task='MW3-047', status='IN_PROGRESS', investigation_complete=False,
@@ -129,14 +131,26 @@ def main():
     try:
         root = args.root.resolve()
         sdk, identity = memory.verify_prepared(root, args.sdk_report)
+        prepared = prepared_identity = None
+        if args.flags_report:
+            import prepare_ppc_flags as flags
+            prepared, prepared_identity = flags.verify_prepared(root, args.flags_report, args.sdk_report)
+        profile = prepared_identity['profile'] if prepared_identity else 'baseline'
         output = common.private_cache(args.output_root, ROOT / '.local/game') / uuid.uuid4().hex
         output.mkdir(parents=True)
         print(json.dumps(dict(output=str(output))), flush=True)
         shutil.copytree(SOURCE, output / 'maintained', ignore=shutil.ignore_patterns('__pycache__'))
         shutil.copy2(__file__, output / 'maintained-driver.py')
-        report.update(sdk=identity, sdk_report_sha256=common.sha(args.sdk_report), helpers={
+        report.update(sdk=identity, sdk_report_sha256=common.sha(args.sdk_report), generator_profile=profile, helpers={
             name: common.sha(ROOT / 'tools' / name) for name in ('recompile.py', 'prepare_runtime_memory.py',
                 'test_rexglue_ppc.py', 'test_sdk_audio.py', 'prepare_windows_runtime.py')})
+        report.update(generator_so_patch_applied=prepared_identity is not None,
+            runtime_sdk_modified=False, reservation_lifetimes_repaired=False)
+        if prepared_identity:
+            # A narrow generator repair is distinct from fixing runtime reservations.
+            report.pop('sdk_repaired')
+            report['prepared_generator'] = prepared_identity
+            report['helpers']['prepare_ppc_flags.py'] = common.sha(flags.__file__)
         windows = sys.platform == 'win32'
         source = root / 'sources/rexglue-decommit'
         if windows:
@@ -178,7 +192,7 @@ def main():
         reference = None
         if windows:
             if not args.reference: raise ValueError('Windows LLVM has no PowerPC assembler; canonical fixture reference required')
-            reference = reference_bundle(args.reference, bins, report['sources'])
+            reference = reference_bundle(args.reference, bins, report['sources'], profile)
             report['reference_manifest_sha256'] = common.sha(args.reference / 'manifest.json')
             symbols_text = (bins / 'fixtures.map').read_text(encoding='utf-8')
         else:
@@ -202,15 +216,18 @@ def main():
         child = {k: v for k, v in env.items() if not k.startswith(('REX_', 'MW3_', 'LD_', 'ASAN_', 'LSAN_', 'UBSAN_'))}
         if windows: child['PATH'] = str(sdk / 'bin') + os.pathsep + child.get('PATH', '')
         else: child['LD_LIBRARY_PATH'] = str(sdk / 'lib')
-        # Existing original038 generator adapter, unchanged, under this lane's cache.
-        key = common.digest(dict(adapter=report['generator_adapter'], sdk=identity, tools=report['tools']))
-        generator_build = output.parent / ('generator-' + key)
-        run('configure-generator', [cmake, '-S', GENERATOR, '-B', generator_build, '-G', 'Ninja', '-DCMAKE_BUILD_TYPE=Release',
-            '-DCMAKE_C_COMPILER=' + tools['clang'].as_posix(), '-DCMAKE_CXX_COMPILER=' + tools['clang++'].as_posix(),
-            '-DCMAKE_PREFIX_PATH=' + sdk.as_posix(), '-DMW3_SDK_SOURCE=' + source.as_posix(), '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG', *extra])
-        run('build-generator', [cmake, '--build', generator_build, '--target', 'ppc-generator', '--parallel', '2'], timeout=900)
         generator = output / ('ppc-generator' + suffix)
-        shutil.copy2(generator_build / generator.name, generator)
+        if prepared:
+            shutil.copy2(prepared, generator)
+        else:
+            # Existing original038 generator adapter, unchanged, under this lane's cache.
+            key = common.digest(dict(adapter=report['generator_adapter'], sdk=identity, tools=report['tools']))
+            generator_build = output.parent / ('generator-' + key)
+            run('configure-generator', [cmake, '-S', GENERATOR, '-B', generator_build, '-G', 'Ninja', '-DCMAKE_BUILD_TYPE=Release',
+                '-DCMAKE_C_COMPILER=' + tools['clang'].as_posix(), '-DCMAKE_CXX_COMPILER=' + tools['clang++'].as_posix(),
+                '-DCMAKE_PREFIX_PATH=' + sdk.as_posix(), '-DMW3_SDK_SOURCE=' + source.as_posix(), '-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG', *extra])
+            run('build-generator', [cmake, '--build', generator_build, '--target', 'ppc-generator', '--parallel', '2'], timeout=900)
+            shutil.copy2(generator_build / generator.name, generator)
         report['generator_sha256'] = common.sha(generator)
         run('generate', [generator, bins / 'fixtures.bin', bins / 'fixtures.map', generated], child)
         emitted = snapshot(generated)
@@ -268,6 +285,8 @@ def main():
             report['results'].append(row)
             print(json.dumps(dict(label=label, status=status, counts=record['counts'] if record else None)), flush=True)
         _, after = memory.verify_prepared(root, args.sdk_report)
+        if prepared_identity and flags.verify_prepared(root, args.flags_report, args.sdk_report)[1] != prepared_identity:
+            raise ValueError('prepared generator changed during diagnostic')
         if (after != identity or snapshot(SOURCE) != report['sources'] or snapshot(GENERATOR) != report['generator_adapter'] or
                 common.sha(__file__) != report['script_sha256'] or common.sha(binary) != report['binary_sha256'] or common.sha(generator) != report['generator_sha256'] or
                 any(common.sha(ROOT / 'tools' / n) != h for n, h in report['helpers'].items()) or
