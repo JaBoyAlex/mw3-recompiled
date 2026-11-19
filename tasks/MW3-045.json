@@ -19,5 +19,13 @@
   ],
   "size": "bounded original preparation tool",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "tools/prepare_content.py and docs/engine/content-preparation.md: exact ISO/pair preflight, unchanged shared Disc reader, handle-relative no-follow exclusive preparation, bounded payload memory and complete private hash receipt",
+    "tests/content: 19 original synthetic contracts; actual Windows junction and Linux symlink/redirection cases, nonblocking FIFO rejection, hardlinks, retained interrupted attempts and wrong-result/extra-file mutations; supported skips explicit",
+    "Native Windows owned Rev 1 preparation PASS: 219 entries, 218 files, one directory and 8,112,921,882 verified bytes; unchanged full ISO hash, independent inventory/pair reconciliation and two actual existing-destination refusals",
+    "Private content manifest SHA-256 cf29e343d947509cb7406c35929e6126f936cd028f949f22b08e9fc756e7592b; executed preparation source dbbb8b15850ca9c72fb760a413519eff86137dd2dbba7a1de961c773add2dc30; no game bytes or private receipt committed",
+    "Windows Release: 137 Python tests with seven explicit platform/tool/privilege skips and CTest 1/1 PASS; Linux Release ASan/UBSan: 137 Python tests with one Windows-only skip and CTest 1/1 PASS",
+    "Owner self-review; no game execution or later-startup claim; main active runtime/ABI lane untouched"
+  ]
 }
