@@ -1,0 +1,24 @@
+{
+  "id": "MW3-087",
+  "title": "Bind controller readings to explicit local-player ownership",
+  "phase": 2,
+  "area": "input-ingress",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-080", "MW3-084", "MW3-085", "MW3-086"],
+  "paths": ["runtime/input/ingress", "tests/host_platform/input_ingress", "tools/test_input_ingress.py", "docs/engine/input-ingress.md"],
+  "goal": "Compose the accepted four-slot ownership model with bounded, incarnation-tagged controller observations and explicit normalization, proving the flow through the repaired real SDL3 provider before physical backend admission.",
+  "acceptance": [
+    "Keep the MW3-080 API unchanged; add original C++20 ingress code with bounded storage, explicit owner reservation/join, nonzero unique sessions and connection-incarnation tokens independent of enumeration order or SDK user numbers",
+    "Normalize complete typed stick/trigger readings and explicitly named original host button bits; reject unknown controls, mismatched sources, stale bindings and nonincreasing sequences before publishing any affected frame",
+    "Neutralize removed devices without releasing their owners, require explicit reattachment and invalidate queued readings across device-ID reuse and backend restart; no automatic reassignment, idle/shared-user fallback or authentication claim",
+    "Use the verified input-snapshot profile read-only in a separate original SDK-facing adapter diagnostic; prove four distinct real provider devices reach the explicitly chosen owners, without embedding the provider or modifying current SDKs, fixtures, shared interfaces or guest services",
+    "Keep physical input, SDK input-system UI policy, mapping reloads, controls held before SDL first open and translated-title admission outside this bounded host-ingress result; MW3-083 and MW3-012 remain unpassed"
+  ],
+  "validation": [
+    "Run public C++20 normalization/ownership/identity/sequence/budget/restart contracts on Windows and Linux with supported sanitizers and exact failure controls; compare all 24 enumeration orders without deriving player ownership from them",
+    "Run repeated private Windows/Linux native, host-sanitizer and participating-library profiles with original virtual-device stimuli through the actual repaired SDK provider, checking normalized frames, held input, hotplug/reused IDs, late readings, explicit owner joins and bounded cleanup",
+    "Reconcile actual loaded libraries, exact source/compiler/configuration/receipt/binary/log identities and complete nonce-bound output; reject wrong routing, stale/partial/duplicate output and late children; run python tools/check.py and report performance/coverage limits"
+  ],
+  "size": "bounded host observation-to-owner seam; no physical or guest service admission"
+}
