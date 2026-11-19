@@ -4,7 +4,7 @@
   "phase": 1,
   "area": "ci-budget",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "depends_on": ["MW3-001", "MW3-006"],
   "paths": [".github/workflows/ci.yml", ".github/workflows/toolchain.yml", "docs/ci-budget.md"],
   "goal": "Conserve the owner's nearly exhausted included Actions allowance by removing duplicate branch/PR work, cancelling superseded checks and restricting expensive host-toolchain rebuilds to their actual inputs, while retaining the existing checks and truthful local verification.",
@@ -19,5 +19,13 @@
     "Run public checks locally and one deliberately scheduled final-head hosted verification; retain exact workflow/check identities and report any hosted checks deferred for quota instead of calling them passed",
     "Record the eliminated duplicate work and budget limits without claiming an unmeasured minute saving, altered product performance, new platform coverage or a free self-hosted billing guarantee"
   ],
-  "size": "workflow routing/concurrency/path filters and contributor budget guidance only"
+  "size": "workflow routing/concurrency/path filters and contributor budget guidance only",
+  "evidence": [
+    "docs/ci-budget.md documents event routing, final-head manual validation, local Windows/Linux commands, explicit pending/skipped/cancelled limits, unchanged task-admin ownership and no paid-plan/public-repository/self-hosted billing assumption",
+    "Feature-branch push duplication removed from both workflows; main, PR and manual validation retained. Ordinary public CI now cancels superseded same-PR/ref runs; both workflow groups use PR numbers rather than fork branch names. Task-admin remains byte-identical and separately serialized",
+    "Host-toolchain path filters now cover its actual preparation script, root lock, original fixtures, smoke project, CMake integration and workflow; unrelated runtime SDK profiles no longer trigger a full rebuild. Static review covers eight positive and six negative examples without calling them actual GitHub event runs",
+    "Both complete jobs sections, commands, four OS/configuration entries, sanitizer invocation, timeouts, permissions and pinned action versions are unchanged. actionlint 1.7.12 passes both files; executable checksum and jobs-section hashes recorded in the subsystem report",
+    "Local Windows Release check.py passes 246 Python tests/eight skips plus parser CTest 1/1; Linux Release --sanitizers passes 246 tests/two Windows-only skips plus parser 1/1. Scope PR113 used one explicit five-job hosted run 44505161813 at exact head 7bdab8385b83d881f983725983014c9dd1bc4430, all successful, with no duplicate automatic runs",
+    "Only reserved workflows/docs and this task JSON changed; no game/SDK/private trace, input/startup source, runtime policy, secrets, repository visibility or billing setting. No unmeasured minute-saving or product-performance claim. Self-review only; final implementation-head hosted results are retained on the PR before merge"
+  ]
 }

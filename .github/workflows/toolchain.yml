@@ -1,15 +1,27 @@
 name: host-toolchain
 on:
   push:
-    branches: [main, 'codex/**']
-    paths: ['tools/prepare_toolchain.py', 'config/toolchains/**', 'cmake/toolchains/**', '.github/workflows/toolchain.yml']
+    branches: [main]
+    paths:
+      - 'tools/prepare_toolchain.py'
+      - 'config/toolchains/lock.json'
+      - 'config/toolchains/fixtures/**'
+      - 'config/toolchains/smoke/**'
+      - 'cmake/toolchains/**'
+      - '.github/workflows/toolchain.yml'
   pull_request:
-    paths: ['tools/prepare_toolchain.py', 'config/toolchains/**', 'cmake/toolchains/**', '.github/workflows/toolchain.yml']
+    paths:
+      - 'tools/prepare_toolchain.py'
+      - 'config/toolchains/lock.json'
+      - 'config/toolchains/fixtures/**'
+      - 'config/toolchains/smoke/**'
+      - 'cmake/toolchains/**'
+      - '.github/workflows/toolchain.yml'
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: host-toolchain-${{ github.head_ref || github.ref }}
+  group: host-toolchain-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   linux-preparation:
