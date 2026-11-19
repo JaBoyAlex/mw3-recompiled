@@ -1,0 +1,23 @@
+{
+  "id": "MW3-049",
+  "title": "Remove redundant hosted CI without reducing validation coverage",
+  "phase": 1,
+  "area": "ci-budget",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-001", "MW3-006"],
+  "paths": [".github/workflows/ci.yml", ".github/workflows/toolchain.yml", "docs/ci-budget.md"],
+  "goal": "Conserve the owner's nearly exhausted included Actions allowance by removing duplicate branch/PR work, cancelling superseded checks and restricting expensive host-toolchain rebuilds to their actual inputs, while retaining the existing checks and truthful local verification.",
+  "acceptance": [
+    "Keep the existing Windows/Linux Debug/Release and sanitizer commands and pinned action versions; run feature-branch validation through pull requests rather than duplicate feature-branch push runs, retaining main and explicit manual validation",
+    "Cancel superseded ordinary CI for the same pull request/ref without changing serialized task-admin ownership or cancelling other lanes' unrelated work",
+    "Narrow host-toolchain path filters to the actual preparation script, lock, original fixtures, smoke project, CMake toolchain integration and workflow; SDK runtime-profile-only changes must not rebuild unrelated host tools",
+    "Document local Windows/Linux verification and explicit final-revision manual CI, including skipped/pending limits, ownership requirements and no false passing status or paid-plan/public-repository change"
+  ],
+  "validation": [
+    "Lint both workflows, reconcile unchanged job commands/matrix/action pins and review positive/negative branch/path event examples against the actual preparation inputs",
+    "Run public checks locally and one deliberately scheduled final-head hosted verification; retain exact workflow/check identities and report any hosted checks deferred for quota instead of calling them passed",
+    "Record the eliminated duplicate work and budget limits without claiming an unmeasured minute saving, altered product performance, new platform coverage or a free self-hosted billing guarantee"
+  ],
+  "size": "workflow routing/concurrency/path filters and contributor budget guidance only"
+}
