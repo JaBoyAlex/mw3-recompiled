@@ -1,0 +1,23 @@
+{
+  "id": "MW3-050",
+  "title": "Verify native D3D12 device bootstrap and synthetic GPU readback",
+  "phase": 2,
+  "area": "gpu-bootstrap",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-009", "MW3-037"],
+  "paths": ["tests/gpu_bootstrap", "tools/test_gpu_bootstrap.py", "docs/engine/gpu-bootstrap.md"],
+  "goal": "Establish a bounded actual native Windows graphics-device foundation using the selected SDK's unchanged D3D12 driver and original synthetic pixels, before any title/frame integration; identify hardware, failures and costs without claiming a rendered MW3 frame.",
+  "acceptance": [
+    "Build an original isolated SDK-facing probe against a verified approved native memory-profile SDK/source package read-only; bind exact module/source/tool/compiler/probe identities, refuse mismatched inputs and load the actual explicitly selected D3D12 driver without null/software fallback",
+    "Exercise actual driver initialization, an owned hidden native surface, selected device/adapter identity, and bounded original render-target clear/copy/readback on that SDK device; compare all expected synthetic pixels and fence completion, clean up owned resources, and distinguish this host API work from Xenos command/shader or MW3 rendering",
+    "Use strict nonce/case/schema/completion/loaded-library verification, bounded owned subprocesses and separate output/cache paths; wrong-pixel, incomplete, stale/mutated receipt/output and deadline controls must not manufacture a successful result",
+    "Record unavailable platform/backend/debug-layer/hardware checks explicitly; leave Vulkan, title startup, shared runtime interfaces, existing SDK/source packages and the first-frame epic unchanged, with actionable prerequisites for later integration"
+  ],
+  "validation": [
+    "Run three independent native Windows processes plus held-out synthetic colors and repeated owned device/surface/resource lifecycle; retain raw actual GPU/device/driver/configuration observations and failures, with supported host instrumentation calibrated separately",
+    "Run meaningful game-free positive/negative evidence tests and public Windows/Linux checks including supported sanitizers; rehash retained artifacts and require actual loaded driver/package identities rather than mocks or upstream capability claims",
+    "Measure cold initialization, GPU completion/readback and cleanup distributions over comparable repeated processes with timer/synchronization limits; do not infer game frame rate, fastest renderer or minimum hardware, and leave missing weighted architecture scores unknown"
+  ],
+  "size": "one diagnostic-only Windows D3D12 bootstrap/readback lane; no title, Xenos packet/shader, renderer replacement or shared SDK repair"
+}
