@@ -4,7 +4,7 @@
   "phase": 2,
   "area": "profile-storage",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "depends_on": ["MW3-010"],
   "paths": [
     "tests/profile_storage",
@@ -23,5 +23,13 @@
     "Record bounded fixture-operation timing over at least three processes, output/mutation checks and exact public check commands; do not infer gameplay performance or console save compatibility",
     "Change only this reserved diagnostic lane and its task metadata; no SDK, preparation cache, runtime/storage interface, controller model, allocation imports, shared startup harness or service admission changes"
   ],
-  "size": "bounded game-free filesystem investigation; split demonstrated repairs"
+  "size": "bounded game-free filesystem investigation; split demonstrated repairs",
+  "evidence": [
+    "docs/engine/profile-storage.md; original actual-SDK diagnostics in tests/profile_storage and tools/test_profile_storage.py, with exact approved receipt/package/compiler/loaded-filesystem identities and private retained artifacts",
+    "Four native/host-sanitizer profiles on Windows/Linux retain 112 process outcomes: 76 PASS (including eight expected detector controls), 18 real link-isolation FAIL and 18 explicit platform/privilege SKIP; all four SDK suites correctly exit 1",
+    "Profiles, read-only content, lexical path bounds, relative operations and rename/remove pass in three isolated processes and both combined orders. Linux file/directory symlinks and Windows directory junctions expose the private outside-root canary; directory redirects also allow its modification",
+    "Investigation complete, confinement correctness NOT passed: SDK repair/integration handoff is explicit; no shared SDK/preparer/runtime/controller/allocation/harness edit, guest save service, real save compatibility or gameplay claim",
+    "All retained final files/binaries/logs and loaded-library identities rehashed; host source/driver match across four profiles; operation timings and original fixture/accounting errors remain identified separately",
+    "Seven result/package/artifact guards pass with one Windows symlink-privilege skip. Root Windows Release: 145 Python tests/eight explicit skips and CTest 1/1 PASS; Linux Release ASan/UBSan: 145 Python tests/one Windows-only skip and CTest 1/1 PASS. Filesystem SDK library itself is uninstrumented; self-review only"
+  ]
 }
