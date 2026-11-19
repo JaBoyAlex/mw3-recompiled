@@ -20,5 +20,12 @@
   ],
   "size": "1-3 days",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "docs/legal/distribution.md: owner source/private-local-build engineering disposition; GPL host plus generated guest object linking analyzed explicitly, with game-linked binary clearance unresolved",
+    "Complete 224-file baseline source candidate inventory at 95332f34981b8767f49f757ac347633a71f6464c, all source categories and planned binary/companion classes reviewed; applicable BSD patch notices retained separately from GPL host tools",
+    "DIST-01 through DIST-07 name unresolved permissions/provenance/relink/SDK/package holds and accountable owner JaBoyAlex; source generation is not represented as legal clearance or a completed consumer installer",
+    "Windows Release tools/check.py PASS: 114 Python tests with five explicit tool/privilege skips and native CTest 1/1; source-count/link/receipt/scope review passes",
+    "No runtime/shared-interface change, game-linked package, external authorization or gameplay/performance claim; recorded owner self-review"
+  ]
 }
