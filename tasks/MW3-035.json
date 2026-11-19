@@ -4,7 +4,7 @@
   "phase": 1,
   "area": "rea",
   "priority": 1,
-  "status": "todo",
+  "status": "done",
   "depends_on": [
     "MW3-001"
   ],
@@ -21,5 +21,12 @@
     "Run synthetic PPC/xref fixture and private title-slice checks if supported",
     "Record capabilities, failures and provider license requirements"
   ],
-  "size": "1-3 days"
+  "size": "1-3 days",
+  "evidence": [
+    "docs/research/rea-evaluation.md and experiments/rea: pinned official REA 6.9.0/Ghidra 12.1.4 evaluation and reproducible original PPC fixture; full private tool/config/artifact hashes",
+    "Final receipt 30ce3aa6754248c584b400702742fc95: three real-provider positive sessions and wrong-word mutations pass; eight expected profile/format refusals, including the unchanged exact owned SP/MP XEX pair",
+    "Generic PPC instructions/xrefs and BE data verified with LLVM/GNU/Python readers; VMX128 probe remains not-in-listing and load-image attestation unsupported; owned-title slice analysis unavailable and not claimed",
+    "Fresh Python/native owned-header cross-check PASS; Windows Release: 114 Python tests with five explicit tool/privilege skips, CTest 1/1 PASS; Linux ASan/UBSan: 114 Python tests without skips and CTest 1/1 PASS",
+    "Provider/host and license limitations recorded; no auto-install, external game upload, title conversion, runtime integration or gameplay/performance claim; self-review only"
+  ]
 }
