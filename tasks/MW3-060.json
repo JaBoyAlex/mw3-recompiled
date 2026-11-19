@@ -1,0 +1,27 @@
+{
+  "id": "MW3-060",
+  "title": "Audit selected-SDK profile and content mount isolation",
+  "phase": 2,
+  "area": "profile-storage",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-010"],
+  "paths": [
+    "tests/profile_storage",
+    "tools/test_profile_storage.py",
+    "docs/engine/profile-storage.md"
+  ],
+  "goal": "Establish the actual selected SDK filesystem's bounded isolation and read-only behavior before profile/save integration, using original game-free host trees and the verified library package.",
+  "acceptance": [
+    "Use original fixtures and the actual dynamically loaded selected-SDK filesystem module; record exact SDK/source/compiler/library identities, API semantics and the boundary between host mount policy and unverified guest save services",
+    "Exercise independent profile filesystems with the same guest path, persistent independent payloads, shared read-only content, invalid/traversing paths, relative directory operations, rename/remove permissions and symlink/reparse escape probes where supported",
+    "Keep every file, link and outside-root canary inside a private per-attempt synthetic tree; verify denied operations preserve canary/content/other-profile bytes and retain unsupported-host skips without touching owned game content or existing saves",
+    "Retain baseline failures and require exact wrong-result/incomplete-process rejection; publish an actionable SDK-repair or integration handoff for demonstrated gaps rather than patching shared code or treating a passing subset as secure save support"
+  ],
+  "validation": [
+    "Run isolated and repeated case orders on native Windows/Linux and supported host sanitizers against the same verified SDK profile; explicitly identify uninstrumented library coverage",
+    "Record bounded fixture-operation timing over at least three processes, output/mutation checks and exact public check commands; do not infer gameplay performance or console save compatibility",
+    "Change only this reserved diagnostic lane and its task metadata; no SDK, preparation cache, runtime/storage interface, controller model, allocation imports, shared startup harness or service admission changes"
+  ],
+  "size": "bounded game-free filesystem investigation; split demonstrated repairs"
+}
