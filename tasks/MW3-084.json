@@ -1,0 +1,23 @@
+{
+  "id": "MW3-084",
+  "title": "Audit the selected SDL3 input driver with original virtual devices",
+  "phase": 2,
+  "area": "input-diagnostics",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-010", "MW3-080"],
+  "paths": ["tests/host_platform/sdk_input", "tools/test_sdk_input.py", "docs/engine/sdk-input.md"],
+  "goal": "Exercise the actual selected SDK SDL3 input provider with original SDL virtual controllers before physical backend integration, retaining exact identities and diagnosed limits without modifying the SDK or the accepted slot model.",
+  "acceptance": [
+    "Load the real selected SDK input provider and SDL library from a verified private package; bind exact source/header/library/compiler/configuration identities and document the exercised interface and provenance",
+    "Use four distinguishable original virtual devices to test enumeration, independent button/stick/trigger state, supported capability/vibration behavior, disconnect/reconnect and invalid/stale device identifiers without touching physical-device state or another lane's SDL process",
+    "Use a bounded owned event dispatcher and retain actual mapping/order/cleanup observations, meaningful wrong-result and incomplete-process rejection, and any baseline SDK failures; split demonstrated SDK or shared-interface repairs before implementation",
+    "Document the boundary between raw driver devices, selected SDK user assignment, the accepted MW3-080 ownership model and unverified physical/guest input; do not equate virtual devices or neutral fallback with working local multiplayer"
+  ],
+  "validation": [
+    "Run isolated and repeated original virtual-device cases on native Windows and Linux/WSL with supported host/core sanitizers and explicit unsupported-platform skips",
+    "Record actual loaded provider/SDL identities, exact result protocol, source and artifact hashes, retained failure logs and resource cleanup; reject deliberate wrong output and missing/late completion",
+    "Run public game-free checks; report absent four-controller hardware and actual title/guest input evidence without passing MW3-083 or MW3-012"
+  ],
+  "size": "bounded selected-driver diagnostics; SDK repairs and physical integration are separate"
+}
