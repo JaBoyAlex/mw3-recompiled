@@ -4,7 +4,7 @@
   "phase": 2,
   "area": "audio-diagnostics",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "depends_on": ["MW3-010", "MW3-044", "MW3-060"],
   "paths": [
     "tests/host_platform/sdk_audio",
@@ -23,5 +23,15 @@
     "Validate result/package/library identities against duplicate, stale, wrong-case, malformed, partial and wrong-output controls; crash/timeouts cannot pass ordinary cases",
     "Measure original host submission/callback/lifecycle costs over at least three independent processes, retaining failures and timing limits; run public checks and publish actionable separate repair/integration prerequisites without marking MW3-082 or any gameplay/audio gate complete"
   ],
-  "size": "bounded game-free selected-SDK audio investigation; title/device/SDK repairs stay separate"
+  "size": "bounded game-free selected-SDK audio investigation; title/device/SDK repairs stay separate",
+  "evidence": [
+    "docs/engine/sdk-audio.md; original tests/host_platform/sdk_audio and tools/test_sdk_audio.py execute actual approved rexapu and SDL3 provider modules with private PCM/configuration and exact loaded audio/provider/SDL/app/base identities",
+    "Four native/host-sanitizer profiles on Windows/Linux retain 132 process outcomes: 92 PASS including 20 expected controls, 40 real lifetime-ownership FAIL, no runtime skips. All four suites correctly exit 1; investigation completion is not passing stream ownership or title audio",
+    "A closed stream is rejected before reuse, but its replacement reuses raw ID 2; submitting through the old ID succeeds and invokes the replacement callback. Other stream/old callback counts stay unchanged. Three isolated runs and both case orders reproduce this in every mode/profile; no SDK or interface repair is hidden",
+    "Eight-stream bounds, invalid/closed IDs before reuse, four-frame queue refusal/drain, independent callbacks, underruns and 32 close/observer cycles pass. Each lifecycle case opens 64 streams and accepts 160 frames; streams/queues, SDK-tracked threads and SDL audio state recover. This is not a general OS/SDK leak or mixed-sample correctness claim",
+    "Strict nonce/mode/case/typed completion and library guards pass 11 Python tests, including an actual owned-child timeout with plausible output. Wrong-result, incomplete-record and invalid-backend controls pass after retaining newline/category/shutdown fixture errors and one deliberately forced-exit Windows control crash; that crash is not normal shutdown success or repaired SDK behavior",
+    "Windows host UBSan traps and Linux host ASan/UBSan exercise identical native SDK bytes; audio/SDL library internals remain uninstrumented. Source/driver/binary/library/log/artifact identities are rehashed and exact receipts published as hashes only",
+    "Three independent native lifecycle runs per mode measure 160 accepted Submit calls each: per-run medians 0.700-1.000 us Windows and 0.507-0.595 us Linux, with raw tails and callback-progress elapsed times retained. Synthetic one-host costs only; no audible latency, title playback, codec fidelity or fastest-framework claim",
+    "Public Windows Release check.py passes 177 Python tests/eight skips plus parser CTest 1/1; Linux Release --sanitizers passes 177 tests/two Windows-only skips plus parser 1/1. Self-review only; owner-token/SDK interface/guest admission and MW3-082 audible/physical-device checks require separate agreed work. No game bytes, SDK, private traces or shared input/startup/allocation/runtime/CI files committed"
+  ]
 }
