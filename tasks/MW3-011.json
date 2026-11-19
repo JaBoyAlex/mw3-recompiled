@@ -4,7 +4,9 @@
   "phase": 2,
   "area": "gpu",
   "depends_on": [
-    "MW3-010"
+    "MW3-010",
+    "MW3-045",
+    "MW3-046"
   ],
   "paths": [
     "runtime/gpu",

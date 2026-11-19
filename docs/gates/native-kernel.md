@@ -1,6 +1,7 @@
 # Controlled native lifecycle integration
 
-MW3-041 is in progress. The integration checkpoint admits the audited
+MW3-041 awaits formal acceptance after its discovered blocker was repaired.
+The integration checkpoint admits the audited
 RtlImageXexHeaderField service, then stops at the next guarded import.
 The owned Campaign and Multiplayer modules are regenerated privately against
 the verified stop-repair SDK and rebuilt with the conservative guest policy.
@@ -24,7 +25,7 @@ every mapped function binding. The additional wrapper changes diagnostic
 termination from process exit to guest-thread unwind.
 
 ```text
-python tools/verify_kernel_gate.py --root PRIVATE_RUNTIME_CACHE --sdk-report NATIVE_STOP_RECEIPT --owned OWNED_EXECUTABLE_PAIR --metadata VERIFIED_METADATA --output-root PRIVATE_OUTPUT --role sp
+python tools/verify_kernel_gate.py --root PRIVATE_RUNTIME_CACHE --sdk-report NATIVE_XMA_RECEIPT --sdk-profile xma --owned OWNED_EXECUTABLE_PAIR --metadata VERIFIED_METADATA --output-root PRIVATE_OUTPUT --role sp
 ```
 
 Repeat for `mp`. A generation receipt can be consumed with `--generation` and
@@ -47,9 +48,20 @@ The context destructor frees its codec and frame but omits its allocated
 packet and packet buffer. All ordinary teardown markers still appear; the
 driver correctly rejects these processes because they leak. Baseline failures
 are retained privately and must not become passing evidence by suppressing
-leak detection. MW3-044 scopes the SDK repair separately, and blocks this task.
+leak detection. MW3-044 scoped the SDK repair separately.
 
-Acceptance remains open until both platforms and supported sanitizer cases
-pass with the repaired profile. First-frame,
-gameplay, original split-screen, four-player Survival, networking and renderer
-modernization retain their existing dependencies and criteria.
+The repair is merged in [PR 70](https://github.com/JaBoyAlex/mw3-recompiled/pull/70).
+Its [evidence](../engine/xma-lifecycle.md) passes all 56 controlled SP/MP cases
+on native Windows/Linux and supported host sanitizers, plus 20 focused
+game-free lifecycle cases across five profiles. Post-audit checks all loaded
+kernel hashes and confirms the repaired Campaign comparison retained the
+original game identity, generation, host source and compiler. The former blocker
+is resolved, so 041 can be claimed for evidence reconciliation. It is not yet
+marked complete; parent 010 and product gates remain open.
+
+First-frame 011 also requires complete content preparation (045) and allocation
+import ABI contracts (046). These disjoint foundation tasks can run beside the
+lead's lifecycle acceptance. Their specifications implement no feature and pass
+no gate. First-frame remains an epic to split before implementation claims.
+Gameplay, original split-screen, four-player Survival, networking and renderer
+modernization retain their established criteria.
