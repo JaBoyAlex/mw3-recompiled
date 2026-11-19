@@ -65,6 +65,14 @@ def verify_prepared(root,report_path,allow_sanitized=False):
     source=root/'sources/rexglue-stop'
     if any(common.sha(source/name)!=files[name]['sha256'] for name in lock['replaced_headers']):
         raise ValueError('stop SDK header does not match its verified source')
+    if receipt['core_sanitizers']:
+        native_report=Path(receipt['native_report'])
+        if common.sha(native_report)!=receipt['native_report_sha256']:
+            raise ValueError('native stop receipt changed')
+        _,native=verify_prepared(root,native_report)
+        xam=library_paths(lock,False)[-1]
+        if native['derivative']!=actual or files[xam]!=native['sdk_files'][xam]:
+            raise ValueError('instrumented core has a mismatched native XAM')
     return sdk,dict(derivative=actual,stop_profile=lock['profile'],stop_lock_sha256=common.sha(LOCK),
         preparation_sha256=common.sha(report_path),baseline=parent,sdk_files=files,
         sdk_tree_sha256=common.digest(files),core_sanitizers=receipt['core_sanitizers'])
@@ -74,6 +82,7 @@ def main():
     for name in ('root','baseline-report'):parser.add_argument('--'+name,required=True,type=Path)
     parser.add_argument('--fetch',action='store_true')
     parser.add_argument('--core-sanitizers',action='store_true')
+    parser.add_argument('--native-report',type=Path,help='verified native stop receipt for XAM in the Linux core profile')
     args=parser.parse_args();output=None
     report=dict(schema_version=1,owned_title_executed=False,release_package=False,
         script_sha256=common.sha(__file__),stop_lock_sha256=common.sha(LOCK),core_sanitizers=args.core_sanitizers)
@@ -86,6 +95,8 @@ def main():
         if parent['core_sanitizers']!=args.core_sanitizers:raise ValueError('baseline instrumentation differs')
         report.update(baseline_report=str(baseline),baseline_report_sha256=common.sha(baseline),baseline_identity=parent)
         windows=sys.platform=='win32';lock=json.loads(LOCK.read_text())
+        if args.core_sanitizers!=bool(args.native_report):
+            raise ValueError('the core profile requires exactly one native stop receipt')
         if windows:
             if args.core_sanitizers:raise ValueError('Windows instrumented core is unsupported')
             import prepare_windows_runtime as win
@@ -113,6 +124,13 @@ def main():
             run('source-worktree',['git','-C',root/'sources/rexglue-sdk','worktree','add','--detach',source,lock['commit']],60)
         if args.fetch:run('source-submodules',['git','-C',source,'submodule','update','--init','--recursive','--depth','1','--jobs','2'],900)
         report['source']=source_identity(root,output,windows);report['profile']=lock['profile']
+        native_sdk=None
+        if args.core_sanitizers:
+            native_report=args.native_report.resolve()
+            native_sdk,native=verify_prepared(root,native_report)
+            if native['derivative']!=report['source']:
+                raise ValueError('native XAM source differs')
+            report.update(native_report=str(native_report),native_report_sha256=common.sha(native_report))
         print(json.dumps(dict(stage='source-verified',profile=lock['profile'])),flush=True)
         build=root/'build'/('rexglue-stop-asan' if args.core_sanitizers else 'rexglue-stop')
         command=[cmake,'-S',source,'-B',build,'-G','Ninja','-DCMAKE_BUILD_TYPE=Release',
@@ -124,11 +142,14 @@ def main():
             '-DVulkan_INCLUDE_DIR='+(root/'sources/headers/include').as_posix(),'-DREXGLUE_VMA_INCLUDE_DIR='+(root/'sources/vma/include').as_posix(),*extra]
         report['configure_command']=list(map(str,command));run('configure',command,180)
         print(json.dumps(dict(stage='build',log=str(output/'build.log'))),flush=True)
-        run('build',[cmake,'--build',build,'--target',*lock['rebuilt_libraries'],'--parallel','2'],1800)
+        targets=lock['rebuilt_libraries']
+        if native_sdk:targets=[name for name in targets if name!='rexxam']
+        run('build',[cmake,'--build',build,'--target',*targets,'--parallel','2'],1800)
         package=output/'sdk';shutil.copytree(sdk,package,symlinks=not windows);changed={}
         for name in library_paths(lock,windows):
             target=package/name
             path=build/'sdk-output'/target.name
+            if native_sdk and target.name=='librexxam.so':path=native_sdk/name
             shutil.copy2(path,target);changed[target.relative_to(package).as_posix()]=common.sha(target)
         for name in lock['replaced_headers']:
             target=package/name

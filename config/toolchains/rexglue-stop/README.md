@@ -14,9 +14,11 @@ python tools/test_runtime_threads.py --root PRIVATE_CACHE --sdk-report STOP_RECE
 ```
 
 `--fetch` is required for the first worktree/submodule preparation. Later runs
-can omit it. The Linux core-sanitizer variant requires both an instrumented
-memory parent and `--core-sanitizers`; the diagnostic driver then also requires
-`--sanitizers`. Native SDK plus `--sanitizers` instruments callbacks only.
+can omit it. The Linux core-sanitizer variant takes an instrumented memory
+parent, `--core-sanitizers`, and `--native-report NATIVE_STOP_RECEIPT`. It uses
+the verified patched native XAM so its shared-library link can resolve all
+symbols. Run the diagnostic driver with `--sanitizers`. A native SDK plus
+`--sanitizers` instruments callbacks only.
 Windows uses native runtime libraries with supported host UBSan traps; core
 ASan remains unsupported.
 
