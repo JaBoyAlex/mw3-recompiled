@@ -309,7 +309,9 @@ int Run(ContractApp& app, const rex::CLIArgList& args) {
                 "unexpected-active-SDL-backend");
         const auto backend = mode == "sdl" ? "dummy" : "none";
         const auto channels = audio.GetOutputChannels();
-        Require(channels == 2 || channels == 6, "unexpected-output-channel-count");
+        // In this pinned dummy profile a successful open reports six; two can
+        // also describe the SDK's timer fallback and must not certify a device.
+        Require(channels == (mode == "sdl" ? 6U : 2U), "unexpected-output-channel-count-or-fallback");
         std::cout << "MW3_AUDIO_LIBRARIES:{\"nonce\":" << Quote(nonce) << ",\"mode\":" << Quote(mode)
             << ",\"backend\":" << Quote(backend) << ",\"loaded\":{\"audio\":" << Quote(VirtualModule(audio))
             << ",\"app\":" << Quote(ModulePath("rexapp")) << ",\"base\":" << Quote(ModulePath("rexbase"))

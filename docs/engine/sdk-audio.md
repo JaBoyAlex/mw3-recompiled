@@ -19,7 +19,8 @@ Two explicit modes run the same cases:
 
 - `timer`: `apu.driver=none`, no SDL audio device, reported output channels 2.
 - `sdl`: required audio, `apu.driver=sdl3`, actual SDL `dummy` backend, reported
-  output channels 6. This is a real driver/callback path with an artificial sink.
+  output channels 6. Six is required for this pinned dummy profile; a two-channel
+  timer fallback is refused. This is a real driver/callback path with an artificial sink.
 
 Neither mode proves the mixed samples, surround/downmix coefficients, speakers,
 audible latency, codec fidelity or title playback. The installed Windows SDL
@@ -117,9 +118,12 @@ SDL's runtime version is checked as 3.4.14 (`3004014`).
 | Actual `rexbase` SHA-256 | `3149476e16d580859e8a953df2890e7cd3cf5e225dc37402ccf57817eca46faa` | `83e249a8d25fb605168876e0fc68bf10bb978425084c314962292dfcb49f1c4f` |
 | Actual `rexapp` SHA-256 | `da6439e68dac00329ded39654cb10e726430a2f374810dbff563bf7a9800b569` | `9d66fa4b10cff33b708798d2dbef7e1f7a0d0f8cc280435e61dc68cb7a745d1f` |
 
-All four profiles use identical maintained C++/CMake/driver/guard bytes.
-Harness SHA-256: `b28a969986bba20078c827093ae3ba225de81c27d76f2873ab6c158d6bcdc47c`;
-driver SHA-256: `d011c6723979d2726aa493eaea1d8c794f0990b425f6e8f0f78ffe270a36ba73`.
+The final revision explicitly rejects a dummy-mode device-open fallback; all four
+profiles were rerun after that guard was tightened, superseding the first PR head
+without discarding its private attempts. All four profiles use identical maintained
+C++/CMake/driver/guard bytes.
+Harness SHA-256: `b3e3d6b4e2075890983271429e23bd9b9db609eb646c95979b92f714c7fc17d5`;
+driver SHA-256: `32b17ac061fe74b17b239c82d79a70c1522d9c47b8939536969ce9a4d214b897`.
 SDK-facing code uses C++23 as required by its headers, `-O2 -DNDEBUG`,
 `-march=x86-64-v2`, and two build workers. Public guard tooling uses Python's
 standard library and does not load an SDK in CI. Original source is GPL-3.0-only;
@@ -128,10 +132,10 @@ No SDK, codec source, library, game-derived output or private log is published.
 
 | Final profile | Private attempt ID | Manifest SHA-256 | Harness binary SHA-256 |
 | --- | --- | --- | --- |
-| Windows native | `8b031639a1cc413cab98e2fc0ff9e1af` | `b5fe2f122d5ce875bdd511a62a6616d6e5c85f4d8a2855e06c8afc4a49ecd20b` | `97f6e5d18dca4bd060abb50479d14a5a215c17e7900d48cba250379ece3fe292` |
-| Windows host UBSan traps | `68e2e3e8382e464f903799dbc0a3f9ee` | `d83427af41fcb68239329ca5ab4ecb64b4969bf029d8f9609d24779fdb7c4868` | `c57ba2d4fe87bba9d9d8151f7d257589d59e1cd628c65a88de06745b74814a2b` |
-| Linux native | `7b355ce70f144969a51f4eed0cd4bf60` | `fe6302377b87af00a1a87e7d93e9aca6f4020fc3fa54e2313eccf6d53ad70352` | `5795d04670b5c4bd5df937871eeb09a60e7cd7f1544bbb20520ef00922214510` |
-| Linux host ASan/UBSan | `f6008e9e7f9e4911885d0d775b7df9af` | `3fa92304137d93eca9296f5909e24a8336ba8b8016cd6fa206e3408f4d8690df` | `09705d06b8dba3c017c4579c3055b23f8a0ff82d4e4aaf062e14a159dc06175e` |
+| Windows native | `7578379fee594679811c828ab4a8c9e4` | `dd795f32809404d6b543ea7e1180b17565eddcc558d5ae2a91a0ce5c62e11e87` | `ccdc37ce9eb824d80cec66b4f9f3de24ae5c3e626fbe3254fb0848c7cd966215` |
+| Windows host UBSan traps | `e6ce94d182fe4e9d82c06dae4ffda65d` | `87240e0fb43ec0bea418e93f75a50197f499c3d85ee1ea50ab9f3fd300402c73` | `256cb5bbf2c0ae8c123d1892bf778f53838a55d2dcaa3e1ea83953a4d085d6c0` |
+| Linux native | `fd7593ab6c2f43f6941167d23704be88` | `b6c5f91412cf94dc74329913ffc3ae6cc9688083f8eab152414a885c2fd96de0` | `7de38a221e11e185fb0f71fd98df6dbea1dc973cc4992eaa037425a47ffa9bf9` |
+| Linux host ASan/UBSan | `8df41ffeaa3b4e0e96475c026fbb860a` | `3371f053b7d74c05affb35fb0a3bbff663356012b0c09264031ca8f42ec8feee` | `31fead0b397528a9484a4235bdf9cabef888fc10f681bd69dd32ff0ffeef5968` |
 
 Each profile retains **33 process outcomes: 23 PASS / 10 FAIL**, including five
 expected detector passes. Total: **132 = 92 PASS / 40 FAIL**, no runtime cases
@@ -161,19 +165,21 @@ comparison or a framework ranking.
 
 | Native profile/mode | Three lifecycle elapsed times (ms) | Three per-run Submit medians (us) | Per-run p95 (us) | Maximum Submit (us) |
 | --- | --- | --- | --- | --- |
-| Windows timer | 171.076, 171.830, 172.099 | 1.000, 1.000, 0.800 | 3.600, 4.000, 3.300 | 23.300 |
-| Windows SDL dummy | 553.405, 554.289, 555.428 | 0.700, 0.700, 0.800 | 4.200, 4.100, 4.200 | 30.500 |
-| Linux timer | 170.601, 170.550, 170.648 | 0.547, 0.595, 0.507 | 3.780, 4.426, 3.941 | 69.519 |
-| Linux SDL dummy | 676.870, 676.269, 675.697 | 0.541, 0.595, 0.566 | 3.964, 3.976, 4.539 | 10.435 |
+| Windows timer | 171.855, 171.806, 172.242 | 0.700, 0.600, 0.600 | 3.300, 3.000, 3.100 | 14.400 |
+| Windows SDL dummy | 596.955, 470.508, 554.119 | 0.700, 0.700, 0.700 | 3.700, 3.600, 3.200 | 11.500 |
+| Linux timer | 170.710, 170.606, 170.515 | 0.430, 0.452, 0.492 | 2.871, 2.823, 3.963 | 13.168 |
+| Linux SDL dummy | 678.982, 678.152, 655.946 | 0.435, 0.532, 0.454 | 3.101, 4.320, 3.327 | 88.034 |
 
 Medians are the mean of the two central observations; p95 uses nearest rank
 over 160 calls/run. Nanoseconds are storage units, not a nanosecond-resolution
 claim (Windows observations are quantized). These numbers are independently
 recomputed from retained records. Host sanitizer costs are separate; Linux
-ASan/UBSan lifecycle Submit medians are 7.558–8.773 us, not native performance.
-All maxima, including the Linux native 69.519 us observation, are retained.
+ASan/UBSan lifecycle Submit medians are 5.953–7.096 us, not native performance.
+All maxima, including the Linux native 88.034 us observation, are retained.
+Windows dummy lifecycle elapsed varies materially across the three runs; it
+does not establish a speedup or a stable device-latency budget.
 
-Capacity cases take 3–8 us in the native runs. Queue/drain cases take roughly
+Capacity cases take 3–6 us in the native runs. Queue/drain cases take roughly
 26–28 ms with the timer and 42–43 ms with dummy; these include waiting for played
 callbacks. Lifecycle elapsed times include opens, closes, queue discard,
 observer callbacks and checker overhead. They exclude app startup. Driver

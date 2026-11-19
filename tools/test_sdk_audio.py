@@ -88,7 +88,7 @@ def classify(cases, mode, nonce, code, text):
         if (type(value["schema"]) is not int or value["schema"] != 1 or
                 any(type(value[k]) is not str or value[k] != libs[k] for k in ("nonce", "mode", "backend")) or
                 not integer(value["channels"], 2, 6) or value["channels"] not in (2, 6) or
-                (mode == "timer" and value["channels"] != 2)):
+                value["channels"] != (6 if mode == "sdl" else 2)):
             return None
         for key in ("threads_before", "threads_after", "open_after", "queued_after", "sdl_audio_after"):
             if not integer(value[key], 0, 1024):

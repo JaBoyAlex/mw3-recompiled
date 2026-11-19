@@ -24,7 +24,7 @@ def records(mode="timer", names=("capacity",)):
                      loaded={role: "/private/" + name for role, name in driver.ROLES.items()})
     if mode == "timer":
         libraries["loaded"]["provider"] = None
-    value = dict(schema=1, nonce=NONCE, mode=mode, backend=libraries["backend"], channels=2,
+    value = dict(schema=1, nonce=NONCE, mode=mode, backend=libraries["backend"], channels=6 if mode == "sdl" else 2,
                  threads_before=0, threads_after=0, open_after=0, queued_after=0, sdl_audio_after=0, cases=[])
     for name in names:
         row = dict(name=name, status="PASS", reason="", checks=100, opened=8, accepted=0, callbacks=0,
@@ -91,6 +91,8 @@ class AudioEvidenceTests(unittest.TestCase):
             self.assertIsNone(driver.classify(("capacity",), "timer", NONCE, 0, output(pair)))
 
     def test_case_specific_wrong_output_and_bounds_rejected(self):
+        fallback = records("sdl"); fallback[1]["channels"] = 2
+        self.assertIsNone(driver.classify(("capacity",), "sdl", NONCE, 0, output(fallback)))
         mutations = {"capacity": {"opened": 7, "callbacks": 1}, "identity": {"stale_ok": True, "callbacks": 2},
                      "queue": {"queue_peak": 5, "callbacks": 4, "underruns": 0},
                      "lifecycle": {"opened": 63, "accepted": 159, "callbacks": 161}}
