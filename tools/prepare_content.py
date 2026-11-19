@@ -26,11 +26,12 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def component(name):
+def component(name, *, operator_path=False):
     """Conservative common Windows/POSIX namespace, without renaming content."""
     require(isinstance(name, str) and 0 < len(name) <= 255, "invalid name length")
     require(name not in (".", "..") and not name.endswith((".", " ")), "unsafe dot/space name")
-    require(not any(c in '<>:"/\\|?*~' or unicodedata.category(c).startswith("C") for c in name),
+    forbidden = '<>:"/\\|?*' + ("" if operator_path else "~")
+    require(not any(c in forbidden or unicodedata.category(c).startswith("C") for c in name),
             "unsafe name character or unverified DOS short alias")
     key = unicodedata.normalize("NFKC", name).casefold()
     require(not key.endswith((".", " ")), "unsafe normalized name")
@@ -49,7 +50,7 @@ def absolute(path):
                 "use a local drive path, not a device/UNC namespace")
     require(path.name != "", "expected a named file/directory")
     for name in path.parts[1:]:
-        component(name)
+        component(name, operator_path=True)
     return path
 
 
@@ -86,7 +87,7 @@ class Directory:
         return cls(handle)
 
     def child(self, name, create=False):
-        component(name)
+        component(name, operator_path=True)
         if os.name == "nt":
             return Directory(_nt_open(self.handle, name, directory=True, create=create))
         if create:
@@ -94,7 +95,7 @@ class Directory:
         return Directory(os.open(name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.handle))
 
     def file(self, name, create=False):
-        component(name)
+        component(name, operator_path=True)
         if os.name == "nt":
             import msvcrt
             handle = _nt_open(self.handle, name, directory=False, create=create)
@@ -116,7 +117,7 @@ class Directory:
             raise
 
     def exists(self, name):
-        component(name)
+        component(name, operator_path=True)
         try:
             if os.name == "nt":
                 handle = _nt_open(self.handle, name, directory=None)

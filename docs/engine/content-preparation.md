@@ -55,8 +55,11 @@ all relative names, parent relationships, extents and budgets first.
 Names are not repaired or renamed. The common Windows/POSIX policy rejects
 traversal, separators/streams/device syntax, reserved Windows names (including
 superscript device aliases), trailing dots/spaces, control characters and
-NFKC/casefold collisions. Tildes are conservatively rejected as unverified DOS
-short aliases. The owned supported image passes this policy; this does not
+NFKC/casefold collisions. Tildes in disc entries are conservatively rejected as
+unverified DOS short aliases. Operator paths may use existing short aliases
+(for example a Windows runner's `RUNNER~1` temp parent); they still use the same
+handle-relative opens, reparse checks and exclusive destination creation.
+The owned supported image passes this policy; this does not
 claim support for every other disc's valid filenames.
 
 On Linux, directory/file access uses directory descriptors and `O_NOFOLLOW`,
@@ -109,22 +112,23 @@ python tools/check.py --config Release
 python3 tools/check.py --config Release --sanitizers
 ```
 
-Nineteen content cases cover nested/empty files and directories, bounded
+Twenty content cases cover nested/empty files and directories, bounded
 large payload reads, root executable/ISO identity failures, entry/byte
 budgets, malformed extents, node/directory cycles, excessive depth, Windows
 device names and normalization/case collisions, traversal, pre-existing
 destinations, retained interrupted attempts, wrong copy-result mutations,
 unexpected extra files, source mutation, hardlinks, nonblocking FIFO rejection
-and real redirection cases.
+and real redirection cases. A separate operator-path test permits legitimate
+tilde paths while still rejecting a tilde-named disc entry.
 
 Native Windows passes the focused suite with an explicit unavailable-symlink
 privilege skip and a POSIX-only FIFO skip. Actual directory-junction source/destination rejection and
 held-directory rename rejection pass. Linux passes with its one explicit
 Windows-only junction skip; actual symlink and mid-copy redirection cases run.
 Neither platform's skipped case is represented as exercised. Windows Release
-passes 137 Python tests with seven explicit skips (the content symlink case,
+passes 138 Python tests with seven explicit skips (the content symlink case,
 the POSIX-only FIFO case, one LLVM assembler/objcopy case and four earlier
-symlink cases), and native CTest 1/1. Linux Release passes 137 Python tests with one Windows-only skip
+symlink cases), and native CTest 1/1. Linux Release passes 138 Python tests with one Windows-only skip
 and ASan/UBSan native CTest 1/1.
 
 After source review and synthetic checks, native Windows prepared the exact
@@ -136,22 +140,23 @@ fingerprints. Initial/final ISO SHA-256 agrees with
 `f5531196d7c064a237791e2dc3e9434ee436aab2c4edb49f870f5a7fcda9d1d5`.
 
 The final private content-manifest SHA-256 is
-`cf29e343d947509cb7406c35929e6126f936cd028f949f22b08e9fc756e7592b`.
+`c585d8136f87ad8ace1676ebe780bdd3fa5c6b50bd18e55cd222cd579533602c`.
 The executed preparation source SHA-256 is
-`dbbb8b15850ca9c72fb760a413519eff86137dd2dbba7a1de961c773add2dc30`.
+`cc535f1a79432f50089e41f721fede983c9f7461127a587cd8c4b2e7df4ff671`.
 The owner's source ISO, prior two-XEX directory and writable profiles were
 unchanged. Both an existing prepared directory and an existing extracted XEX
 were refused by the real CLI; their manifest and executable hashes remain
 unchanged. The private `.local/045-owned-index.json` handoff identifies the
 local prepared root and receipt; no private path/file inventory is published.
 
-The final native Windows preparation took 56.579 seconds including ISO hashing,
+The final native Windows preparation took 53.885 seconds including ISO hashing,
 copying, file verification and final source hashing. This is an offline
 preparation observation on one machine, with host/cache/concurrent-check effects uncontrolled;
 it is not a gameplay/load-time or comparative throughput benchmark. No root
 ISO extraction was repeated on Linux; its safety checks use original fixtures.
-The earlier 43.701-second positive preparation remains retained with its own
-receipt/source binding; the final run binds the added POSIX nonblocking guard.
+The earlier 43.701- and 56.579-second positive preparations remain retained
+with their own receipt/source bindings; the final run binds both the POSIX
+nonblocking guard and the operator-path alias correction.
 
 The first Linux full-check attempt stopped before tests because Windows Git
 had written an absolute Windows gitdir path into this task's checkout. Only
@@ -159,3 +164,8 @@ this worktree's local gitdir link was made relative; no shared code, checkout
 or global Git configuration changed. Review is owner self-review, with no
 independent reviewer claimed. A prepared content directory is not evidence of
 file-service compatibility, later startup, rendering, audio or gameplay.
+
+Initial Windows CI failed because the strict disc-name policy was also applied
+to the hosted runner's short-form temporary path. The policy is now separated
+for operator lookups, with a regression test; no reparse/exclusive-create guard
+was relaxed. Those failed jobs remain recorded rather than relabelled passing.

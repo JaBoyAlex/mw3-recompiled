@@ -103,6 +103,16 @@ class ContentTests(unittest.TestCase):
         self.assertFalse((self.output / "profiles").exists())
         self.assertEqual(json.loads((self.output / "manifest.json").read_text()), report)
 
+    def test_operator_path_tilde_is_allowed_but_disc_alias_is_not(self):
+        # Hosted Windows runners can expose their temp parent as RUNNER~1.
+        parent = self.root / "operator~1"
+        parent.mkdir()
+        self.iso, self.output = parent / "owned~1.iso", parent / "prepared~1"
+        report = self.run_prepare(image())
+        self.assertTrue(report["complete"])
+        self.output = parent / "another"
+        self.rejected_before_output(image([("disc~1", b"x")]), "unsafe")
+
     def test_streamed_payload_reads_are_chunk_bounded(self):
         largest = []
         real = prep.hash_range
