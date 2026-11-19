@@ -1,0 +1,1287 @@
+{
+  "schema_version": 1,
+  "task": "MW3-004",
+  "baseline": {
+    "manifest_id": "mw3-xbox360-usa-korea-rev1",
+    "iso_sha256": "f5531196d7c064a237791e2dc3e9434ee436aab2c4edb49f870f5a7fcda9d1d5",
+    "executable_sha256": {
+      "default.xex": "f59be1342c2fc664e2a2e7322d024028a0ca7216d279ed32fef6e114d8c37c30",
+      "default_mp.xex": "ba1bc57af4c4f75934a106b3d470559b356252b9e100d98e335bcfd0e574806a"
+    },
+    "title_update": "not_supplied",
+    "dlc": "not_supplied"
+  },
+  "sources": [
+    {
+      "id": "MANUAL-X360-EN",
+      "kind": "manual",
+      "location": "https://support.activision.com/servlet/servlet.FileDownload?file=00PU0000004Z7f9MAC&retURL=%2Fapex%2Fmanuals",
+      "sha256": "c281bfbd9e5f5b9d4088fe763677b08a48ce8d803c5f8dd230733b7d795ceaca",
+      "page_count": 20
+    },
+    {
+      "id": "OWNED-IDENTITY",
+      "kind": "repo_manifest",
+      "location": "config/titles/mw3-xbox360-rev1.json",
+      "sha256": "d9e5e461da3ae5ca7128bde49ab1c9524c336d46923a983c92f73e3f68380b85",
+      "page_count": null
+    },
+    {
+      "id": "OWNER-FOUR-PLAYER",
+      "kind": "project_requirement",
+      "location": "tasks/MW3-034.json",
+      "sha256": "c0f0d19760ee4ed15bf5fa8ffd52e7b700f7311621de9fe9a62e0f4479fa2ab7",
+      "page_count": null
+    }
+  ],
+  "facts": [
+    {
+      "id": "cam.single_player",
+      "mode": "campaign",
+      "kind": "count",
+      "value": 1,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "cam.auto_checkpoint",
+      "mode": "campaign",
+      "kind": "boolean",
+      "value": true,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "cam.save_quit",
+      "mode": "campaign",
+      "kind": "boolean",
+      "value": true,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "cam.mission_replay",
+      "mode": "campaign",
+      "kind": "boolean",
+      "value": true,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "ops.advertised_coop",
+      "mode": "special_ops",
+      "kind": "count",
+      "value": 2,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "ops.local_split",
+      "mode": "special_ops",
+      "kind": "boolean",
+      "value": true,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "ops.online_coop",
+      "mode": "special_ops",
+      "kind": "boolean",
+      "value": true,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "ops.solo",
+      "mode": "special_ops",
+      "kind": "boolean",
+      "value": true,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "ops.difficulty_count",
+      "mode": "spec_ops_missions",
+      "kind": "count",
+      "value": 3,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "sur.map_family",
+      "mode": "survival",
+      "kind": "text",
+      "value": "multiplayer",
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 4,
+      "reason": ""
+    },
+    {
+      "id": "mp.pause_stops_match",
+      "mode": "multiplayer_local",
+      "kind": "boolean",
+      "value": false,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 6,
+      "reason": ""
+    },
+    {
+      "id": "controls.options",
+      "mode": "shared",
+      "kind": "boolean",
+      "value": true,
+      "basis": "manual",
+      "source": "MANUAL-X360-EN",
+      "pdf_page": 6,
+      "reason": ""
+    },
+    {
+      "id": "cam.local_limit",
+      "mode": "campaign",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "ops.local_limit",
+      "mode": "spec_ops_missions",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "ops.online_limit",
+      "mode": "spec_ops_missions",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "sur.local_limit",
+      "mode": "survival",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "sur.online_limit",
+      "mode": "survival",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "mp.local_limit",
+      "mode": "multiplayer_local",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "mp.online_total",
+      "mode": "multiplayer_online",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "mp.online_local",
+      "mode": "multiplayer_online",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "mp.link_total",
+      "mode": "multiplayer_system_link",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "mp.link_local",
+      "mode": "multiplayer_system_link",
+      "kind": "count",
+      "value": null,
+      "basis": "unobserved",
+      "source": null,
+      "pdf_page": null,
+      "reason": "No exact-build console observation supplied."
+    },
+    {
+      "id": "extension.survival_local",
+      "mode": "survival_extension",
+      "kind": "count",
+      "value": 4,
+      "basis": "owner_extension",
+      "source": "OWNER-FOUR-PLAYER",
+      "pdf_page": null,
+      "reason": ""
+    }
+  ],
+  "inventories": [
+    {
+      "id": "campaign_missions",
+      "mode": "campaign",
+      "required": true,
+      "state": "unknown",
+      "items": [],
+      "reason": "Console inventory not recorded; file names are not a gameplay catalog."
+    },
+    {
+      "id": "campaign_difficulties",
+      "mode": "campaign",
+      "required": true,
+      "state": "unknown",
+      "items": [],
+      "reason": "Console inventory not recorded; file names are not a gameplay catalog."
+    },
+    {
+      "id": "campaign_checkpoints",
+      "mode": "campaign",
+      "required": true,
+      "state": "unknown",
+      "items": [],
+      "reason": "Console inventory not recorded; file names are not a gameplay catalog."
+    },
+    {
+      "id": "spec_ops_missions",
+      "mode": "spec_ops_missions",
+      "required": true,
+      "state": "unknown",
+      "items": [],
+      "reason": "Console inventory not recorded; file names are not a gameplay catalog."
+    },
+    {
+      "id": "spec_ops_difficulties",
+      "mode": "spec_ops_missions",
+      "required": true,
+      "state": "unknown",
+      "items": [],
+      "reason": "Console inventory not recorded; file names are not a gameplay catalog."
+    },
+    {
+      "id": "survival_maps",
+      "mode": "survival",
+      "required": true,
+      "state": "unknown",
+      "items": [],
+      "reason": "Console inventory not recorded; file names are not a gameplay catalog."
+    },
+    {
+      "id": "multiplayer_maps",
+      "mode": "multiplayer_local",
+      "required": true,
+      "state": "unknown",
+      "items": [],
+      "reason": "Console inventory not recorded; file names are not a gameplay catalog."
+    },
+    {
+      "id": "multiplayer_modes",
+      "mode": "multiplayer_local",
+      "required": true,
+      "state": "unknown",
+      "items": [],
+      "reason": "Console inventory not recorded; file names are not a gameplay catalog."
+    },
+    {
+      "id": "other_regions",
+      "mode": "shared",
+      "required": false,
+      "state": "not_supplied",
+      "items": [],
+      "reason": "No separately fingerprinted licensed inputs supplied."
+    },
+    {
+      "id": "dlc_packs",
+      "mode": "shared",
+      "required": false,
+      "state": "not_supplied",
+      "items": [],
+      "reason": "No separately fingerprinted licensed inputs supplied."
+    }
+  ],
+  "cases": [
+    {
+      "id": "REF-SYS-IDENTITY",
+      "mode": "shared",
+      "area": "identity",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record disc/input identity, console model/system version, active update state and installed content."
+      ],
+      "checks": [
+        "identity_recorded",
+        "update_state_checked",
+        "profile_isolated"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-MISSION-LIST",
+      "mode": "campaign",
+      "area": "mission",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Enumerate visible and locked Campaign entries; assign stable per-mission identifiers."
+      ],
+      "checks": [
+        "enumeration_complete",
+        "unlock_state_recorded"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-DIFFICULTY-LIST",
+      "mode": "campaign",
+      "area": "difficulty",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record every selectable Campaign difficulty without importing PC or guide assumptions."
+      ],
+      "checks": [
+        "enumeration_complete",
+        "labels_recorded"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-LOCAL-LIMIT",
+      "mode": "campaign",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Attempt distinct local joins and record admitted slots and rejection behavior."
+      ],
+      "checks": [
+        "slots_counted",
+        "rejection_recorded"
+      ],
+      "facts": [
+        "cam.local_limit"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-PLAY",
+      "mode": "campaign",
+      "area": "gameplay",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "For every mission/difficulty pair, record start, completion, failure and retry transitions."
+      ],
+      "checks": [
+        "all_pairs_run",
+        "transitions_checked"
+      ],
+      "facts": [
+        "cam.single_player"
+      ],
+      "inventories": [
+        "campaign_missions",
+        "campaign_difficulties"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-CHECKPOINT-LIST",
+      "mode": "campaign",
+      "area": "checkpoint",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record checkpoint identifiers and their mission ownership on the exact build."
+      ],
+      "checks": [
+        "enumeration_complete",
+        "mission_ownership_recorded"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-CHECKPOINT-RESTORE",
+      "mode": "campaign",
+      "area": "checkpoint",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "For every recorded checkpoint, compare restart state and progress using an isolated profile."
+      ],
+      "checks": [
+        "all_checkpoints_run",
+        "progress_checked"
+      ],
+      "facts": [
+        "cam.auto_checkpoint"
+      ],
+      "inventories": [
+        "campaign_checkpoints"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-SAVE-QUIT",
+      "mode": "campaign",
+      "area": "save",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Compare progress across menu return, process exit and a fresh session without touching original saves."
+      ],
+      "checks": [
+        "resume_checked",
+        "profile_preserved"
+      ],
+      "facts": [
+        "cam.save_quit"
+      ],
+      "inventories": [
+        "campaign_missions"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-MISSION-REPLAY",
+      "mode": "campaign",
+      "area": "mission",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Replay each unlocked mission and verify unlock/progression ownership."
+      ],
+      "checks": [
+        "all_missions_run",
+        "progression_checked"
+      ],
+      "facts": [
+        "cam.mission_replay"
+      ],
+      "inventories": [
+        "campaign_missions"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-CAM-CINEMATICS",
+      "mode": "campaign",
+      "area": "presentation",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Review mission introductions/transitions, audiovisual sync and HUD boundaries."
+      ],
+      "checks": [
+        "captures_reviewed",
+        "transitions_checked"
+      ],
+      "facts": [],
+      "inventories": [
+        "campaign_missions"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-OPS-MISSION-LIST",
+      "mode": "spec_ops_missions",
+      "area": "mission",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Enumerate locked/unlocked Spec Ops Missions separately from Survival maps."
+      ],
+      "checks": [
+        "enumeration_complete",
+        "mode_separated"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-OPS-DIFFICULTY-LIST",
+      "mode": "spec_ops_missions",
+      "area": "difficulty",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record selectable mission difficulties and associate their identifiers."
+      ],
+      "checks": [
+        "enumeration_complete",
+        "count_checked"
+      ],
+      "facts": [
+        "ops.difficulty_count"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-OPS-SOLO",
+      "mode": "spec_ops_missions",
+      "area": "gameplay",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record per-mission solo eligibility; execute applicable difficulty pairs and retain co-op-only exclusions."
+      ],
+      "checks": [
+        "eligibility_recorded",
+        "applicable_pairs_run",
+        "exclusions_recorded"
+      ],
+      "facts": [
+        "ops.solo"
+      ],
+      "inventories": [
+        "spec_ops_missions",
+        "spec_ops_difficulties"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-OPS-COOP-MISSIONS",
+      "mode": "spec_ops_missions",
+      "area": "gameplay",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record each mission's required party configuration, run supported co-op difficulty pairs, and retain unsupported-configuration rejections."
+      ],
+      "checks": [
+        "eligibility_recorded",
+        "supported_pairs_run",
+        "no_solo_fallback"
+      ],
+      "facts": [
+        "ops.advertised_coop"
+      ],
+      "inventories": [
+        "spec_ops_missions",
+        "spec_ops_difficulties"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-OPS-SPLIT-LIMIT",
+      "mode": "spec_ops_missions",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record local admission limit, independent inputs, viewport ownership and unsupported joins."
+      ],
+      "checks": [
+        "slots_counted",
+        "input_ownership_checked",
+        "rejection_recorded"
+      ],
+      "facts": [
+        "ops.local_limit"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-OPS-ONLINE-LIMIT",
+      "mode": "spec_ops_missions",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "In an authorized private reference session, record remote/local slot limits and disconnect behavior."
+      ],
+      "checks": [
+        "slots_counted",
+        "disconnect_recorded"
+      ],
+      "facts": [
+        "ops.online_limit"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile",
+        "authorized_console_online_session"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No authorized console online reference capture supplied."
+    },
+    {
+      "id": "REF-SUR-MAP-LIST",
+      "mode": "survival",
+      "area": "map",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Enumerate selectable and locked Survival maps independently from the multiplayer menu."
+      ],
+      "checks": [
+        "enumeration_complete",
+        "unlock_state_recorded"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SUR-SOLO",
+      "mode": "survival",
+      "area": "gameplay",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "For each recorded Survival map, record solo start, wave transitions, death and retry."
+      ],
+      "checks": [
+        "all_maps_run",
+        "wave_transitions_checked"
+      ],
+      "facts": [],
+      "inventories": [
+        "survival_maps"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SUR-SPLIT-LIMIT",
+      "mode": "survival",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record local Survival slots, distinct controllers/viewports and refused additional joins."
+      ],
+      "checks": [
+        "slots_counted",
+        "ownership_checked",
+        "rejection_recorded"
+      ],
+      "facts": [
+        "sur.local_limit"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SUR-ONLINE-LIMIT",
+      "mode": "survival",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record actual Survival party limits in an authorized private console session."
+      ],
+      "checks": [
+        "slots_counted",
+        "mode_separated"
+      ],
+      "facts": [
+        "sur.online_limit"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile",
+        "authorized_console_online_session"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No authorized console online reference capture supplied."
+    },
+    {
+      "id": "REF-SUR-REVIVE-RESTART",
+      "mode": "survival",
+      "area": "gameplay",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record down/revive, simultaneous failure, wave restart and rewards for each admitted slot."
+      ],
+      "checks": [
+        "revive_checked",
+        "failure_checked",
+        "rewards_attributed"
+      ],
+      "facts": [],
+      "inventories": [
+        "survival_maps"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SUR-PROFILE-PROGRESS",
+      "mode": "survival",
+      "area": "save",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Check unlock/reward ownership and isolated profile persistence across sessions."
+      ],
+      "checks": [
+        "ownership_checked",
+        "persistence_checked"
+      ],
+      "facts": [],
+      "inventories": [
+        "survival_maps"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-MP-MAP-LIST",
+      "mode": "multiplayer_local",
+      "area": "map",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record baseline multiplayer map identifiers, locks and content origin."
+      ],
+      "checks": [
+        "enumeration_complete",
+        "baseline_separated"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-MP-MODE-LIST",
+      "mode": "multiplayer_local",
+      "area": "gameplay",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record every selectable local game type and mode-specific options."
+      ],
+      "checks": [
+        "enumeration_complete",
+        "options_recorded"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-MP-LOCAL-LIMIT",
+      "mode": "multiplayer_local",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Attempt one through four distinct controllers and record the actual local admission ceiling."
+      ],
+      "checks": [
+        "slots_counted",
+        "inputs_distinct",
+        "viewports_counted"
+      ],
+      "facts": [
+        "mp.local_limit"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-MP-ONLINE-TOTAL",
+      "mode": "multiplayer_online",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record total reference session capacity for each authorized online mode."
+      ],
+      "checks": [
+        "capacity_recorded",
+        "mode_recorded"
+      ],
+      "facts": [
+        "mp.online_total"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile",
+        "authorized_console_online_session"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No authorized console online reference capture supplied."
+    },
+    {
+      "id": "REF-MP-ONLINE-LOCAL",
+      "mode": "multiplayer_online",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Measure local slots admitted into online sessions separately from offline local limits."
+      ],
+      "checks": [
+        "local_slots_recorded",
+        "guest_identity_recorded"
+      ],
+      "facts": [
+        "mp.online_local"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile",
+        "authorized_console_online_session"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No authorized console online reference capture supplied."
+    },
+    {
+      "id": "REF-MP-LINK-TOTAL",
+      "mode": "multiplayer_system_link",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record isolated LAN/system-link session capacity without assuming Xbox LIVE limits."
+      ],
+      "checks": [
+        "capacity_recorded",
+        "transport_checked"
+      ],
+      "facts": [
+        "mp.link_total"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile",
+        "two_console_isolated_lan"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-MP-LINK-LOCAL",
+      "mode": "multiplayer_system_link",
+      "area": "players",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record local participants per linked console and profile ownership."
+      ],
+      "checks": [
+        "local_slots_recorded",
+        "ownership_checked"
+      ],
+      "facts": [
+        "mp.link_local"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile",
+        "two_console_isolated_lan"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-MP-OBJECTIVES-MENU",
+      "mode": "multiplayer_local",
+      "area": "pause",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Observe match progression while the objectives/options menu is open."
+      ],
+      "checks": [
+        "world_progression_checked",
+        "menu_behavior_recorded"
+      ],
+      "facts": [
+        "mp.pause_stops_match"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-MP-MAP-TRANSITIONS",
+      "mode": "multiplayer_local",
+      "area": "map",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "For every recorded map/game-type pair, check start/end, score ownership and map transitions."
+      ],
+      "checks": [
+        "all_pairs_run",
+        "transitions_checked"
+      ],
+      "facts": [],
+      "inventories": [
+        "multiplayer_maps",
+        "multiplayer_modes"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SYS-CONTROLLER-RECONNECT",
+      "mode": "shared",
+      "area": "controller",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Disconnect/reconnect each admitted controller and check ownership, menu focus and recovery."
+      ],
+      "checks": [
+        "ownership_preserved",
+        "recovery_checked"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SYS-CONTROL-OPTIONS",
+      "mode": "shared",
+      "area": "controller",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Record control options and check independent local input routing."
+      ],
+      "checks": [
+        "options_recorded",
+        "inputs_distinct"
+      ],
+      "facts": [
+        "controls.options"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SYS-SAVE-ISOLATION",
+      "mode": "shared",
+      "area": "save",
+      "scope": "retail",
+      "required": true,
+      "procedure": [
+        "Check separate reference profiles, interrupted writes and recovery without sharing writable saves."
+      ],
+      "checks": [
+        "profiles_isolated",
+        "recovery_recorded"
+      ],
+      "facts": [],
+      "inventories": [],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SYS-REGION",
+      "mode": "shared",
+      "area": "region",
+      "scope": "retail",
+      "required": false,
+      "procedure": [
+        "For separately fingerprinted regions, enumerate differences rather than inheriting this build."
+      ],
+      "checks": [
+        "identity_separated",
+        "differences_recorded"
+      ],
+      "facts": [],
+      "inventories": [
+        "other_regions"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-SYS-DLC",
+      "mode": "shared",
+      "area": "dlc",
+      "scope": "retail",
+      "required": false,
+      "procedure": [
+        "For separately supplied licensed DLC, record content hashes, entitlements and affected cases."
+      ],
+      "checks": [
+        "identity_separated",
+        "entitlement_recorded"
+      ],
+      "facts": [],
+      "inventories": [
+        "dlc_packs"
+      ],
+      "prerequisites": [
+        "owned_console",
+        "supported_disc_identity",
+        "isolated_reference_profile"
+      ],
+      "status": "NOT_RUN",
+      "reason": "No exact-build console reference capture supplied."
+    },
+    {
+      "id": "REF-EXT-SURVIVAL-FOUR",
+      "mode": "survival_extension",
+      "area": "players",
+      "scope": "extension",
+      "required": false,
+      "procedure": [
+        "Validate requested four-local-player behavior only in the native extension suite, preserving retail fallback."
+      ],
+      "checks": [
+        "four_slots_distinct",
+        "four_viewports_checked",
+        "fallback_checked"
+      ],
+      "facts": [
+        "extension.survival_local"
+      ],
+      "inventories": [],
+      "prerequisites": [
+        "validated_native_survival_extension",
+        "four_distinct_controllers"
+      ],
+      "status": "NOT_RUN",
+      "reason": "Extension runtime unavailable."
+    }
+  ]
+}
