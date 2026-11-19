@@ -27,18 +27,14 @@ fiber forwarding keeps that existing request. Import/hook entry and exit checks,
 plus stoppable spin acquisition, use the tag. Standard explicit thread exits
 continue through the original exception path.
 
-Preparation rebuilds base/PPC/kernel and stages the three modified public
-headers together with those libraries. Other module/dependency files retain
-their verified parent identities. This is not full-SDK instrumentation or ABI
-compatibility proof with arbitrary external modules. Every affected maintained
-callback is freshly compiled against the chosen package. Any future owned-title
-consumer must regenerate/rebind its preparation identity and rebuild with these
-headers before acceptance. Current owned-title preparation does not automatically
-accept this separate SDK profile.
+Preparation rebuilds base, PPC, kernel and XAM and packages the three modified
+public headers with those libraries. XAM instantiates the thunk in its own
+binary. The other packaged dependencies retain their verified parent identities.
+Each maintained callback compiles against the selected headers. The synthetic
+tests cover kernel and XAM import entry, native thunk return, and explicit exit.
+The profile is selected explicitly for standalone diagnostics.
 
 The verifier refuses stale preparers/locks, modified compositions, reset/changed
 sources, changed parent receipts, compiler mismatches, changed package files and
-instrumentation mislabeling. Those local provenance checks are not signed
-attestation, an access boundary, or permission to execute untrusted inputs.
-No game assets, generated game code or private SDK packages belong in Git.
-See [patch terms](NOTICE.md); release clearance remains separate.
+instrumentation mislabeling. Those local provenance checks establish the
+identity of the tested package. See [patch terms](NOTICE.md).

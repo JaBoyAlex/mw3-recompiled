@@ -8,6 +8,8 @@
     "config/toolchains/rexglue-stop",
     "tools/prepare_runtime_stop.py",
     "tools/test_runtime_threads.py",
+    "tools/test_runtime_memory.py",
+    "tools/test_rexglue_ppc.py",
     "tests/threads",
     "docs/engine/threads.md",
     "docs/STATUS.md"
@@ -17,7 +19,7 @@
     "Retain the decommit-v1 failure: a barrier-controlled child with RequestStop(77) before its next kernel import must exit with 77 and never return from that import",
     "Distinguish a pending cooperative stop from an explicit thread exit; audit import/hook, wait, spin and fiber exception consumers and preserve explicit exit behavior",
     "Use an original minimal BSD-compatible patch with exact base, composition, compiler, source, header and library identities; preserve all baseline packages and rebuild every affected consumer",
-    "Provide fail-closed preparation/verification and permit the thread diagnostic driver to select the repaired SDK explicitly; do not silently substitute it into owned-title preparation"
+    "Provide fail-closed preparation/verification and explicit repaired-SDK selection in thread, memory and CPU diagnostics; do not silently substitute it into owned-title preparation"
   ],
   "validation": [
     "Repeat isolated and combined declaration/shuffled thread contracts on Windows/Linux native and supported sanitizers, including actual instrumented Linux core",

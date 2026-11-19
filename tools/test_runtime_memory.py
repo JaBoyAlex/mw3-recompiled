@@ -65,7 +65,10 @@ def layouts(metadata):
     return result
 
 
-def linux_sdk(root,report_path,sanitizers):
+def linux_sdk(root,report_path,sanitizers,sdk_profile='memory'):
+    if sdk_profile=='stop':
+        import prepare_runtime_stop as stop
+        return stop.verify_prepared(root,report_path,allow_sanitized=sanitizers)
     receipt=json.loads(report_path.read_text())
     if "profile" in receipt:
         import prepare_runtime_memory as memory
@@ -94,6 +97,7 @@ def main():
     parser.add_argument("--metadata",type=Path,help="required for the hash-bound synthetic/SP/MP matrix")
     parser.add_argument("--upstream",action="store_true",help="build original upstream heap/access tests against the actual SDK DLL; no game metadata needed")
     parser.add_argument("--sanitizers",action="store_true")
+    parser.add_argument('--sdk-profile',choices=('memory','stop'),default='memory')
     args=parser.parse_args()
     report=dict(schema_version=1,evidence_class="original-synthetic-memory-contract",owned_title_executed=False,
                 performance_measured=False,script_sha256=prep.sha(__file__),sources=prep.snapshot(SOURCE),results=[])
@@ -108,23 +112,28 @@ def main():
             clang,compiler=win.compiler(root,lock["compiler"],False)
             env,cmake,ninja,host=win.msvc_environment(lock,clang)
             receipt=json.loads(args.sdk_report.read_text());sdk=Path(receipt["sdk_prefix"])
-            if "profile" in receipt:
+            if args.sdk_profile=='stop':
+                import prepare_runtime_stop as stop
+                sdk,evidence=stop.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
+                actual=receipt['source']
+            elif "profile" in receipt:
                 import prepare_runtime_memory as memory
                 sdk,evidence=memory.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
                 actual=receipt["source"]
             else:
                 actual=win.sdk_derivative(root/"sources/rexglue-sdk",lock,output)
             if (receipt.get("status")!="PASS" or receipt.get("source")!=actual or receipt.get("compiler")!=compiler
-                    or (receipt.get("windows_lock_sha256") if "profile" in receipt else receipt.get("lock_sha256"))!=prep.sha(win.LOCK)
+                    or (args.sdk_profile!='stop' and (receipt.get("windows_lock_sha256") if "profile" in receipt else receipt.get("lock_sha256"))!=prep.sha(win.LOCK))
                     or receipt["sdk_files"]!=prep.snapshot(sdk)):
                 raise ValueError("Windows SDK receipt/source/artifact mismatch")
             report.update(compiler=compiler,host=host,sdk=dict(source=actual,sdk_files=receipt["sdk_files"]))
+            if args.sdk_profile=='stop':report['sdk']=evidence
             compiler_path=clang/"bin/clang++.exe"
             extra=["-DCMAKE_MAKE_PROGRAM="+ninja.as_posix(),"-DCMAKE_CXX_FLAGS=-march=x86-64-v2","-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=lld"]
             if args.sanitizers:report["calibration"]=win.calibrate_sanitizer(output,clang,env)
         else:
             if sys.platform!="linux":raise ValueError("unsupported host")
-            sdk,report["sdk"]=linux_sdk(root,args.sdk_report,args.sanitizers)
+            sdk,report["sdk"]=linux_sdk(root,args.sdk_report,args.sanitizers,args.sdk_profile)
             compiler_path=Path(shutil.which("clang++-20") or "missing-compiler")
             version=subprocess.check_output([compiler_path,"--version"],text=True)
             pinned=json.loads((prep.EXPERIMENT/"pins.json").read_text())["compiler"]
@@ -145,7 +154,7 @@ def main():
                      "-DMW3_MEMORY_SANITIZERS="+("ON" if args.sanitizers else "OFF"),*extra]
             if args.upstream:
                 prepared=json.loads(args.sdk_report.read_text())
-                source=root/"sources"/("rexglue-decommit" if "profile" in prepared else "rexglue-sdk")
+                source=root/"sources"/('rexglue-stop' if args.sdk_profile=='stop' else "rexglue-decommit" if "profile" in prepared else "rexglue-sdk")
                 command += ["-DMW3_UPSTREAM_MEMORY_TESTS=ON","-DMW3_SDK_SOURCE="+source.as_posix()]
             command += [f"-D{k}={hex(v)}" for k,v in shape.items()]
             report.setdefault("builds",[]).append(dict(layout=layout,geometry=shape,configure_command=list(map(str,command))))
@@ -227,8 +236,11 @@ def main():
                     print(json.dumps({k:row[k] for k in ("layout","scenario","seed","status","returncode")}),flush=True)
         if windows:
             if receipt["sdk_files"]!=prep.snapshot(sdk):raise ValueError("SDK package changed during tests")
+            if args.sdk_profile=='stop':
+                _,after=stop.verify_prepared(root,args.sdk_report,allow_sanitized=args.sanitizers)
+                if after!=report['sdk']:raise ValueError('stop SDK preparation changed during tests')
         else:
-            _,after=linux_sdk(root,args.sdk_report,args.sanitizers)
+            _,after=linux_sdk(root,args.sdk_report,args.sanitizers,args.sdk_profile)
             if after!=report["sdk"]:raise ValueError("SDK preparation changed during tests")
         allowed=("PASS","SKIP") if args.upstream else ("PASS",)
         report["status"]="PASS" if all(r["status"] in allowed for r in report["results"]) and any(r["status"]=="PASS" for r in report["results"]) else "FAIL"

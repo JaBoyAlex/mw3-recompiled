@@ -4,6 +4,7 @@
   "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
   "patch_path": "stop.patch",
   "patch_sha256": "11592aec5c2c809157dafe95e8507ee88defeb308fa63a00b3c432004e5438d3",
+  "rebuilt_libraries": ["rexbase", "rexppc", "rexkernel", "rexxam"],
   "replaced_headers": [
     "include/rex/platform/thread.h",
     "include/rex/ppc/call.h",

@@ -36,6 +36,12 @@ def source_identity(root,output,windows,existing=False):
             raise ValueError('stop source reset to baseline')
     return common.derive(source,path,dict(commit=lock['commit'],patch_sha256=common.sha(path)))
 
+def library_paths(lock, windows):
+    if windows:
+        return [f"bin/{name}.dll" for name in lock["rebuilt_libraries"]]
+    return [f"lib/lib{name}.so" for name in lock["rebuilt_libraries"]]
+
+
 def verify_prepared(root,report_path,allow_sanitized=False):
     receipt=json.loads(report_path.read_text());lock=json.loads(LOCK.read_text())
     if (receipt.get('status')!='PASS' or receipt.get('profile')!=lock['profile']
@@ -53,6 +59,12 @@ def verify_prepared(root,report_path,allow_sanitized=False):
     if actual!=receipt['source']:raise ValueError('stop source changed')
     sdk=Path(receipt['sdk_prefix']);files=memory.package_files(sdk)
     if files!=receipt['sdk_files']:raise ValueError('stop SDK artifact/header changed')
+    replacements=library_paths(lock,sys.platform=='win32')+lock['replaced_headers']
+    if receipt.get('replaced_files')!={name: files[name]['sha256'] for name in replacements}:
+        raise ValueError('stop SDK replacement manifest differs')
+    source=root/'sources/rexglue-stop'
+    if any(common.sha(source/name)!=files[name]['sha256'] for name in lock['replaced_headers']):
+        raise ValueError('stop SDK header does not match its verified source')
     return sdk,dict(derivative=actual,stop_profile=lock['profile'],stop_lock_sha256=common.sha(LOCK),
         preparation_sha256=common.sha(report_path),baseline=parent,sdk_files=files,
         sdk_tree_sha256=common.digest(files),core_sanitizers=receipt['core_sanitizers'])
@@ -112,11 +124,11 @@ def main():
             '-DVulkan_INCLUDE_DIR='+(root/'sources/headers/include').as_posix(),'-DREXGLUE_VMA_INCLUDE_DIR='+(root/'sources/vma/include').as_posix(),*extra]
         report['configure_command']=list(map(str,command));run('configure',command,180)
         print(json.dumps(dict(stage='build',log=str(output/'build.log'))),flush=True)
-        run('build',[cmake,'--build',build,'--target','rexkernel','--parallel','2'],1800)
+        run('build',[cmake,'--build',build,'--target',*lock['rebuilt_libraries'],'--parallel','2'],1800)
         package=output/'sdk';shutil.copytree(sdk,package,symlinks=not windows);changed={}
-        for name in ('rexbase','rexppc','rexkernel'):
-            path=build/'sdk-output'/(name+'.dll' if windows else 'lib'+name+'.so')
-            target=package/('bin' if windows else 'lib')/path.name
+        for name in library_paths(lock,windows):
+            target=package/name
+            path=build/'sdk-output'/target.name
             shutil.copy2(path,target);changed[target.relative_to(package).as_posix()]=common.sha(target)
         for name in lock['replaced_headers']:
             target=package/name

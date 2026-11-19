@@ -101,6 +101,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('root','sdk-report','output-root'):parser.add_argument('--'+name,required=True,type=Path)
     parser.add_argument('--sanitizers',action='store_true')
+    parser.add_argument('--sdk-profile',choices=('memory','stop'),default='memory')
     parser.add_argument('--reference',type=Path,help='Windows: successful canonical Linux synthetic fixture preparation')
     parser.add_argument('--seed',type=lambda n:int(n,0),default=0x20110360)
     args=parser.parse_args();output=None
@@ -120,9 +121,12 @@ def main():
         import prepare_runtime_memory as memory
         # Generation uses a native SDK. Sanitizers instrument the adapter and
         # emitted instructions, not an accidentally mixed native/core-ASan CLI.
-        sdk,evidence=memory.verify_prepared(root,args.sdk_report)
+        if args.sdk_profile=='stop':
+            import prepare_runtime_stop as selected
+        else:selected=memory
+        sdk,evidence=selected.verify_prepared(root,args.sdk_report)
         receipt=json.loads(args.sdk_report.read_text());report.update(sdk=evidence,sdk_report_sha256=prep.sha(args.sdk_report))
-        source=root/'sources/rexglue-decommit'
+        source=root/('sources/rexglue-stop' if args.sdk_profile=='stop' else 'sources/rexglue-decommit')
         if windows:
             import prepare_windows_runtime as win
             lock=json.loads(win.LOCK.read_text());clang,compiler=win.compiler(root,lock['compiler'],False)
@@ -232,7 +236,7 @@ def main():
             passed=classify(r.returncode,log.read_text(encoding='utf-8',errors='replace'),data,label=='mutation')
             row=dict(case=label,status='PASS' if passed else 'FAIL',returncode=r.returncode,case_file_sha256=prep.sha(path),log_sha256=prep.sha(log))
             report['results'].append(row);print(json.dumps(row),flush=True)
-        _,after=memory.verify_prepared(root,args.sdk_report)
+        _,after=selected.verify_prepared(root,args.sdk_report)
         if after!=evidence:raise ValueError('SDK changed during tests')
         if report['script_sha256']!=prep.sha(__file__) or report['sources']!=source_snapshot():
             raise ValueError('oracle source changed during tests')

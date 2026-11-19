@@ -1,8 +1,8 @@
 # Thread and lifecycle validation
 
-MW3-039 is **blocked by MW3-043**. Original synthetic tests expose a repeatable
-selected-runtime cancellation defect. No thread or orderly title teardown gate
-passes. These tests enable no MW3 imports and execute no game instructions.
+MW3-039 remains open. The baseline exposed a repeatable cancellation defect
+at a native import boundary. MW3-043 supplies an isolated SDK repair for that
+defect. These tests exercise original synthetic callbacks and SDK services.
 
 ## Maintained contracts
 
@@ -55,7 +55,7 @@ logs/XML, source copies, compile commands and executed binary/source/SDK/compile
 hashes are retained and rechecked. Emergency _Exit(3) cleanup paths are failures,
 never orderly-shutdown evidence. Isolation does not repair aggregate failures.
 
-## Demonstrated blocker: requested stop exit lost
+## Baseline failure: requested stop exit lost
 
 A native fixture gate holds the child outside guest code until RequestStop(77)
 has completed, then releases it into NtYieldExecution. Windows and Linux record:
