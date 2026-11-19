@@ -20,5 +20,8 @@
   ],
   "size": "1-3 days",
   "priority": 1,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "docs/research/scorecard.md"
+  ]
 }
