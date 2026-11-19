@@ -78,9 +78,12 @@ automatic approval of every future file or commit.
 | Preparation/host experiments | 74 | All tracked `config/**`, `runtime/**`, `experiments/**` | Source, recipes, hashes, original fixtures and reviewed patches only; preserve every narrower patch notice/license |
 | Documentation/evidence/catalog | 75 | All tracked `docs/**`, `qa/**`, `tasks/**` | Reviewed text and synthetic/reference metadata; executable fingerprints are identities, not redistributed game bytes |
 
-The preparation group includes the BSD repair patches under
-`config/toolchains/rexglue-memory`, `rexglue-stop`, `rexglue-windows/patches`
-and `experiments/runtime-bakeoff/patches`. Their notices and
+The preparation group includes the BSD repair patches with their
+[memory notice](../../config/toolchains/rexglue-memory/NOTICE.md),
+[stop notice](../../config/toolchains/rexglue-stop/NOTICE.md),
+[Windows notice](../../config/toolchains/rexglue-windows/patches/NOTICE.md)
+and [host-range notice](../../experiments/runtime-bakeoff/patches/NOTICE.md).
+Those notices and
 [`LICENSE.rexglue`](../../experiments/runtime-bakeoff/patches/LICENSE.rexglue)
 must travel with them. Their GPL preparation/test drivers retain their own
 license. REA is referenced by pinned archives/source, not vendored here; its
