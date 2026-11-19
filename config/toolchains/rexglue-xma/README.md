@@ -1,7 +1,8 @@
 # Decoder packet ownership profile
 
-MW3-044 is in progress. `xma-packet-v1` derives from the reviewed stop-v1
-profile. It composes that exact parent's patches with one original packet
+MW3-044 passes the [validation matrix](validation.json). `xma-packet-v1`
+derives from the reviewed stop-v1 profile. It composes that exact parent's
+patches with one original packet
 destructor call. It rebuilds/replaces only the affected kernel shared library;
 public headers and every other packaged file retain their parent hashes.
 Baseline source worktrees, SDK packages and failing observations are preserved.
