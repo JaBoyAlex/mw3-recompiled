@@ -3,7 +3,10 @@
   "title": "Preserve requested stop exits across selected-runtime import boundaries",
   "phase": 2,
   "area": "threads",
-  "depends_on": ["MW3-009", "MW3-042"],
+  "depends_on": [
+    "MW3-009",
+    "MW3-042"
+  ],
   "paths": [
     "config/toolchains/rexglue-stop",
     "tools/prepare_runtime_stop.py",
@@ -28,5 +31,11 @@
   ],
   "size": "bounded repair; split new defects",
   "priority": 0,
-  "status": "in_progress"
+  "status": "done",
+  "evidence": [
+    "config/toolchains/rexglue-stop/validation.md",
+    "docs/engine/threads.md",
+    "tools/prepare_runtime_stop.py",
+    "tools/test_runtime_threads.py"
+  ]
 }

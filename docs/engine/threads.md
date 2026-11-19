@@ -2,7 +2,9 @@
 
 MW3-039 remains open. The baseline exposed a repeatable cancellation defect
 at a native import boundary. MW3-043 supplies an isolated SDK repair for that
-defect. These tests exercise original synthetic callbacks and SDK services.
+defect. The [repair validation](../../config/toolchains/rexglue-stop/validation.md)
+covers kernel and XAM imports, thunk return, and explicit exits. The sections
+below retain the original synthetic baseline and its failures.
 
 ## Maintained contracts
 

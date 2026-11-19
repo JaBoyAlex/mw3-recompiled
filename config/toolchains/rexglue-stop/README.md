@@ -1,6 +1,6 @@
 # Explicit stop-boundary SDK derivative
 
-MW3-043 is in progress. The patched SDK is not yet a passing thread gate.
+MW3-043 passes the standalone [validation matrix](validation.md).
 Baseline failures remain in [thread evidence](../../../docs/engine/threads.md).
 
 Start from a verified decommit-v1 receipt. All source/package baselines remain
