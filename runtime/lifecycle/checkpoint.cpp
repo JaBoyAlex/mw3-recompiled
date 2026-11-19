@@ -31,6 +31,7 @@
 #endif
 
 bool VerifyProbeImportStops(rex::kernel::TitleRuntime&);
+extern "C" void __imp__RtlImageXexHeaderField(PPCContext&, u8*);
 namespace k = rex::kernel;
 namespace p = rex::platform;
 namespace {
@@ -113,23 +114,25 @@ void PrepareAudit() {
   VerifyHeader();
   Require(kernel_library.LoadNamed("rexkernel", p::SymbolResolution::kImmediate), "SDK kernel provider unavailable");
   original_header_query = kernel_library.GetSymbol<Function>("__imp__RtlImageXexHeaderField");
-  Require(original_header_query != nullptr, "SDK header provider missing");
+  Require(original_header_query && original_header_query != &__imp__RtlImageXexHeaderField,
+          "SDK header provider missing/interposed");
   std::fprintf(stderr, "MW3_MODULE_HEADER_AUDIT_PASS:cell=%08x module=%08x header=%08x bytes=%u\n",
                cell_address, module_address, header_address, size);
 }
 
 bool ReservationReleased(void* address) {
   if (!address) return false;
+  constexpr std::size_t span = 0x120000000ull;
 #if REX_PLATFORM_WIN32
-  void* claimed = VirtualAlloc(address, 0x10000, MEM_RESERVE, PAGE_NOACCESS);
+  void* claimed = VirtualAlloc(address, span, MEM_RESERVE, PAGE_NOACCESS);
   if (!claimed) return false;
   const bool exact = claimed == address;
   return VirtualFree(claimed, 0, MEM_RELEASE) && exact;
 #else
-  void* claimed = mmap(address, 0x10000, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
+  void* claimed = mmap(address, span, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE, -1, 0);
   if (claimed == MAP_FAILED) return false;
   const bool exact = claimed == address;
-  return munmap(claimed, 0x10000) == 0 && exact;
+  return munmap(claimed, span) == 0 && exact;
 #endif
 }
 }
@@ -191,7 +194,7 @@ class LifecycleApp final : public rex::app::App {
 int RunLifecycle(LifecycleApp& app, const rex::CLIArgList& args) {
   const char* selected = std::getenv("MW3_LIFECYCLE_CASE");
   mode = selected ? selected : "positive";
-  const auto threads_before = p::GetThreadCount();
+  const auto threads_before = p::detail::GetThreadCount();
   if (!app.Init(args)) return 90;
   std::unique_ptr<k::TitleRuntime> runtime = std::make_unique<k::TitleRuntime>(kPPCImageConfig);
   int result = 90;
@@ -239,10 +242,11 @@ int RunLifecycle(LifecycleApp& app, const rex::CLIArgList& args) {
   current = nullptr;
   const bool released = ReservationReleased(reservation);
   std::fprintf(stderr, "MW3_LIFECYCLE_UNLOADED:reservation_released=%u\n", unsigned(released));
+  if (released) std::fputs("MW3_LIFECYCLE_MAPPING_RELEASED:bytes=4831838208\n", stderr);
   if (!released) result = 90;
   checkpoint.reset(); never.reset(); exited.reset();
   const int shutdown = app.Shutdown();
-  const auto threads_after = p::GetThreadCount();
+  const auto threads_after = p::detail::GetThreadCount();
   std::fprintf(stderr, "MW3_LIFECYCLE_SHUTDOWN:result=%d threads_before=%llu threads_after=%llu\n",
                shutdown, static_cast<unsigned long long>(threads_before), static_cast<unsigned long long>(threads_after));
   if (shutdown != 0 || threads_before != threads_after) return 90;

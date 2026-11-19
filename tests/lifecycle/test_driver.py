@@ -14,6 +14,7 @@ class LifecycleResultGuards(unittest.TestCase):
                 + "MW3_PROBE_UNREVIEWED_IMPORT:NtAllocateVirtualMemory lr=1234\n"
                 + "MW3_LIFECYCLE_THREAD_STOPPED:exit=86 queries=1\n"
                 + "MW3_LIFECYCLE_UNLOADED:reservation_released=1\n"
+                + "MW3_LIFECYCLE_MAPPING_RELEASED:bytes=4831838208\n"
                 + "MW3_LIFECYCLE_SHUTDOWN:result=0 threads_before=0 threads_after=0\n"
                 + "MW3_LIFECYCLE_COMPLETE:exit=86\n")
 
@@ -39,13 +40,17 @@ class LifecycleResultGuards(unittest.TestCase):
 
     def test_negative_requires_its_reason_and_cleanup(self):
         text = ("MW3_LIFECYCLE_REJECT:unexpected header pointer\n"
+                "MW3_LIFECYCLE_THREAD_STOPPED:exit=87 queries=1\n"
                 "MW3_LIFECYCLE_UNLOADED:reservation_released=1\n"
+                "MW3_LIFECYCLE_MAPPING_RELEASED:bytes=4831838208\n"
                 "MW3_LIFECYCLE_SHUTDOWN:result=0 threads_before=0 threads_after=0\n"
                 "MW3_LIFECYCLE_COMPLETE:exit=87\n")
         self.assertTrue(driver.classify("bad-pointer", 87, text))
         self.assertFalse(driver.classify("bad-binding", 87, text))
         self.assertFalse(driver.classify("bad-pointer", 87, text + "MW3_HEADER_QUERY_PASS:wrong\n"))
         self.assertFalse(driver.classify("bad-pointer", 87, text.replace("reservation_released=1", "reservation_released=0")))
+        self.assertFalse(driver.classify("bad-pointer", 87, text + "MW3_LIFECYCLE_REJECT:exit metadata invalid\n"))
+        self.assertFalse(driver.classify("bad-pointer", 87, text.replace("MW3_LIFECYCLE_THREAD_STOPPED:exit=87 queries=1", "")))
 
     def test_controlled_imports_retain_complete_binding_checks(self):
         def record(name, address, kind):

@@ -30,6 +30,8 @@ def classify(case, code, text):
         return False
     if text.count("MW3_LIFECYCLE_UNLOADED:reservation_released=1") != 1:
         return False
+    if text.count("MW3_LIFECYCLE_MAPPING_RELEASED:bytes=4831838208") != 1:
+        return False
     counts = re.findall(r"MW3_LIFECYCLE_SHUTDOWN:result=0 threads_before=(\d+) threads_after=(\d+)", text)
     if len(counts) != 1 or counts[0][0] != counts[0][1]:
         return False
@@ -46,7 +48,9 @@ def classify(case, code, text):
                 and "MW3_PROBE_UNREVIEWED_IMPORT:" not in text and "MW3_LIFECYCLE_REJECT:" not in text)
     reason = {"bad-binding": "function binding verification", "bad-pointer": "unexpected header pointer",
               "bad-oracle": "SDK header result differs from independent oracle"}[case]
-    return text.count("MW3_LIFECYCLE_REJECT:" + reason) == 1 and "MW3_HEADER_QUERY_PASS:" not in text
+    rejects = re.findall(r"^MW3_LIFECYCLE_REJECT:(.*)$", text, re.MULTILINE)
+    metadata_checked = case == "bad-binding" or text.count("MW3_LIFECYCLE_THREAD_STOPPED:exit=87 queries=1") == 1
+    return rejects == [reason] and metadata_checked and "MW3_HEADER_QUERY_PASS:" not in text
 
 
 def controlled_traps(metadata, prefix, expected_count):
@@ -81,6 +85,10 @@ def main():
     report = dict(schema_version=1, status="IN_PROGRESS", playable=False, guest_executed=False,
                   script_sha256=common.sha(__file__), role=args.role, results=[],
                   host_sources=common.snapshot(HOST), host_sanitizers=args.sanitizers)
+    report["supporting_sources"] = {str(path.relative_to(ROOT)): common.sha(path) for path in (
+        ROOT / "src/xex.cpp", ROOT / "include/mw3/xex.hpp", Path(common.__file__), Path(stop.__file__),
+        Path(audit.__file__), ROOT / "experiments/runtime-bakeoff/rexglue_probe.py",
+        ROOT / "runtime/bringup/analysis-lock.json", common.DEFAULT, common.RECIPE)}
     try:
         for task in ("036", "037", "038", "039", "040", "042", "043"):
             if json.loads((ROOT / f"tasks/MW3-{task}.json").read_text())["status"] != "done":
@@ -90,6 +98,8 @@ def main():
         output = common.private_cache(args.output_root, owned) / uuid.uuid4().hex
         output.mkdir(parents=True)
         print(json.dumps(dict(output=str(output))), flush=True)
+        shutil.copytree(HOST, output / "maintained-host")
+        shutil.copy2(__file__, output / "maintained-driver.py")
         sdk, evidence = stop.verify_prepared(args.root.resolve(), args.sdk_report)
         report.update(identity=identity, sdk=evidence, sdk_report_sha256=common.sha(args.sdk_report))
         recipe = common.validate_recipe(json.loads(common.RECIPE.read_text()))
@@ -100,7 +110,10 @@ def main():
             generation = json.loads(args.generation.read_text())
             payload = args.generation.parent / "payload"
             if (generation.get("status") != "GENERATED" or generation["identity"] != identity
-                    or generation["recipe"] != recipe or generation["files"] != common.snapshot(payload)):
+                    or generation["recipe"] != recipe or generation["files"] != common.snapshot(payload)
+                    or generation["recipe_sha256"] != common.sha(common.RECIPE)
+                    or generation["driver_sha256"] != common.sha(common.__file__)
+                    or generation["sdk"]["stop_lock_sha256"] != common.sha(stop.LOCK)):
                 raise ValueError("generation payload or identity changed")
         else:
             if windows:
@@ -123,7 +136,6 @@ def main():
         (output / "data-import.h").write_text(f"#pragma once\n#define MW3_MODULE_HANDLE_IMPORT {hex(address)}u\n")
         report.update(metadata_sha256=common.sha(metadata), traps_sha256=common.sha(output / "traps.cpp"),
                       data_import_sha256=common.sha(output / "data-import.h"))
-        build = output / "build"
         if windows:
             import prepare_windows_runtime as win
             lock = json.loads(win.LOCK.read_text())
@@ -141,6 +153,11 @@ def main():
             report["compiler"] = dict(sha256=common.sha(compiler), version=subprocess.check_output([compiler, "--version"], text=True).splitlines()[0])
             extra = ["-DCMAKE_CXX_FLAGS=-march=x86-64-v2 --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13",
                      "-DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=/usr/bin/ld.lld-20 -Wl,--threads=2"]
+        cache = common.private_cache(output.parent / "build-cache", owned)
+        cache.mkdir(exist_ok=True)
+        build_key = common.digest(dict(sdk=evidence, generation=generation["files"], role=args.role,
+                                       compiler=report["compiler"], cmake_sha256=common.sha(HOST / "CMakeLists.txt")))
+        build = cache / build_key
         configure = [cmake, "-S", HOST, "-B", build, "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release",
                      "-DCMAKE_CXX_COMPILER=" + compiler.as_posix(), "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG",
                      "-DCMAKE_PREFIX_PATH=" + sdk.as_posix(), "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
@@ -148,12 +165,23 @@ def main():
                      "-DMW3_GENERATED_PREFIX=" + prefix, "-DMW3_PRIVATE_TRAPS=" + (output / "traps.cpp").as_posix(),
                      "-DMW3_DATA_IMPORT_HEADER=" + (output / "data-import.h").as_posix(),
                      "-DMW3_LIFECYCLE_SANITIZERS=" + ("ON" if args.sanitizers else "OFF"), *extra]
-        for label, command in (("configure", configure), ("build", [cmake, "--build", build, "--parallel", "2"])):
-            report.setdefault("commands", []).append(list(map(str, command)))
-            print(json.dumps(dict(stage=label)), flush=True)
-            with (output / (label + ".log")).open("wb") as log:
-                subprocess.run(list(map(str, command)), env=env, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=1800)
-        binary = build / ("mw3-lifecycle.exe" if windows else "mw3-lifecycle")
+        execution = output / "execution"
+        execution.mkdir()
+        with common.writer_lock(cache, build_key):
+            for label, command in (("configure", configure), ("build", [cmake, "--build", build, "--parallel", "2"])):
+                report.setdefault("commands", []).append(list(map(str, command)))
+                print(json.dumps(dict(stage=label)), flush=True)
+                with (output / (label + ".log")).open("wb") as log:
+                    subprocess.run(list(map(str, command)), env=env, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=1800)
+            name = "mw3-lifecycle.exe" if windows else "mw3-lifecycle"
+            shutil.copy2(build / name, execution / name)
+            if windows:
+                for library in build.glob("*.dll"):
+                    shutil.copy2(library, execution / library.name)
+            shutil.copy2(build / "compile_commands.json", output / "compile_commands.json")
+        binary = execution / name
+        report.update(execution_files=common.snapshot(execution), build_key=build_key,
+                      compile_commands_sha256=common.sha(output / "compile_commands.json"))
         report["binary_sha256"] = common.sha(binary)
         for case in CASES:
             lane = output / case
@@ -176,7 +204,7 @@ def main():
                 child["LD_LIBRARY_PATH"] = str(sdk / "lib")
             with (lane / "run.log").open("wb") as log:
                 try:
-                    code = subprocess.run(command, cwd=build, env=child, stdout=log, stderr=subprocess.STDOUT, timeout=30).returncode
+                    code = subprocess.run(command, cwd=execution, env=child, stdout=log, stderr=subprocess.STDOUT, timeout=30).returncode
                 except subprocess.TimeoutExpired:
                     code = -999
             text = (lane / "run.log").read_text(errors="replace")
@@ -189,8 +217,12 @@ def main():
         _, after = stop.verify_prepared(args.root.resolve(), args.sdk_report)
         if after != evidence or common.sha(binary) != report["binary_sha256"]:
             raise ValueError("SDK or executed binary changed")
+        if common.snapshot(execution) != report["execution_files"]:
+            raise ValueError("executed package changed")
         if common.snapshot(HOST) != report["host_sources"] or common.sha(__file__) != report["script_sha256"]:
             raise ValueError("maintained lifecycle source changed during verification")
+        if any(common.sha(ROOT / path) != digest for path, digest in report["supporting_sources"].items()):
+            raise ValueError("supporting source changed during verification")
         common.verify(owned, json.loads(common.DEFAULT.read_text()))
         if common.snapshot(payload) != generation["files"]:
             raise ValueError("generated payload changed")
