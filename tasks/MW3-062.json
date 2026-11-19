@@ -4,8 +4,10 @@
   "phase": 2,
   "area": "audio-ownership",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-061"],
+  "status": "done",
+  "depends_on": [
+    "MW3-061"
+  ],
   "paths": [
     "runtime/audio/streams",
     "tests/host_platform/audio_streams",
@@ -25,5 +27,15 @@
     "Run supported public-core and SDK-facing host sanitizers, actual SDK isolated/repeated/reordered cases, strict nonce/library/result controls and resource recovery; identify uninstrumented library coverage and physical/title checks not run",
     "Measure token admission/submission/callback progress over at least three independent comparable processes, retain tails and correctness work, run public checks, and publish exact source/compiler/package/library/binary identities with material limits"
   ],
-  "size": "bounded original host lifetime gate plus actual-SDK diagnostic bridge; no shared ABI repair or title binding"
+  "size": "bounded original host lifetime gate plus actual-SDK diagnostic bridge; no shared ABI repair or title binding",
+  "evidence": [
+    "docs/engine/audio-streams.md records the standalone C++20 eight-stream host gate, backend/thread/destruction preconditions, exact evidence identities, results, performance and production handoff; original source only in the reserved paths",
+    "Opaque instance/session tokens reject default, moved, foreign, stale and wrong-owner commands before backend calls. Closing/owner-close/shutdown invalidates before release; detached serialized callback counters cannot credit replacement state. Small binding/frame budgets exercise exhaustion without wrapping",
+    "Nine model groups pass on Windows/MSVC, Windows MSVC ASan and Linux/GCC ASan/UBSan, including ordinary open/submit rollback, duplicate/zero raw IDs fail-closed without closing earlier owners, delayed callback copies, wrong-thread operations, frame bounds, reentry and deterministic cleanup. These injected faults are synthetic, not SDK playback evidence",
+    "Actual unchanged approved SDK bridge passes four Windows/Linux native/host-sanitizer profiles: 128 process checks including 16 expected wrong-result/incomplete controls. Three isolated repeats and both case orders cover timer and six-channel SDL dummy modes, retained raw-ID aliasing, valid replacement/other-owner progress, actual queue refusal/recovery, 32-cycle lifetimes and recovered streams/queues/SDK-tracked threads/SDL state",
+    "Forty ordinary raw reuse observations remain unsafe at raw ID 2; 1360 ordinary stale host commands are rejected before another SDK Submit. MW3-061 original failing receipts are retained; this fixes host admission, not the SDK raw-ID ABI or guest/title audio",
+    "Eight Python evidence-guard tests reject malformed/stale/typed/partial/duplicate results, fallback devices, wrong SDK call counts and failed controls; an actual owned child times out after plausible output. Compiler/package/source/binary/loaded-library/log/artifact hashes verified before/after; host core/bridge instrumented, SDK/SDL internals uninstrumented",
+    "Three independent model processes per OS discard 256 warmup calls then measure 4096 batches of 64 submits, retaining tails and checking all credits with zero measured submit allocations. Batch-averaged per-run medians 9.375 ns Windows and 7.203125-11.765625 ns Linux are synthetic trivial-backend costs only. Actual SDK 160-call/32-cycle per-process timings and refusal tails are separately published without a gameplay or audible-latency claim",
+    "Windows public check.py Release passes 203 Python tests/eight skips plus parser CTest 1/1; Linux Release --sanitizers passes 203 tests/two Windows-only skips plus parser 1/1. No shared input/startup/allocation/SDK/interface changes, game bytes, SDKs or private logs committed. Self-review only; production adapter/owner mapping, guest admission, physical output and MW3-082 remain separate agreed work"
+  ]
 }
