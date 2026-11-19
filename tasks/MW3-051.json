@@ -1,0 +1,23 @@
+{
+  "id": "MW3-051",
+  "title": "Audit the selected kernel's display-query import ABI",
+  "phase": 2,
+  "area": "gpu-display-api",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-037", "MW3-039", "MW3-044"],
+  "paths": ["tests/gpu_display", "tools/test_gpu_display.py", "docs/engine/gpu-display.md"],
+  "goal": "Exercise actual selected-kernel display-query exports through original synthetic guest callbacks before any GPU service admission, separating observed query ABI behavior from unbacked display/engine controls and unknown retail semantics.",
+  "acceptance": [
+    "Bind exact approved lifecycle-repaired SDK/source, export ordinal/name/function-module, prototype/layout and compiler identities; inspect the pinned implementation and define independent byte-level serialization/canary expectations with retail and alternate-mode unknowns explicit",
+    "Invoke actual VdQueryVideoMode, VdGetCurrentDisplayInformation, VdGetCurrentDisplayGamma and VdQueryVideoFlags export wrappers from original bounded synthetic guest-thread contexts; verify output extent/endian handling, returned flag placement, permitted register effects and owned runtime cleanup without compiling kernel objects or using success stubs",
+    "Exercise valid output geometry/order, guarded or invalid guest output boundaries in isolated owned subprocesses, wrong-result and incomplete/deadline controls; retain successes, faults, deviations and inconclusive expectations separately rather than declaring full console compatibility",
+    "Classify adjacent success-valued no-op/stub display and engine controls from exact source without admitting or presenting them as functioning rendering; change no SDK, shared runtime interface, GPU packet/shader path, guarded startup harness or service allowlist"
+  ],
+  "validation": [
+    "Run repeated original query/canary cases on native Windows/Linux and supported host/core sanitizer profiles using actual loaded SDK module identities; use lifecycle-repaired packages and private per-attempt profiles/output/process ownership",
+    "Run meaningful positive/negative protocol, receipt/source/library/result checks and public platform suites; preserve failed attempts and explicit missing console-reference, alternative-mode and graphics/debug-layer evidence",
+    "Measure comparable query/dispatch and teardown distributions over at least three independent processes, with timer/instrumentation/cache limits and unknown weighted MW3 architecture scores; this audit alone passes no title, GPU service, first-frame or gameplay gate"
+  ],
+  "size": "bounded game-free display-query ABI audit with retained defects; separate tasks required for SDK repairs, mode injection, GPU service admission or title adoption"
+}
