@@ -1,0 +1,30 @@
+{
+  "id": "MW3-080",
+  "title": "Implement a game-free four-slot controller ownership model",
+  "phase": 2,
+  "area": "input-model",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": [
+    "MW3-010"
+  ],
+  "paths": [
+    "runtime/input/slot_router.hpp",
+    "runtime/input/slot_router.cpp",
+    "tests/host_platform/input_slots",
+    "docs/engine/input-slots.md"
+  ],
+  "goal": "Provide an original C++20 host input ownership component with four independent slots, explicit reservations and stale-event rejection, without connecting it to guest input or claiming physical controller support.",
+  "acceptance": [
+    "Use fixed-capacity original code with explicit local-owner/device identities and a caller-owned session identity; do not infer retail player limits, guest addresses, Xbox account identities or SDK button layouts",
+    "Require explicit assignment, reject duplicate device/owner bindings and occupied-slot takeover, preserve slot ownership on disconnect, neutralize state, and invalidate stale session/binding events",
+    "Validate complete normalized frames before mutation, reject nonfinite/out-of-range values and nonincreasing sequences, and never let another slot or rejected event change unrelated state",
+    "Keep the interface single-thread owned, ephemeral and independent of SDL/XInput/SDK/runtime imports; physical/backend and title integration remain separate dependent work"
+  ],
+  "validation": [
+    "Run original four-slot, disconnect/reconnect, duplicate/takeover, stale-session/token, ordering/wrap and invalid-frame cases with meaningful unchanged-state assertions",
+    "Run deterministic repeated/permuted event orders on native Windows/Linux and supported address/undefined sanitizers; record an intentionally wrong-result rejection",
+    "Run the public game-free checks and bind compiler/source/test identities; report unavailable physical controllers and unexecuted title/guest mappings explicitly"
+  ],
+  "size": "bounded original host input component"
+}

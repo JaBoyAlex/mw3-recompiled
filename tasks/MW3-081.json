@@ -1,0 +1,31 @@
+{
+  "id": "MW3-081",
+  "title": "Implement isolated profile and recoverable save storage contracts",
+  "phase": 2,
+  "area": "profile-storage",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": [
+    "MW3-010",
+    "MW3-045",
+    "MW3-060"
+  ],
+  "paths": [
+    "runtime/storage/profile",
+    "tests/host_platform/storage",
+    "docs/engine/profile-save-contract.md"
+  ],
+  "goal": "Implement original host profile/save confinement and recovery primitives, keeping immutable prepared content distinct from writable state; guest save-format/service integration remains explicitly unverified.",
+  "acceptance": [
+    "Use explicitly owned profile roots and reject traversal, reserved/normalized collisions, link/reparse redirection and shared writable profile ownership",
+    "Keep prepared game content read-only by contract; implement bounded save staging, integrity checking and an explicit recoverable commit/rollback protocol without overwriting original saves",
+    "Retain corrupt/partial saves diagnostically and prove failures preserve the previous valid state and other profiles",
+    "Do not implement or guess proprietary save layouts, guest filesystem services or production synchronization; split those interfaces into agreed tasks before integration"
+  ],
+  "validation": [
+    "Run original corrupt/truncated/oversized save, interruption, rollback, profile-crossing and real supported link/reparse cases on Windows/Linux",
+    "Exercise resource recovery and supported sanitizer checks; record exact filesystem/atomicity limits and skipped privilege cases",
+    "Run public checks and document that host storage success is not actual MW3 save/load compatibility"
+  ],
+  "size": "bounded host storage contracts; split discovered service/format work"
+}

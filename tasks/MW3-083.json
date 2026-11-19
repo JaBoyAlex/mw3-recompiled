@@ -1,0 +1,29 @@
+{
+  "id": "MW3-083",
+  "title": "Connect physical controllers to the reviewed input ownership model",
+  "phase": 2,
+  "area": "controller-backend",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": [
+    "MW3-080"
+  ],
+  "paths": [
+    "runtime/input/backend",
+    "tests/host_platform/input_backend",
+    "docs/engine/input-backend.md"
+  ],
+  "goal": "Connect a pinned host controller backend to the accepted four-slot ownership contract, measuring actual physical-device behavior without guessing guest input mappings.",
+  "acceptance": [
+    "Use the established selected-platform backend where suitable, pin its exact version/configuration, and preserve stable logical local-player ownership separately from device enumeration",
+    "Demonstrate four distinguishable physical controllers, disconnect/reconnect, neutral state, late events and independent input without slot/profile theft or solo fallback",
+    "Document button/axis normalization, unavailable hardware and backend/device limitations; no borrowed MW2 guest addresses or invented guest input semantics",
+    "The accepted MW3-080 API is the dependency contract; split any model/interface change, guest service binding or translated-title input admission before parallel implementation"
+  ],
+  "validation": [
+    "Run original adapter contracts and real physical-device captures on supported Windows/Linux configurations",
+    "Exercise event-order, invalid-device, disconnect/reconnect and wrong-routing controls with supported diagnostics/sanitizers",
+    "Run public checks; host device routing does not certify console split-screen, all-mode gameplay or the requested Survival extension"
+  ],
+  "size": "bounded physical input backend; title binding is separate"
+}

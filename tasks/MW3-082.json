@@ -1,0 +1,30 @@
+{
+  "id": "MW3-082",
+  "title": "Validate selected audio output and actual title playback",
+  "phase": 2,
+  "area": "audio-output",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": [
+    "MW3-044",
+    "MW3-011"
+  ],
+  "paths": [
+    "runtime/audio/output",
+    "tests/host_platform/audio",
+    "docs/engine/audio-output.md"
+  ],
+  "goal": "Validate the selected decoder/mixer/output path with actual owned-title audio after a supported scene exists; XMA context teardown alone is not audible playback evidence.",
+  "acceptance": [
+    "Bind exact decoder/runtime/configuration provenance and licensing; identify channel/sample/mixing assumptions and actual output backend without changing shared SDK profiles implicitly",
+    "Prove audible title output, ordering, channel ownership, pause/resume and bounded resource recovery; diagnose unsupported formats rather than silent success",
+    "Record underruns, latency method, long-session stability and backend/device loss/recovery using isolated lane resources",
+    "Split unreviewed guest service admission, decoder repairs or shared SDK changes into separate agreed tasks before modifying them"
+  ],
+  "validation": [
+    "Run original host audio contracts plus actual hash-bound title captures and human listening checks on Windows/Linux where supported",
+    "Exercise underrun/device-loss and deliberate wrong-output controls, with supported sanitizer and platform skips explicit",
+    "Run public checks; do not turn synthetic PCM output or prior XMA ownership tests into a title playback claim"
+  ],
+  "size": "bounded audio-output integration; split newly discovered seams"
+}
