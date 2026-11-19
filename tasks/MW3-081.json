@@ -4,7 +4,7 @@
   "phase": 2,
   "area": "profile-storage",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "depends_on": [
     "MW3-010",
     "MW3-045",
@@ -27,5 +27,14 @@
     "Exercise resource recovery and supported sanitizer checks; record exact filesystem/atomicity limits and skipped privilege cases",
     "Run public checks and document that host storage success is not actual MW3 save/load compatibility"
   ],
-  "size": "bounded host storage contracts; split discovered service/format work"
+  "size": "bounded host storage contracts; split discovered service/format work",
+  "evidence": [
+    "docs/engine/profile-save-contract.md; original C++20 runtime/storage/profile with native anchored Windows/Linux IO, identity-separated content/writable roots, canonical names and exclusive OS profile ownership; no SDK or guest save-service integration",
+    "Bounded 1 MiB host envelopes bind profile, slot, monotonic generation, length and CRC32; Python independently checks produced CRC. Immutable no-replace stage/commit/rollback and explicit recovery retain earlier, corrupt and partial bytes instead of overwriting original saves",
+    "Eleven native CTest groups and six Python tests cover real link/hardlink/junction refusal, ownership, corrupt/truncated/oversized/invalid/staged damage, process exits before and after publication, cross-profile/slot/session rejection, publication/quarantine collisions, history/overflow bounds and deliberate negative detectors",
+    "128 native handle/FD ownership/failure cycles recover exact baseline counts. Linux RLIMIT_FSIZE forces an actual 90-of-91-byte partial write; explicit recovery retains it and restores the previous valid payload. Prior/content/other-profile canaries remain unchanged",
+    "Windows Release root check.py: 154 Python tests/eight skips and root CTest 1/1 PASS. Linux Release --sanitizers: 154 Python tests/two Windows-only skips and root CTest 1/1 PASS; standalone storage ASan/UBSan included. Separate Windows ASan storage: six Python tests and native CTest 11/11 PASS. Windows symlink privilege unavailable; actual Windows junctions/hardlinks and Linux symlink/hardlink cases pass",
+    "Three independent Release runs per OS/history scenario measure verified 64 KiB stage+commit+load with flushing: Windows medians 21.461-22.660 ms after three warmups, 53.951-67.213 ms after 200 generations; WSL ext4 10.546-11.069 and 11.719-11.841 ms. Synthetic one-host costs require future scheduling outside frame-critical execution; no framework/gameplay speed claim",
+    "Self-review only; SDK confinement repair, host ACL adversaries, power-loss/disk-full guarantees, cloud/network filesystems, original-save migration and actual MW3 save compatibility remain explicitly outside tested acceptance. No game bytes, SDK, generated game code, private logs or shared interfaces committed"
+  ]
 }
