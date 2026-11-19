@@ -1,0 +1,23 @@
+{
+  "id": "MW3-085",
+  "title": "Audit selected SDK user assignment and input blocking",
+  "phase": 2,
+  "area": "input-users",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-080", "MW3-084"],
+  "paths": ["tests/host_platform/input_users", "tools/test_input_users.py", "docs/engine/input-users.md"],
+  "goal": "Exercise the actual selected SDK input-system module above the verified SDL3 provider, distinguishing real virtual-device routing from SDK user-0 fallback and documenting the ownership integration boundary before physical/title input admission.",
+  "acceptance": [
+    "Load the real verified input-system and SDL3 provider modules through versioned interfaces, with original owned host context, private configuration and exact SDK/source/compiler/loaded-library identities; embed no SDK module or guest implementation",
+    "Use four distinguishable original SDL virtual devices to verify independent SDK user readings, capability/vibration routing, unchanged/changed packet observations and hotplug behavior without deriving player identities from enumeration order",
+    "Exercise nested UI input blocking/restoration, documented no-device user-0 fallback, explicit shared-pad mode and invalid users; never count a successful neutral fallback as four connected players",
+    "Retain baseline failures and exact wrong-routing/incomplete-process rejection; document SDK automatic assignment versus the MW3-080 explicit ownership contract and split any demonstrated SDK/shared/guest integration repair before modifying it"
+  ],
+  "validation": [
+    "Run original isolated/repeated device-order and lifecycle cases on native Windows and Linux/WSL with supported host and participating-core sanitizers, preserving exact logs/source/configuration/artifact identities",
+    "Require actual loaded input-system/provider/SDL/base identities, bounded owned dispatcher/handle cleanup and exact complete result records; reject deliberate wrong routing, stale/duplicate/partial results, wrong libraries and late children",
+    "Run public game-free checks and report physical controllers, independent Linux hardware, guest services and actual MW3 input unexecuted; this investigation cannot complete MW3-083 or MW3-012"
+  ],
+  "size": "bounded SDK user-routing investigation; no runtime or SDK repair"
+}
