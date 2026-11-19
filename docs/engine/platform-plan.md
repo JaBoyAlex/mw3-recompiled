@@ -8,7 +8,7 @@ untouched. The first-frame epic (011) still needs its own scoped children.
 | Task | Scope | Evidence boundary |
 | --- | --- | --- |
 | 080 | Original four-slot host ownership model | Game-free correctness only; no physical device or guest mapping |
-| 081 | Isolated profile/save storage primitives | Host confinement/recovery only; no MW3 save-format compatibility |
+| 081 | Isolated profile/save storage primitives after 060 | Host confinement/recovery only; no MW3 save-format compatibility |
 | 082 | Selected audio output and title playback after 011 | Requires actual title capture/listening and underrun/soak evidence |
 | 083 | Physical controller backend after 080 | Requires four real devices; no inferred guest input or gameplay parity |
 | 012 | Final platform evidence reconciliation | Requires real title behavior; no completion by implementing a description |
@@ -51,6 +51,10 @@ build limit and do not run GPU/title suites over another lane's resources.
 ## What remains outside the foundation components
 
 Storage work must keep prepared content and writable profiles distinct and
+depends on the active MW3-060 selected-SDK filesystem investigation. Its
+`docs/engine/profile-save-contract.md` is separate from 060's reserved
+`docs/engine/profile-storage.md`; this split does not assign or duplicate 060.
+Storage work
 must retain damaged/partial data without overwriting original saves. Host
 rollback does not establish proprietary save-format or guest filesystem
 behavior. Audio work reuses the documented selected-runtime provenance rather

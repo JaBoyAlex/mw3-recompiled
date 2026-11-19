@@ -7,12 +7,13 @@
   "status": "todo",
   "depends_on": [
     "MW3-010",
-    "MW3-045"
+    "MW3-045",
+    "MW3-060"
   ],
   "paths": [
     "runtime/storage/profile",
     "tests/host_platform/storage",
-    "docs/engine/profile-storage.md"
+    "docs/engine/profile-save-contract.md"
   ],
   "goal": "Implement original host profile/save confinement and recovery primitives, keeping immutable prepared content distinct from writable state; guest save-format/service integration remains explicitly unverified.",
   "acceptance": [
