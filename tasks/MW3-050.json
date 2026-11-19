@@ -4,7 +4,7 @@
   "phase": 2,
   "area": "gpu-bootstrap",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "depends_on": ["MW3-009", "MW3-037"],
   "paths": ["tests/gpu_bootstrap", "tools/test_gpu_bootstrap.py", "docs/engine/gpu-bootstrap.md"],
   "goal": "Establish a bounded actual native Windows graphics-device foundation using the selected SDK's unchanged D3D12 driver and original synthetic pixels, before any title/frame integration; identify hardware, failures and costs without claiming a rendered MW3 frame.",
@@ -19,5 +19,10 @@
     "Run meaningful game-free positive/negative evidence tests and public Windows/Linux checks including supported sanitizers; rehash retained artifacts and require actual loaded driver/package identities rather than mocks or upstream capability claims",
     "Measure cold initialization, GPU completion/readback and cleanup distributions over comparable repeated processes with timer/synchronization limits; do not infer game frame rate, fastest renderer or minimum hardware, and leave missing weighted architecture scores unknown"
   ],
-  "size": "one diagnostic-only Windows D3D12 bootstrap/readback lane; no title, Xenos packet/shader, renderer replacement or shared SDK repair"
+  "size": "one diagnostic-only Windows D3D12 bootstrap/readback lane; no title, Xenos packet/shader, renderer replacement or shared SDK repair",
+  "evidence": [
+    "docs/engine/gpu-bootstrap.md",
+    "tests/gpu_bootstrap/probe.cpp",
+    "tests/gpu_bootstrap/test_evidence.py"
+  ]
 }
