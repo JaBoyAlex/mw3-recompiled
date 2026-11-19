@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "profile": "conditional-store-so-v1",
+  "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+  "source": "src/codegen/builder/memory.cpp",
+  "before_sha256": "ad124de078fc2d06100b4f52c72e2932450a022fa69993b95d217e2dd8a7eeda",
+  "after_sha256": "ec2d50ea294d9f33d683c6280fd1331b7447caaad60a6fef963b613a17841ee9",
+  "patch": "atomic-so.patch",
+  "patch_sha256": "6ee793ae387d918d89890d1b9588eca0b8a5effa0ee3000866b0ab1edc60b3e3",
+  "adapter_sha256": "d79f286fbf1ab42e1742d1b660a0fde2408593363babea3ec64ef4f5aa5414ab",
+  "upstream_license_sha256": "8e065be1da2ff9a16b1f063d4636d8b67e6a654bb90583ea4332e66ac421bb18"
+}

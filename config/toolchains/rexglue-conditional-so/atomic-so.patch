@@ -1,0 +1,11 @@
+diff --git a/src/codegen/builder/memory.cpp b/src/codegen/builder/memory.cpp
+--- a/src/codegen/builder/memory.cpp
++++ b/src/codegen/builder/memory.cpp
+@@ -83,6 +83,7 @@
+       "std::memory_order_acq_rel, std::memory_order_acquire);",
+       ctx.CR(0), ptr_type, ctx.EA(), ctx.Reserved(), field, bswap_func, ctx.R(ctx.insn.operands[0]),
+       field);
++  ctx.Println("\t{}.so = {}.so;", ctx.CR(0), ctx.XER());
+ }
+ 
+ /** Emits a D-form sign extending load, `rD = sign_extend(LOAD(rA + d))`. */
