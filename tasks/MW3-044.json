@@ -1,0 +1,30 @@
+{
+  "id": "MW3-044",
+  "title": "Release XMA packet ownership during runtime teardown",
+  "phase": 2,
+  "area": "audio-lifecycle",
+  "depends_on": ["MW3-009", "MW3-042", "MW3-043"],
+  "paths": [
+    "config/toolchains/rexglue-xma",
+    "tools/prepare_runtime_xma.py",
+    "tools/test_runtime_xma.py",
+    "tests/xma",
+    "tools/verify_kernel_gate.py",
+    "docs/engine/xma-lifecycle.md"
+  ],
+  "goal": "Repair the reproduced decoder-packet leak in an isolated, verified SDK derivative before accepting real-title lifecycle teardown.",
+  "acceptance": [
+    "Retain the original LeakSanitizer failure and trace packet/buffer ownership through setup, decode and destruction; distinguish lifecycle correctness from audio playback",
+    "Provide an original minimal BSD-compatible patch bound to the exact stop-v1 parent, composition, compiler, source and package identities without modifying baseline packages",
+    "Exercise unconfigured destruction, configured destruction and repeated context-pool lifetimes using actual SDK code; retain a failing baseline control and supported native/sanitizer coverage on Windows/Linux",
+    "Reject stale or modified preparation receipts, patch composition and packages; explicitly select the repaired SDK in the controlled-title driver without disabling leak detection or weakening result checks"
+  ],
+  "validation": [
+    "Run original game-free context-lifecycle regressions with native and host sanitizers and an instrumented Linux core where supported",
+    "Run bounded owned Campaign/Multiplayer lifecycle checks on native Windows/Linux and supported host sanitizers using immutable per-attempt executables",
+    "Record exact commands, identities, failures/skips, self-review and performance implications; no playback, gameplay or full-kernel claim"
+  ],
+  "size": "bounded ownership repair; split additional defects",
+  "priority": 0,
+  "status": "todo"
+}

@@ -33,7 +33,23 @@ requires this independent generation receipt. `--sanitizers` instruments the
 maintained host code, while generated guest objects use their established
 wraparound and exact floating-point compile policy.
 
-The first implementation and native matrix are being tested. Acceptance remains
-open until both platforms and supported sanitizer cases pass. First-frame,
+The current Linux Campaign native run passes all seven cases, including
+reclaiming the entire 4.5 GiB former mapping span and recovering SDK thread
+counts from zero to zero. Each attempt retains its own executable and source
+snapshots; a serialized build cache cannot overwrite executed evidence.
+
+The first host-ASan/UBSan run fails six cases after title launch; only the
+pre-launch binding rejection passes. LeakSanitizer reports **41,991,680 bytes
+in 1,280 allocations**, originating in the 320 XMA contexts created at launch.
+A second run with slow allocation unwinding resolves the allocation stacks
+through `XMAContext::Setup`, `XMADecoder::Setup` and the APU/title launch path.
+The context destructor frees its codec and frame but omits its allocated
+packet and packet buffer. All ordinary teardown markers still appear; the
+driver correctly rejects these processes because they leak. Baseline failures
+are retained privately and must not become passing evidence by suppressing
+leak detection. MW3-044 scopes the SDK repair separately, and blocks this task.
+
+Acceptance remains open until both platforms and supported sanitizer cases
+pass with the repaired profile. First-frame,
 gameplay, original split-screen, four-player Survival, networking and renderer
 modernization retain their existing dependencies and criteria.
