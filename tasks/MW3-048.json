@@ -1,0 +1,23 @@
+{
+  "id": "MW3-048",
+  "title": "Repair conditional-store SO propagation in an isolated generator profile",
+  "phase": 2,
+  "area": "cpu-flags",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-047"],
+  "paths": ["config/toolchains/rexglue-conditional-so", "tools/prepare_ppc_flags.py", "tools/test_ppc_reservations.py", "tests/ppc_flags", "docs/engine/ppc-flags.md"],
+  "goal": "Fix the demonstrated stwcx./stdcx. CR0 SO propagation error through an explicit, immutable, generator-only derivative while retaining the independent reservation-lifetime failures and leaving startup/shared runtime packages unchanged.",
+  "acceptance": [
+    "Publish a minimal provenance-reviewed patch to the selected conditional-store emitter that copies current XER SO into CR0 on both store outcomes, with no CPU ABI, reservation-validity policy, memory ordering or kernel behavior change",
+    "Prepare a fresh private generator using the verified native memory-profile SDK/source read-only and a one-file overlay; bind exact baseline/source/patch/profile/adapter/compiler/binary identities, refuse changed or unapproved inputs, and preserve existing SDKs/generators/packages",
+    "Extend the existing reservation diagnostic with an explicit opt-in prepared-generator receipt, preserving default baseline behavior, independent oracle expectations, strict source/library/reference/completion guards and actual generated instruction execution; no game or title startup integration",
+    "Compare matched original fixed/seeded/reversed/held-out observations: SO mismatches must disappear on success and failure, unrelated observed state must remain unchanged, and remaining reservation-lifetime failures must remain failures rather than a false compatibility pass"
+  ],
+  "validation": [
+    "Run baseline and derived actual emitted instruction matrices on Windows/Linux native and supported host/generated sanitizer profiles with three independent comparable processes, reversed order, held-out seed and wrong-result/incomplete controls",
+    "Verify repeated and cross-host emission, minimal intended generated differences, unchanged loaded SDK library bytes, preserved baseline receipts and unrelated original CPU fixture emission; reject mutated patch/source/profile/receipt/binary/reference inputs",
+    "Run public checks and meaningful positive/negative preparation/selection tests, rehash retained artifacts, measure matched dispatch costs/tails with timer-resolution and instrumentation limits, and document self-review plus separate reservation repair/title-adoption prerequisites"
+  ],
+  "size": "one emitter flag assignment plus isolated opt-in preparation and existing diagnostic integration; no shared runtime adoption"
+}
