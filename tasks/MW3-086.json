@@ -1,0 +1,24 @@
+{
+  "id": "MW3-086",
+  "title": "Repair initial held-input sampling in the selected SDL3 provider",
+  "phase": 2,
+  "area": "input-snapshot",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-080", "MW3-084", "MW3-085"],
+  "paths": ["config/toolchains/rexglue-input-snapshot", "tools/prepare_runtime_input.py", "tools/test_input_users.py", "tools/test_sdk_input.py", "tests/host_platform/input_snapshot", "docs/engine/input-snapshot.md"],
+  "goal": "Repair the reproduced SDK cache-initialization gap where SDL reports already-held controls but the first assigned SDK user reads zeros, using an isolated reviewed provider profile while preserving every existing SDK package and input contract.",
+  "acceptance": [
+    "Retain MW3-085's Windows/Linux held-discovery failures and actual SDL-versus-SDK values; audit provider creation, current-state reads, event normalization and threading before choosing the minimal repair",
+    "Use an original licensed patch and a separate derived source/build/cache/package from the verified XMA profile; initialize the provider snapshot without changing guest mappings, user assignment, kernel imports, generated code or another lane's SDK",
+    "Bind exact parent/source/patch/compiler/configuration/library identities and an explicit replacement allowlist; preserve unaffected files and parents, and split any broader SDK or interface repair before implementation",
+    "Admit the new profile explicitly in the two diagnostic runners while preserving default XMA behavior; these shared runner paths are serialized after completed 084/085, not edited during their active claims",
+    "Make the unchanged held-discovery correctness case pass with actual loaded repaired-library proof; never remove the assertion, count a known failure as success or add success-valued input stubs"
+  ],
+  "validation": [
+    "Compare retained baseline and repaired native Windows/Linux results with identical original stimuli; rerun all user-routing and raw-provider cases, including held controls, packet changes, all 24 attach orders, hotplug, UI blocking, virtual rumble, stale events and wrong-routing controls",
+    "Run supported host and participating-library sanitizers, independently reconcile actual loaded library/source/binary/receipt identities and cleanup, and document unavailable instrumentation and physical hardware explicitly",
+    "Reject stale parents, wrong patch/package/replacement identities, changed unaffected files and incomplete/late/wrong outputs; run public game-free checks and record performance impact without a title benchmark claim"
+  ],
+  "size": "bounded host-provider repair and isolated profile; no title service admission"
+}
