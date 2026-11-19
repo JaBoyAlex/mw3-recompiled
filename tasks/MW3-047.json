@@ -4,9 +4,16 @@
   "phase": 2,
   "area": "cpu-reservations",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-038", "MW3-039"],
-  "paths": ["tests/ppc_reservations", "tools/test_ppc_reservations.py", "docs/engine/ppc-reservations.md"],
+  "status": "done",
+  "depends_on": [
+    "MW3-038",
+    "MW3-039"
+  ],
+  "paths": [
+    "tests/ppc_reservations",
+    "tools/test_ppc_reservations.py",
+    "docs/engine/ppc-reservations.md"
+  ],
   "goal": "Close a documented CPU-oracle investigation gap by exercising actual selected-translator word/doubleword reservation instructions with original game-free sequences and an independent state-transition oracle, retaining incompatibilities without modifying the SDK or startup harness.",
   "acceptance": [
     "Generate and execute original aligned lwarx/stwcx. and ldarx/stdcx. fixtures through the unchanged approved selected translator and native SDK; bind exact input, configuration, generator, compiler, emitted output, runner and loaded core identities",
@@ -19,5 +26,15 @@
     "Measure actual emitted instruction/sequence costs with raw samples and tails, document warmup and one-machine/instrumentation limits, and consider correctness before performance without claiming general ordering, Xenon reservation granules, full ISA or gameplay parity",
     "Run public game-free checks and positive/negative oracle/evidence guards; publish exact commands, source/package/tool/binary/receipt identities, skips, self-review status and an actionable separately scoped repair/integration handoff"
   ],
-  "size": "bounded original emitted-instruction diagnostic; no SDK repair or guest startup integration"
+  "size": "bounded original emitted-instruction diagnostic; no SDK repair or guest startup integration",
+  "evidence": [
+    "docs/engine/ppc-reservations.md records original game-free instruction inputs, independent allowed-state oracle, defined/spurious/undefined boundaries, exact package/compiler/generator/emission/runner/library/receipt hashes, failures and separate repair handoff",
+    "Eight original two-instruction fixtures execute actual selected-translator lwarx/stwcx. and ldarx/stdcx. with RA zero/indexed addressing; two emissions and Windows/Linux generated hashes match. Existing MW3-038 generator/helpers and SDK/input/startup/CPU/thread interfaces remain unchanged",
+    "Four Windows/Linux native/host-generated sanitizer profiles complete 28 processes: 20 ordinary FAIL observations and 8 expected detector PASS controls. Each ordinary process evaluates 672 cases with 240 PASS/432 FAIL, including three repeats, reversed order and held-out seed. All four commands intentionally exit 1; investigation completion is not passing CPU compatibility",
+    "Observed failures retain SO flag mismatch, fresh-context store without load-reserve, repeated store after consumed reservation, second attempt after failed conditional store, and intervening change/restore ABA acceptance. First ordinary process/profile has 768 CR, 304 reservation and 312 memory mismatch checks, overlapping within cases. No mismatched-address or general ordering/console-parity assertion is used",
+    "Fifteen Python oracle/evidence tests pass on both hosts, including permitted spurious failure, consumption on either outcome, same-value/ABA invalidation, inconclusive unexercised premise, malformed/stale/duplicate/partial/typed records, loaded-core bytes/reference changes, exact wrong-result and actual child timeout. Initial log-matching/source-development/timeout-sentinel fixture errors are retained separately",
+    "Windows calibrated UBSan traps and Linux ASan/UBSan instrument runner and generated instructions; native SDK/generator internals uninstrumented. Explicit memory release/destruction and SDK-tracked thread recovery pass; all artifact/current-source/binary/loaded-library identities rehashed. No OS allocator/race-free or hardware context-switch proof",
+    "Three independent process timing distributions per profile retain 864 load/1152 conditional-store dispatch intervals each without discarded warmup. Windows zero medians are unresolved 100 ns quantization, not zero cost; Linux native medians 24-26 ns load/27 ns store include dispatch/clock overhead, with 6305 ns load tail retained. No eligible performance winner or MW3 timing claim",
+    "Public Windows check.py Release passes 230 Python/eight skips/parser 1/1; Linux Release --sanitizers passes 230/two Windows-only skips/parser 1/1. Reserved paths and own task JSON only, no input/lead MW3-046/startup/SDK overlap or game bytes/generated guest code/SDK/keys/private logs committed. Self-review only; shared reservation repair, kernel integration and title admission require agreed follow-ups"
+  ]
 }
