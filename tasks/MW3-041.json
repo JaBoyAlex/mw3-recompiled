@@ -9,7 +9,9 @@
     "MW3-038",
     "MW3-039",
     "MW3-040",
-    "MW3-042"
+    "MW3-042",
+    "MW3-043",
+    "MW3-044"
   ],
   "paths": [
     "runtime/lifecycle",
@@ -29,5 +31,5 @@
   ],
   "size": "bounded integration; split discovered blockers",
   "priority": 0,
-  "status": "todo"
+  "status": "blocked"
 }
