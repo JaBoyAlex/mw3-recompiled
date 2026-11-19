@@ -4,9 +4,19 @@
   "phase": 2,
   "area": "input-ingress",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-080", "MW3-084", "MW3-085", "MW3-086"],
-  "paths": ["runtime/input/ingress", "tests/host_platform/input_ingress", "tools/test_input_ingress.py", "docs/engine/input-ingress.md"],
+  "status": "done",
+  "depends_on": [
+    "MW3-080",
+    "MW3-084",
+    "MW3-085",
+    "MW3-086"
+  ],
+  "paths": [
+    "runtime/input/ingress",
+    "tests/host_platform/input_ingress",
+    "tools/test_input_ingress.py",
+    "docs/engine/input-ingress.md"
+  ],
   "goal": "Compose the accepted four-slot ownership model with bounded, incarnation-tagged controller observations and explicit normalization, proving the flow through the repaired real SDL3 provider before physical backend admission.",
   "acceptance": [
     "Keep the MW3-080 API unchanged; add original C++20 ingress code with bounded storage, explicit owner reservation/join, nonzero unique sessions and connection-incarnation tokens independent of enumeration order or SDK user numbers",
@@ -20,5 +30,15 @@
     "Run repeated private Windows/Linux native, host-sanitizer and participating-library profiles with original virtual-device stimuli through the actual repaired SDK provider, checking normalized frames, held input, hotplug/reused IDs, late readings, explicit owner joins and bounded cleanup",
     "Reconcile actual loaded libraries, exact source/compiler/configuration/receipt/binary/log identities and complete nonce-bound output; reject wrong routing, stale/partial/duplicate output and late children; run python tools/check.py and report performance/coverage limits"
   ],
-  "size": "bounded host observation-to-owner seam; no physical or guest service admission"
+  "size": "bounded host observation-to-owner seam; no physical or guest service admission",
+  "evidence": [
+    "Original C++20 ControllerIngress composes unchanged MW3-080 with sixteen bounded incarnation-tagged sources and four explicitly reserved owner routes; full typed normalization, stale/source/ownership/sequence guards, neutral removal/restart and fail-closed default results; no allocation, locks, SDK or guest dependency in the component",
+    "Native eight-case Windows/Linux contracts plus exact negative/argument controls cover endpoints/intermediates, nonordinal joins, rejection immutability, removal/reused IDs, backend restart, sequence limits and a full source budget while four owners hold input; all 24 discovery orders repeated 32 times (768 synthetic scenarios)",
+    "Five actual repaired-provider SDK profiles PASS/exit 0: 70 processes, 60 positives and ten exact wrong-route controls. Held input precedes first SDK discovery; all 24 orders, hotplug/late SDK and host input, actual raw ID reuse across restart, source/owner rejections, all fifteen named controls and axis/trigger quantization are observed",
+    "All 70 nonce-bound actual provider/SDL/base records and complete or rejection cleanup footers independently reconciled with seven staged source inputs, five binaries/compile-command/CMake-cache records, exact compiler/tool/SDK receipt and tree identities; 1250 original virtual cleanup callbacks across 310 complete driver/SDL lifetimes",
+    "Pinned SDL guide events have an intentional minimum 250 ms pulse; retained six early immediate-release assertion failures across three profiles were corrected against inspected source. Final guide-only bounded waits observe source release and actual SDK release at 250-251 ms, preserve immediate assertions for fourteen other controls and never force state",
+    "Public checks PASS: 231 Python tests on Windows Release (eight existing documented skips) and Linux Release ASan/UBSan (two Windows-junction skips), parser CTest 1/1, all sixteen new synthetic/native checks. Separate Windows MSVC Release ASan ingress CTest 8/8 and exact negative control PASS; no findings in exercised coverage",
+    "Reuses existing MW3-086 preparations read-only, with per-lane staging/output/configuration/process ownership and protected output roots. Public component C++20; isolated actual-SDK adapter C++23/Clang20. Main allocation/PPC work untouched; exact commands/hashes and retained iterations in docs/engine/input-ingress.md/private ledgers",
+    "Owner self-review only; no independent review, title benchmark or distribution claim. Physical controllers, SDK input-system UI/shared/fallback policy integration, before-first-SDL-open held controls, mapping reloads, independent Linux hardware, guest/title input and gameplay remain unverified; native SDL, vptr and Windows SDK/core sanitizer limits retained; MW3-083/MW3-012 remain open"
+  ]
 }
