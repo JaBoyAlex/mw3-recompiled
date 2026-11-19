@@ -4,9 +4,16 @@
   "phase": 2,
   "area": "input-diagnostics",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-010", "MW3-080"],
-  "paths": ["tests/host_platform/sdk_input", "tools/test_sdk_input.py", "docs/engine/sdk-input.md"],
+  "status": "done",
+  "depends_on": [
+    "MW3-010",
+    "MW3-080"
+  ],
+  "paths": [
+    "tests/host_platform/sdk_input",
+    "tools/test_sdk_input.py",
+    "docs/engine/sdk-input.md"
+  ],
   "goal": "Exercise the actual selected SDK SDL3 input provider with original SDL virtual controllers before physical backend integration, retaining exact identities and diagnosed limits without modifying the SDK or the accepted slot model.",
   "acceptance": [
     "Load the real selected SDK input provider and SDL library from a verified private package; bind exact source/header/library/compiler/configuration identities and document the exercised interface and provenance",
@@ -19,5 +26,15 @@
     "Record actual loaded provider/SDL identities, exact result protocol, source and artifact hashes, retained failure logs and resource cleanup; reject deliberate wrong output and missing/late completion",
     "Run public game-free checks; report absent four-controller hardware and actual title/guest input evidence without passing MW3-083 or MW3-012"
   ],
-  "size": "bounded selected-driver diagnostics; SDK repairs and physical integration are separate"
+  "size": "bounded selected-driver diagnostics; SDK repairs and physical integration are separate",
+  "evidence": [
+    "Original SDK-facing virtual-device contracts dynamically load the actual verified SDL3 provider; four explicit original identities, independent buttons/sticks/triggers, capabilities/virtual rumble, invalid IDs, disconnect/reconnect/late events and owned cleanup; no SDK or accepted model changes",
+    "Five hash-bound private profiles PASS: Windows native and calibrated host UBSan traps; Linux/WSL native, host ASan/UBSan and participating instrumented-base profile. Fifty processes: 40 positive and ten exact wrong-result rejections; two orders per profile and four driver/SDL lifetimes in each lifetime case",
+    "Independent artifact reconciliation PASS for all 50 logs, staged compiled sources, five binaries/compile-command records and actual loaded provider/SDL/base identities; exact compiler, SDK tree, source/driver versions and private-receipt hashes in docs/engine/sdk-input.md",
+    "Windows observations retained with the prior driver hash; only the Linux expected SDL SONAME changed afterward. Auditor proves that exact one-line delta and unchanged Windows branch/compiled probe; final Linux observations use the current driver",
+    "Twelve public synthetic evidence guards PASS, including stale/partial/duplicate JSON and wrong-library rejection, wrong results and actual incomplete/late owned children; these tests do not load an SDK or certify device behavior",
+    "Public checks PASS: Windows Release 160 Python tests with eight explicit existing platform/tool/link-privilege skips and CTest 1/1; Linux Release ASan/UBSan 160 Python tests with one Windows-junction skip and CTest 1/1",
+    "Harness allocator/identity/import-thunk/SONAME failures retained and corrected without an SDK repair. Linux provider/SDL remain native even in the core profile; vptr instrumentation disabled and Windows core ASan unavailable. Physical controllers, SDK user assignment, guest input and title gameplay NOT RUN",
+    "Owner self-review only; C++23 isolated SDK adapter follows existing diagnostics while maintained core stays C++20. Original GPL fixture/driver, existing private BSD/SDL provenance, no title performance or split-screen/Survival claim; parent 083/012 remain open and active allocation/profile-storage lanes untouched"
+  ]
 }
