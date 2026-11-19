@@ -1,0 +1,11 @@
+diff --git a/src/kernel/xma/context.cpp b/src/kernel/xma/context.cpp
+--- a/src/kernel/xma/context.cpp
++++ b/src/kernel/xma/context.cpp
+@@ -50,6 +50,7 @@ XMAContext::~XMAContext() {
+   if (av_frame_) {
+     av_frame_free(&av_frame_);
+   }
++  av_packet_free(&av_packet_);
+ }
+ 
+ int XMAContext::Setup(u32 id, kernel::GuestAddressSpace* memory, u32 guest_ptr) {

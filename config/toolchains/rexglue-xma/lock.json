@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "profile": "xma-packet-v1",
+  "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+  "patch_path": "packet.patch",
+  "patch_sha256": "dac93eba6d6c4b82b16186f46a13f3b89b3dab4a6668c18f4ce9b2a7db16d05d",
+  "parent_stop_lock_sha256": "16943a9cf056f80b261dbe02205b3b7b18580716f981df9a757a2ff579c6d838"
+}

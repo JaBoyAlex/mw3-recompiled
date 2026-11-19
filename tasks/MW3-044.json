@@ -3,7 +3,11 @@
   "title": "Release XMA packet ownership during runtime teardown",
   "phase": 2,
   "area": "audio-lifecycle",
-  "depends_on": ["MW3-009", "MW3-042", "MW3-043"],
+  "depends_on": [
+    "MW3-009",
+    "MW3-042",
+    "MW3-043"
+  ],
   "paths": [
     "config/toolchains/rexglue-xma",
     "tools/prepare_runtime_xma.py",
@@ -26,5 +30,11 @@
   ],
   "size": "bounded ownership repair; split additional defects",
   "priority": 0,
-  "status": "todo"
+  "status": "done",
+  "evidence": [
+    "docs/engine/xma-lifecycle.md",
+    "config/toolchains/rexglue-xma/validation.json",
+    "tools/prepare_runtime_xma.py",
+    "tools/test_runtime_xma.py"
+  ]
 }

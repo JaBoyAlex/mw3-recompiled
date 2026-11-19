@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "task": "MW3-044",
+  "status": "PASS",
+  "implementation_commit": "158bd0c3018e30c41c7833d239928124dc15a5b0",
+  "title_manifest": "config/titles/mw3-xbox360-rev1.json",
+  "title_manifest_sha256": "d9e5e461da3ae5ca7128bde49ab1c9524c336d46923a983c92f73e3f68380b85",
+  "recipe_sha256": "1bc26a56654448d7e99d71f3a455babd89a48c780c2cf29759d3578764278bc0",
+  "sdk_preparations": [
+    {
+      "platform": "Windows",
+      "core_sanitizers": false,
+      "receipt_id": "5630f18f4eae43e68f61d7a4025e5862",
+      "receipt_sha256": "6d435da877fe2bce5eab777cf19d2aa34159f230e5a7f06e30446f6c7c2c8558",
+      "kernel_sha256": "2ac5f027dc4a0975d1dfc51440c282448057a02daa9fd3367b9d46b4a82a27f1",
+      "source_identity_sha256": "3f93b2a941986a79f0407fc6151928e72b0b0565b216a6fabfba2f993e5fc530",
+      "parent_receipt_sha256": "8b44b124e9c2fe0578e7256de42d3dd28f904316eb323a08bea328914931ff83",
+      "compiler": {
+        "archive_sha256": "8e771a685cd718303ea0d632a8a95ad7b3cb17068f3952fbefa64a77290324d8",
+        "files_sha256": "300ca7cd9b2d224ef1e57b70fa3351166047bb313de6b49ae2fbc7becbaef3d7",
+        "version": "clang version 20.1.2"
+      }
+    },
+    {
+      "platform": "Linux/WSL",
+      "core_sanitizers": false,
+      "receipt_id": "720f4ff41cab492485af32e5166fa753",
+      "receipt_sha256": "480059015ad3f14e36b972b416aa67458f016f2f5cecf23b886afd6680245c17",
+      "kernel_sha256": "006fa034d23dfc6837f4e3e05c5113ddce3478affac5a735418fb821a90b6cb9",
+      "source_identity_sha256": "f80844d9f1968b48c63c967b82fabca5b0c32b7166d5a1b669b6a0b1adcf7944",
+      "parent_receipt_sha256": "1be29426a9ca3acd8f42bfea92bac4075fd0230a06b9b0941cd879c393e5d25e",
+      "compiler": {
+        "sha256": "b15e7640bf3082f36ef14321711706b265df3058721e3c2caef3a4b83895d07d",
+        "version": "Ubuntu clang version 20.1.2 (0ubuntu1~24.04.3)"
+      }
+    },
+    {
+      "platform": "Linux/WSL",
+      "core_sanitizers": true,
+      "receipt_id": "841dee25fe7d45fca75cf68f7bdf49fd",
+      "receipt_sha256": "c076aaac19a573aa533494e8bd735bc07cfd76e570190e7fef7eddc32e3591a4",
+      "kernel_sha256": "36153ce9115cc8071b268bb0012c2f72720e9df41e287b4b877a43ade315f942",
+      "source_identity_sha256": "f80844d9f1968b48c63c967b82fabca5b0c32b7166d5a1b669b6a0b1adcf7944",
+      "parent_receipt_sha256": "8887f0c8a511f10414ef123b4ab2b0d54f3118f73b8f55a12e660a2780f08842",
+      "compiler": {
+        "sha256": "b15e7640bf3082f36ef14321711706b265df3058721e3c2caef3a4b83895d07d",
+        "version": "Ubuntu clang version 20.1.2 (0ubuntu1~24.04.3)"
+      }
+    }
+  ],
+  "suites": [
+    {
+      "label": "linux-native",
+      "directory": "428e5e6c185a4c86af207a88f9373794",
+      "receipt_sha256": "5e1a731d56be149e968d35ec3f12b07b52dc6cecb30422ae0cfe59ce759080c0",
+      "binary_sha256": "4f6489468668ac941c2e46eed89aec8764f8f1740b6be30d9a13f6301d7f4f7b",
+      "kernel_sha256": "006fa034d23dfc6837f4e3e05c5113ddce3478affac5a735418fb821a90b6cb9",
+      "statuses": {
+        "PASS": 4
+      }
+    },
+    {
+      "label": "linux-host-sanitizers",
+      "directory": "1859bdaf759a4cf0b14abc8d96564cba",
+      "receipt_sha256": "af4ff8d3fc38fbd7e1c3fc549af5e2f17567f874e915fb7123e171adfdef98f3",
+      "binary_sha256": "a0d392806301707f2e50079d6db082c23c500de6d03801f20ca7142f0c87eb30",
+      "kernel_sha256": "006fa034d23dfc6837f4e3e05c5113ddce3478affac5a735418fb821a90b6cb9",
+      "statuses": {
+        "PASS": 4
+      }
+    },
+    {
+      "label": "linux-core-sanitizers",
+      "directory": "063f2cf43a8a40368d75e181cdf74e70",
+      "receipt_sha256": "bd884b48bb36237700bd1e170be8ce3201bcf53a1585ac7596df547aa56fce52",
+      "binary_sha256": "983e12cd3268748292172f43b1b5f70a9e216f09800654540d4b3c35d8d0df8c",
+      "kernel_sha256": "36153ce9115cc8071b268bb0012c2f72720e9df41e287b4b877a43ade315f942",
+      "statuses": {
+        "PASS": 4
+      }
+    },
+    {
+      "label": "windows-native",
+      "directory": "0a6abee380b1477f8002fa78d0be87ba",
+      "receipt_sha256": "53b0e21e33420c1bd62794193a35e3d7883591a128d058c067c918358d261269",
+      "binary_sha256": "167b7660dbaee0e625c34b3b760bac59e85217ea5da6072ffb5a17735faa264d",
+      "kernel_sha256": "2ac5f027dc4a0975d1dfc51440c282448057a02daa9fd3367b9d46b4a82a27f1",
+      "statuses": {
+        "PASS": 4
+      }
+    },
+    {
+      "label": "windows-host-sanitizers",
+      "directory": "744a761552ef43399359cb542b1431ee",
+      "receipt_sha256": "04438fac59aaed56677f9e0b76c11dc8e1b295bd29f58acd03591e209a95d52f",
+      "binary_sha256": "08d7d9221869a34b9d694967dd71589a097b5de7c93b7e51e12296a50d46ac93",
+      "kernel_sha256": "2ac5f027dc4a0975d1dfc51440c282448057a02daa9fd3367b9d46b4a82a27f1",
+      "statuses": {
+        "PASS": 4
+      }
+    },
+    {
+      "label": "title-linux-sp-native",
+      "directory": "776d4c0b455b4a21856db30a7e2b5bea",
+      "receipt_sha256": "5781ea4ea949dcc663589234b5c1ce02e8105cd6ec09873e062a28f21022b764",
+      "binary_sha256": "4b272beb2aac0f5338b877d24c4f3a71519a09ac116e5bd494a88bf88d32fe30",
+      "kernel_sha256": "006fa034d23dfc6837f4e3e05c5113ddce3478affac5a735418fb821a90b6cb9",
+      "statuses": {
+        "PASS": 7
+      }
+    },
+    {
+      "label": "title-linux-sp-host-sanitizers",
+      "directory": "ef0139453b144fb6aa31278956b24c28",
+      "receipt_sha256": "9776a6db4e8246510d292d7f0a10718585f249243a6872b739b04f729f2f8898",
+      "binary_sha256": "65a5e8c951081a52b6b6ba5f4288ea6616844221dd00cb96832934739a44b871",
+      "kernel_sha256": "006fa034d23dfc6837f4e3e05c5113ddce3478affac5a735418fb821a90b6cb9",
+      "statuses": {
+        "PASS": 7
+      }
+    },
+    {
+      "label": "title-linux-mp-native",
+      "directory": "02a0945036474792a905d0887261495a",
+      "receipt_sha256": "df8ac59308892aa7fd61f15799b1dbb6f18320e6c100ed5ec903dc021f94deb7",
+      "binary_sha256": "136d78671d201b11b026214c0bbf6612ff1e584e6a915a4b0a0c4772f35ba230",
+      "kernel_sha256": "006fa034d23dfc6837f4e3e05c5113ddce3478affac5a735418fb821a90b6cb9",
+      "statuses": {
+        "PASS": 7
+      }
+    },
+    {
+      "label": "title-linux-mp-host-sanitizers",
+      "directory": "7aaf7229854f477bb871079cfb032c80",
+      "receipt_sha256": "4ac28c68e33b1d7324affcaf04e3e8bd348830891f7e3ae8ee8ef7873cd86c10",
+      "binary_sha256": "5d33b1eafc765659d267abfcaad36746eac39dd5cb08506d17917ff5d265e1e3",
+      "kernel_sha256": "006fa034d23dfc6837f4e3e05c5113ddce3478affac5a735418fb821a90b6cb9",
+      "statuses": {
+        "PASS": 7
+      }
+    },
+    {
+      "label": "title-windows-sp-native",
+      "directory": "ee777c45c5a042f894335ca657647996",
+      "receipt_sha256": "623896c3a76a2659cd4705c95118683b6f542b9f637934ab5ac6d4ce0a5b7778",
+      "binary_sha256": "d6cd2f19cdfb6cb258d07f57b415a971750d75ca4a034f451eecee20c02fa15b",
+      "kernel_sha256": "2ac5f027dc4a0975d1dfc51440c282448057a02daa9fd3367b9d46b4a82a27f1",
+      "statuses": {
+        "PASS": 7
+      }
+    },
+    {
+      "label": "title-windows-sp-host-sanitizers",
+      "directory": "41deb822fee441e6a70bf671c29790f7",
+      "receipt_sha256": "9af40641b50dd87fd3f3f5aec8bd72fc1fa6fe1360ce5a7eeffcb10162e2fa93",
+      "binary_sha256": "5ac57d56d0df31d766d8b96a7ef8d365596e5370f70e2864fc3c0cf0483ffa28",
+      "kernel_sha256": "2ac5f027dc4a0975d1dfc51440c282448057a02daa9fd3367b9d46b4a82a27f1",
+      "statuses": {
+        "PASS": 7
+      }
+    },
+    {
+      "label": "title-windows-mp-native",
+      "directory": "50c3a4fddd8e4efd89bc47477ba521a5",
+      "receipt_sha256": "ca7fa0271cbdbbc52abacac06a795673f249a830b6f1b36561eaf92debab00cf",
+      "binary_sha256": "14e416cb51e42aaaf56555453ea93cae749eaa0cd01c891c9b52036b4da17c50",
+      "kernel_sha256": "2ac5f027dc4a0975d1dfc51440c282448057a02daa9fd3367b9d46b4a82a27f1",
+      "statuses": {
+        "PASS": 7
+      }
+    },
+    {
+      "label": "title-windows-mp-host-sanitizers",
+      "directory": "40f797cbb5a04630ab2f76c78b001832",
+      "receipt_sha256": "1d989c18142bf875d6d615146c46d8525e97edeac5090dbc609e891ab4b46095",
+      "binary_sha256": "6108553c89f63dd40820caab4be40f58f1ecf80c53184ed9e8b2cd9ec0672f52",
+      "kernel_sha256": "2ac5f027dc4a0975d1dfc51440c282448057a02daa9fd3367b9d46b4a82a27f1",
+      "statuses": {
+        "PASS": 7
+      }
+    }
+  ],
+  "public_checks": {
+    "public-windows": {
+      "status": "PASS",
+      "python_tests": 116,
+      "skips": 5,
+      "log_sha256": "2e0117f11d042a508fedf2372dbfb53287d80115341bd4b59c546c1a0c779dad",
+      "native_ctest": "PASS"
+    },
+    "public-linux-sanitizers": {
+      "status": "PASS",
+      "python_tests": 118,
+      "skips": 0,
+      "log_sha256": "d1479c6ce05e4cf9d86ac5505ad84e1cbfa34ee3e508c68c74edf7b9b9b87952",
+      "native_ctest": "PASS"
+    }
+  },
+  "controls": {
+    "synthetic_baseline_receipt_sha256": "59bf75a9553d35fff39e2d5fad46b3161f5d49cf7576fd2832f26450447525c5",
+    "actual_title_baseline_receipt_sha256": "341b82a085892a8e87d2cb2e17c7ae67c45ae05b6df02202ea280b7ca401adce",
+    "actual_title_ab_inputs_equal": true,
+    "synthetic_control_statuses": [
+      "PASS",
+      "PASS",
+      "FAIL",
+      "FAIL"
+    ],
+    "actual_title_baseline_failures": 6,
+    "single_pool_leak_bytes": 41991680,
+    "single_pool_leak_allocations": 1280,
+    "four_pool_leak_bytes": 167966720,
+    "four_pool_leak_allocations": 5120,
+    "provenance_mutations_rejected": 7,
+    "mutation_receipt_sha256": "40dfe83c64bf2cb46ac6f66ecf2fa911a31628ab8014abdc0d1057d594fcd1b8"
+  },
+  "limitations": [
+    "No playable boot, frame, audio playback or gameplay acceptance",
+    "Owned checkpoints admit one audited header service and stop at guarded NtAllocateVirtualMemory",
+    "Generated guest code is not sanitizer-instrumented",
+    "Linux core profile retains native XAM; vptr instrumentation disabled",
+    "Windows core/AddressSanitizer unavailable; host UBSan traps calibrated separately",
+    "No allocation-failure injection or codec decoding accuracy claim",
+    "Self-review only"
+  ]
+}
