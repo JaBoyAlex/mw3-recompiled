@@ -1,43 +1,51 @@
-# Status — 2026-11-19
+# Status — 2026-11-23
 
-**Not playable. No menu, rendered MW3 frame or playable mode has been verified.**
-Private native Windows and Linux/WSL modules execute a bounded portion of owned
-Campaign/Multiplayer startup through one audited header service, then stop at
-guarded NtAllocateVirtualMemory. This is actual translated title execution,
-with deliberately limited service coverage. It is not a game launcher.
+**Not playable. No rendered MW3 frame, menu or playable mode is verified.**
+The immediate priority is a visible Windows Campaign boot and then one
+controllable scene, using existing runtime implementations and compatible
+MW2 components. This is static recompilation, not full source reconstruction.
+See [boot-first integration and tools](research/boot-acceleration.md).
 
-The baseline is MW3 **2011**, Xbox 360 USA/Korea Rev 1, bound to the exact
-[owned-input manifest](../config/titles/mw3-xbox360-rev1.json). The owner's
-informal “1.1” preference is not a verified title update. PC files are optional.
+## Current verified boundary
 
-## Current integration checkpoint
+MW3-046 allocation-import contracts are accepted with the MW3-091 selected-SDK
+repair. MW3-092 is merged in [PR140](https://github.com/JaBoyAlex/mw3-recompiled/pull/140)
+at `2d1ac5764b4bea20ea8e1d0d00b2265c38a9151a`. Both exact owned SP/MP modules
+execute the audited header query and one original kernel allocation, checking
+a 1 MiB reserve-only region, then stop before translated title code resumes.
+There is no observed next service, menu, frame or gameplay from that checkpoint.
 
-MW3-044 is merged in [PR 70](https://github.com/JaBoyAlex/mw3-recompiled/pull/70).
-It fixes the demonstrated XMA packet-ownership leak without changing decoding
-algorithms or admitting another guest service. Its matrix passes **56 bounded
-owned-title processes and 20 focused game-free processes**. The original
-42 MB-per-pool leak and six original title-sanitizer failures remain retained.
-All 76 processes' reported kernel-library hashes were checked. The repaired
-Campaign comparison retains identical game inputs, generation, host source and
-compiler, with the exact original SDK as parent. See
-[lifecycle evidence and limitations](engine/xma-lifecycle.md).
+The [allocation report](engine/title-allocation.md) records 246 isolated process
+cases across 28 independently audited runs: 120 allocation, 70 read-only
+inspection and 56 original-header regressions, with 246 unique nonces and
+60 actual calls including intentional post-call controls. Native Windows/Linux,
+supported host sanitizers and Linux participating-kernel sanitizers pass.
+Windows kernel sanitizers are unsupported; Linux/WSL shares the Windows machine.
+Generated guest code and retained native dependencies are outside parts of
+instrumentation. Self-review only; no independent reviewer is claimed.
 
-Public checks for that implementation pass 116 Python tests on Windows with
-five explicit LLVM/symlink skips, and 118 on Linux with no skips. Native parser
-CTest and Linux ASan/UBSan checks pass. Windows uses native runtime libraries
-and supported host UBSan traps; core ASan is unavailable. Generated guest code
-is not sanitizer-instrumented. Linux core coverage retains native XAM and
-disabled vptr instrumentation. Self-review is recorded; no independent review
-is claimed. No game-linked binaries, SDKs or private traces are published.
+Public local Windows Release and Linux Release ASan/UBSan checks each pass
+327 Python tests plus parser CTest 1/1, with 8/2 explicit platform skips. The
+final [exact-head CI run](https://github.com/JaBoyAlex/mw3-recompiled/actions/runs/45127118417)
+passes all five Windows/Linux Debug/Release and sanitizer jobs at reviewed head
+`0cdbdbaf2571cf25f28e31596167e8f8299c4ea5`. Retained failures and limitations
+remain in the subsystem report; a passing probe is not gameplay evidence.
 
-The discovered lifecycle blocker is resolved and
-[041 acceptance](gates/native-kernel.md) is merged. **The scoped
-[kernel checkpoint gate 010](gates/native-kernel-acceptance.md) passes; Phase 2
-and all product gates remain incomplete.** First-frame 011 remains an epic
-that must be split before implementation claims. Its next
-foundations are complete private content preparation (045) and allocation
-import ABI contracts (046). The current owned directory contains only the two
-XEX files. No full game-content preparation or later startup is verified.
+The source baseline remains MW3 **2011**, Xbox 360 USA/Korea Rev 1, bound to the
+[owned executable manifest](../config/titles/mw3-xbox360-rev1.json). Informal
+"1.1", disc revision, XEX version and title update remain distinct identities.
+PC files are optional. Owner console content is privately prepared by 045:
+218 files, 8,112,921,882 bytes, unchanged ISO and verified executable identities;
+see [content preparation](engine/content-preparation.md). The old minimal owned
+directory still contains only the two XEX files. Full preparation does not
+prove the title has loaded those assets through its runtime.
+
+MW3-011 remains an unfinished first-frame epic. New child 093 scopes the first
+post-allocation reserve/commit startup segment and next diagnostic stop, using
+existing SDK services. It must be separately published and claimed before
+implementation. Subsequent content/device/rendering integration remains
+unverified and must be split into bounded tasks. No unsupported calendar
+estimate is adopted as a delivery schedule.
 
 ## Completed foundation and bounded evidence
 

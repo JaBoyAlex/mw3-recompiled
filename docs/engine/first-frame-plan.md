@@ -57,3 +57,16 @@ Keep the one-call checkpoint as a regression while adding the next explicit
 boundary. Do not infer a next import from a service list or mark MW3-011 done
 without actual rendered-title evidence. Content/device services and rendering
 still need their own bounded, independently testable work.
+
+
+## Next claimed scope
+
+MW3-093 owns the existing lifecycle seam for the first post-allocation
+reserve/commit continuation. Original-code inspection identifies a following
+commit setup and heap-initialization path; inspection alone does not establish
+that path executes successfully. Admit the original SDK call only after its
+actual arguments and accessed memory are bound, then stop at the next reviewed
+diagnostic boundary. Windows Campaign probes lead development; SP/MP and
+supported platform/sanitizer regressions remain required acceptance. The
+[boot-first priority](../research/boot-acceleration.md) favors existing runtime
+and renderer code and actual startup progress. This scope does not complete011.

@@ -9,7 +9,8 @@
     "MW3-046",
     "MW3-050",
     "MW3-051",
-    "MW3-092"
+    "MW3-092",
+    "MW3-093"
   ],
   "paths": [
     "runtime/gpu",
@@ -25,7 +26,7 @@
     "Run synthetic shader/format tests",
     "Capture menu on at least NVIDIA and AMD/Intel hardware"
   ],
-  "size": "epic; first owned-title allocation checkpoint split as MW3-092; split later startup/rendering work before implementation claims",
+  "size": "epic; allocation checkpoint092 complete; startup reserve/commit continuation split as093; split subsequent services/content/rendering before implementation claims",
   "priority": 0,
   "status": "todo"
 }

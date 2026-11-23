@@ -1,6 +1,6 @@
 # Architecture decision: Xbox 360 AOT with selective native replacements
 
-Status: ReXGlue selected for private development by [MW3-008](adr/0002-runtime-selection.md). Optimization remains part of ongoing selection. Private native Windows/Linux probes execute bounded SP/MP startup through one audited header service; no playable boot is verified.
+Status: ReXGlue selected for private development by [MW3-008](adr/0002-runtime-selection.md). Optimization remains part of ongoing selection. Private native Windows/Linux probes execute bounded SP/MP startup through the audited header query and first allocation, stopping before translated guest return. No frame, menu or playable boot is verified. The immediate delivery priority is a Windows Campaign first frame/scene using existing SDK implementations; see [boot acceleration](research/boot-acceleration.md).
 
 ## Alternatives
 
