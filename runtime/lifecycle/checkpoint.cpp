@@ -164,9 +164,26 @@ bool ReservationReleased(void* address) {
 }
 }
 
+#ifdef MW3_STARTUP
+#include "startup.inc"
+#endif
+
+#ifdef MW3_STARTUP
+extern "C" void StopUnreviewedImport(const char* name, PPCContext& ctx) {
+#else
 extern "C" [[noreturn]] void StopUnreviewedImport(const char* name, PPCContext& ctx) {
+#endif
   guest_callback = true;
   PinCallingThread();
+#ifdef MW3_STARTUP
+  if (std::strcmp(name, "NtAllocateVirtualMemory") == 0 && allocation_inputs == 1) {
+    StartupInspectCommit(ctx);
+    return;
+  }
+#ifdef MW3_STARTUP_EXECUTE
+  if (std::strcmp(name, "KeGetCurrentProcessType") == 0) StartupNext(ctx);
+#endif
+#endif
 #ifdef MW3_ALLOCATION_INSPECT
   if (std::strcmp(name, "NtAllocateVirtualMemory") == 0) {
     const char* nonce = std::getenv("MW3_ALLOCATION_NONCE");
@@ -234,6 +251,10 @@ extern "C" [[noreturn]] void StopUnreviewedImport(const char* name, PPCContext& 
     }
     allocation_checked = true;
     std::fprintf(stderr, "MW3_ALLOCATION_CHECK_PASS:bytes=%08x reserved=1 committed=0 neighbours=1 nonce=%s\n", rounded, nonce);
+#ifdef MW3_STARTUP
+    StartupResumeFirst(ctx, result_base, nonce);
+    return;
+#endif
     if (mode == "allocation-bad-oracle") {
       std::fprintf(stderr, "MW3_ALLOCATION_MUTATION:allocation-bad-oracle nonce=%s\n", nonce);
       Require(result_size == rounded + 65536, "intentional allocation oracle mismatch");
@@ -342,12 +363,24 @@ int RunLifecycle(LifecycleApp& app, const rex::CLIArgList& args) {
     auto object = runtime->GetGuestMemory().Load<k::X_KTHREAD>(thread_address);
     Require(stopped_object && object && object->terminated == 1, "stopped thread metadata missing");
     Require(object->exit_status == diagnostic_code, "diagnostic exit code lost");
-    if (mode == "positive") Require(diagnostic && std::strcmp(diagnostic, "NtAllocateVirtualMemory") == 0,
+#ifdef MW3_STARTUP_EXECUTE
+    constexpr auto expected_boundary = "KeGetCurrentProcessType";
+#else
+    constexpr auto expected_boundary = "NtAllocateVirtualMemory";
+#endif
+    if (mode == "positive") Require(diagnostic && std::strcmp(diagnostic, expected_boundary) == 0,
                                     "unexpected startup boundary");
 #ifdef MW3_ALLOCATION_INSPECT
     if (mode == "positive") {
 #ifdef MW3_ALLOCATION_EXECUTE
+#ifdef MW3_STARTUP
+      Require(allocation_inputs == 2 && allocation_checked && startup_inspected, "startup inspection missing");
+#ifdef MW3_STARTUP_EXECUTE
+      Require(startup_committed && startup_heap_checked, "startup continuation missing");
+#endif
+#else
       Require(allocation_inputs == 1 && allocation_checked, "allocation checkpoint missing");
+#endif
 #else
       Require(allocation_inputs == 1 && !allocation_checked, "read-only allocation inspection missing");
 #endif

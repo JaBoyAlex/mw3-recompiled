@@ -1,72 +1,57 @@
-# First-frame foundations after allocation-import contracts
+# First-frame integration after initial heap startup
 
-MW3-046 accepts the scoped selected-kernel allocation/free contract with the
-explicit MW3-091 safety profile. It does not execute an MW3 allocation call or
-admit another title import. Content preparation 045, native synthetic D3D12
-bootstrap 050 and display-query contracts 051 are complete foundations, not
-first-frame evidence. No rendered MW3 frame, menu or playable mode is verified.
+**No rendered MW3 frame, menu or playable mode is verified.** MW3-011 remains
+an unfinished epic and must not be claimed as one implementation lane.
+The immediate priority is a visible Windows Campaign boot and then one
+controllable scene using the existing selected SDK and compatibility renderer.
+Original modes and console split-screen remain product requirements.
 
-MW3-011 remains an epic and must not be claimed as an implementation lane.
-Its completed independently testable child **MW3-092** verifies the first
-actual title allocation checkpoint; [evidence](title-allocation.md) records
-the exact identities, controls and limits. This does not complete first-frame 011.
-Later startup, content/device services and real rendering must receive their
-own bounded tasks as evidence identifies their interfaces and blockers.
+## Verified foundations and current lane
 
-## Agreed next runtime boundary
+MW3-046 accepts the scoped allocation/free import contracts with the MW3-091
+safety profile. Child [MW3-092](title-allocation.md) executes the audited header
+service and first 1 MiB reserve-only allocation, then stops before returning to
+title code. That explicit checkpoint remains a regression.
 
-MW3-092 reserves the existing lifecycle harness/driver/tests as a serial lead
-integration change, with its own per-executable call contract and report. No
-other active lane may alter these interfaces during its serialized claim.
-The existing header-only checkpoint remains explicitly available and must
-retain its bounded stop, negative controls and orderly teardown behavior.
+Claimed child [MW3-093](title-startup.md) extends the same isolated lifecycle
+seam through the following 64 KiB commit and audited heap initialization to
+the next `KeGetCurrentProcessType` call, which is not invoked. Native Windows
+SP/MP development probes reach that boundary; supported acceptance verification
+is still in progress. Its separate inspection mode stops before the commit.
+Neither child completes first-frame epic 011.
 
-The allocation lane first audits original PPC call-site argument setup and
-captures the actual pre-call values without calling the allocation export.
-It binds all observations to both exact owned executable hashes and verified
-metadata, generation, compiler and repaired SDK identities. Matching a human
-filename or a related title is not evidence for an address or ABI.
+Content preparation 045 supplies verified private full console content.
+Native synthetic D3D12 bootstrap 050 and display-query contracts 051 are
+complete foundations. They do not prove MW3 has loaded its assets or rendered
+through those interfaces. The current startup probe remains headless and uses
+the minimal two-XEX input directory.
 
-Only after that audit may an explicit new checkpoint call the original
-`NtAllocateVirtualMemory` export once under the recorded argument contract
-and bounded size policy. It checks outputs/state and stops **before returning
-to translated title code**. This avoids silently extending execution through
-unaudited data-variable accesses or further services. All other imports stay
-diagnostic stops; no successful stub substitutes for an unavailable service.
+## Next integration scope
 
-An intended reference status or field that disagrees with actual owned-title
-evidence blocks acceptance and gets a separately scoped investigation/repair.
-The lane must not force the return value, relax identity or pointer checks,
-enable the whole SDK service table, or describe this checkpoint as playable.
+Keep the existing header, first-allocation and new continuation checkpoints.
+The next serial lead task must independently inspect original instructions and
+data accesses following the observed service boundary, agree a bounded group
+of service/caller/value/output contracts, publish scope and claim the shared
+runtime paths through task-admin before extending execution. Prefer useful
+startup segments using existing implementations; repair demonstrated MW3
+mismatches rather than rebuilding a generic runtime.
 
-Private profiles, logs, binaries, generated title code and original game inputs
-remain isolated. Windows/Linux and supported sanitizer checks include teardown
-and malformed evidence; WSL on the Windows machine is not independent hardware.
-No benchmark, renderer choice change or binary-distribution right follows.
+Move toward content loading, device initialization and the existing renderer
+as actual execution identifies those interfaces. Use the prepared private
+content when the audited title path first needs it. Bind every admitted path
+to exact executable, generation, metadata, compiler, SDK and configuration
+identities. A related title's function name or address is only a hypothesis.
 
+An intended result that disagrees with owned-title evidence blocks that
+admission and gets a scoped investigation or SDK repair. Unknown services and
+indirect targets remain diagnostic; do not enable the whole SDK table, force
+success values, edit generated title code or bypass unavailable services.
 
-## Handoff after the allocation checkpoint
-
-SP and MP each pass the scoped actual allocation and immediate stop on all
-supported profiles, with the original header boundary retained. No translated
-instruction after that return has executed under this new admission. A next
-lead-owned child must first inspect the original post-call path and its data
-accesses, agree its caller/service/size/deadline contract, then claim the
-reserved lifecycle interface through task-admin before extending execution.
-Keep the one-call checkpoint as a regression while adding the next explicit
-boundary. Do not infer a next import from a service list or mark MW3-011 done
-without actual rendered-title evidence. Content/device services and rendering
-still need their own bounded, independently testable work.
-
-
-## Next claimed scope
-
-MW3-093 owns the existing lifecycle seam for the first post-allocation
-reserve/commit continuation. Original-code inspection identifies a following
-commit setup and heap-initialization path; inspection alone does not establish
-that path executes successfully. Admit the original SDK call only after its
-actual arguments and accessed memory are bound, then stop at the next reviewed
-diagnostic boundary. Windows Campaign probes lead development; SP/MP and
-supported platform/sanitizer regressions remain required acceptance. The
-[boot-first priority](../research/boot-acceleration.md) favors existing runtime
-and renderer code and actual startup progress. This scope does not complete011.
+Windows Campaign probes lead development. SP/MP and supported sanitizer/platform
+checks, negative controls and complete thread/runtime/mapping recovery are
+acceptance requirements at the completed integration boundary. WSL on the same
+Windows machine is not independent hardware. Keep private inputs, generated
+code, logs, outputs and profiles isolated; build with at most two workers and
+serialize heavy runs. No gameplay benchmark, framework speed claim or calendar
+playable date follows from these probes. See the
+[boot-first integration/tool findings](../research/boot-acceleration.md).

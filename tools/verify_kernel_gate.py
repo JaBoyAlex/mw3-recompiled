@@ -21,9 +21,151 @@ ROOT = Path(__file__).resolve().parents[1]
 HOST = ROOT / "runtime/lifecycle"
 CASES = ("positive-0", "positive-1", "positive-2", "bad-binding", "bad-pointer", "bad-oracle", "interrupt")
 ALLOCATION_CONTRACT = ROOT / "config/runtime/title-allocation.json"
+STARTUP_CONTRACT = ROOT / "config/runtime/title-startup.json"
 ALLOCATION_CASES = (*CASES, "allocation-bad-binding", "allocation-bad-pointer", "allocation-bad-oracle",
                     "allocation-incomplete", "allocation-late")
+STARTUP_CASES = (*CASES, "allocation-bad-binding", "startup-bad-caller", "startup-bad-pointer",
+                 "startup-bad-value", "startup-bad-oracle", "startup-bad-heap", "startup-incomplete", "startup-late")
 DIAGNOSTICS = ("addresssanitizer", "leaksanitizer", "undefinedbehaviorsanitizer", "runtime error:", "crash report", "exception:")
+
+
+def inspect_startup(path, expected_sha256, role, first, metadata, generation_sha256):
+    if not expected_sha256 or common.sha(path) != expected_sha256:
+        raise ValueError("startup contract differs from explicit binding")
+    contract = json.loads(path.read_text(encoding="utf-8"))
+    required = {"schema_version", "phase", "allow_commit", "call_budget", "max_commit_bytes", "generation_sha256",
+                "allocation_contract_sha256", "source_audit_manifest_sha256", "roles"}
+    if (not isinstance(contract, dict) or set(contract) != required or type(contract["schema_version"]) is not int
+            or contract["schema_version"] != 1 or contract["phase"] != "reserve-commit" or contract["allow_commit"] is not True
+            or type(contract["call_budget"]) is not int or contract["call_budget"] != 2
+            or type(contract["max_commit_bytes"]) is not int or contract["max_commit_bytes"] != 65536
+            or contract["generation_sha256"] != generation_sha256
+            or contract["allocation_contract_sha256"] != common.sha(ALLOCATION_CONTRACT)
+            or not isinstance(contract["roles"], dict) or set(contract["roles"]) != {"sp", "mp"}):
+        raise ValueError("unreviewed startup continuation policy")
+    row = contract["roles"][role]
+    integers = {"first_lr", "commit_lr", "next_lr", "commit_import", "next_import", "next_ordinal",
+                "global_base", "global_address", "global_value", "commit_size", "hint", "flags", "extra", "field"}
+    digests = {"executable_sha256", "metadata_sha256", "original_words_sha256", "llvm_sha256", "global_words_sha256", "precall_capture_manifest_sha256"}
+    if (not isinstance(row, dict) or set(row) != integers | digests
+            or any(type(row[k]) is not int or not 0 <= row[k] < 2**32 for k in integers)
+            or any(not isinstance(row[k], str) or not re.fullmatch(r"[a-f0-9]{64}", row[k]) for k in digests)
+            or not isinstance(contract["source_audit_manifest_sha256"], str)
+            or not re.fullmatch(r"[a-f0-9]{64}", contract["source_audit_manifest_sha256"])):
+        raise ValueError("incomplete startup source bindings")
+    if (row["executable_sha256"] != first["executable_sha256"] or row["metadata_sha256"] != first["metadata_sha256"]
+            or row["first_lr"] != first["lr"] or row["commit_import"] != first["import_address"]
+            or row["commit_lr"] != row["first_lr"] + 0x50 or row["next_lr"] != row["first_lr"] + 0x154
+            or row["commit_size"] != 65536 or row["hint"] != 65536 or row["flags"] != 2
+            or row["extra"] != 1460 or row["field"] != 65535
+            or row["global_base"] % 65536 or row["global_address"] % 4 or row["global_value"] != 0
+            or not row["global_base"] - 32768 <= row["global_address"] < row["global_base"]):
+        raise ValueError("startup source contract differs from audited path")
+    exports = [r for lib in metadata["import_audit"]["libraries"] for r in lib["records"]
+               if r["type"] == 1 and r["export_name"] == "KeGetCurrentProcessType"]
+    if (len(exports) != 1 or exports[0]["address"] != row["next_import"] or row["next_ordinal"] != 102
+            or exports[0]["ordinal"] != 102 or exports[0]["export_kind"] != "kFunction"):
+        raise ValueError("unreviewed next startup boundary")
+    for lr, target in ((row["commit_lr"], row["commit_import"]), (row["next_lr"], row["next_import"])):
+        if not any(r["site"] == lr - 4 and r["target"] == target for r in metadata["flow_scan"]["immediate_calls"]):
+            raise ValueError("startup caller/import metadata differs")
+    return row, contract["max_commit_bytes"]
+
+
+def startup_prefix(text, nonce, first, selected, inspect):
+    """Validate the shared reservation and second-call evidence; never invoke a title."""
+    captured = allocation_input(text, first, nonce)
+    results = re.findall(r"^MW3_ALLOCATION_RETURN:status=00000000 base=([a-f0-9]{8}) size=00100000 nonce=" + nonce + "$", text, re.MULTILINE)
+    if not captured or len(results) != 1:
+        return None
+    address = int(results[0], 16)
+    if not address or address % 65536 or address + 0x100000 > 2**32:
+        return None
+    resumes = [line for line in text.splitlines() if line.startswith("MW3_STARTUP_RESUME:")]
+    if len(resumes) != 1:
+        return None
+    resume = re.fullmatch(r"MW3_STARTUP_RESUME:reserved=([a-f0-9]{8}) hint=([a-f0-9]{8}) page=00010000 flags=([a-f0-9]{8}) extra=([a-f0-9]{8}) field=([a-f0-9]{8}) global=([a-f0-9]{8}) value=00000000 nonce=" + nonce, resumes[0])
+    if not resume or int(resume[1], 16) != address or int(resume[6], 16) != selected["global_address"]:
+        return None
+    values = [int(resume[i], 16) for i in (2, 3, 4, 5)]
+    if not inspect and values != [selected[k] for k in ("hint", "flags", "extra", "field")]:
+        return None
+    wanted = [f"MW3_ALLOCATION_ARMED:nonce={nonce}", captured, f"MW3_ALLOCATION_CALL:nonce={nonce}",
+              f"MW3_ALLOCATION_RETURN:status=00000000 base={address:08x} size=00100000 nonce={nonce}",
+              f"MW3_ALLOCATION_CHECK_PASS:bytes=00100000 reserved=1 committed=0 neighbours=1 nonce={nonce}", resumes[0]]
+    frame = int(re.search(r" r31=([a-f0-9]{8}) ", captured)[1], 16)
+    return wanted, address, frame, values[0]
+
+
+def classify_startup(case, code, text, nonce, first, selected, inspect=False):
+    if not re.fullmatch(r"[a-f0-9]{32}", nonce) or case not in STARTUP_CASES:
+        return False
+    if any(word in text.lower() for word in DIAGNOSTICS):
+        return False
+    if case in (*CASES[3:], "allocation-bad-binding"):
+        return "MW3_STARTUP_" not in text and classify_allocation(case, code, text, nonce, first)
+    if inspect and not case.startswith("positive"):
+        return False
+    lines = [line for line in text.splitlines() if line.startswith("MW3_")]
+    mode = "positive" if case.startswith("positive") else case
+    markers = [line for line in lines if line.startswith("MW3_CHECKPOINT_RUN:")]
+    if markers != [f"MW3_CHECKPOINT_RUN:case={mode} nonce={nonce}"] or not lines or lines[0] != markers[0]:
+        return False
+    if (text.count("MW3_MODULE_HEADER_AUDIT_PASS:") != 1 or
+            text.count("MW3_HEADER_ORACLE_CASE_PASS:") != 4 or text.count("MW3_HEADER_QUERY_PASS:") != 1
+            or "MW3_PROBE_UNREVIEWED_IMPORT:" in text):
+        return False
+    prefix = startup_prefix(text, nonce, first, selected, inspect)
+    if not prefix:
+        return False
+    wanted, address, frame, hint = prefix
+    early = {"startup-bad-caller": "startup commit caller mismatch",
+             "startup-bad-pointer": "startup commit pointer setup mismatch",
+             "startup-bad-value": "startup commit value setup mismatch"}
+    reason = early.get(case)
+    if reason:
+        wanted.append(f"MW3_STARTUP_MUTATION:{case} nonce={nonce}")
+    else:
+        size = (hint or 65536) if inspect else selected["commit_size"]
+        if frame + 344 > 2**32 or not 0 < size <= 65536:
+            return False
+        wanted.append(f"MW3_STARTUP_INPUT:lr={selected['commit_lr']:08x} r31={frame:08x} base_word={frame + 84:08x} size_word={frame + 332:08x} base={address:08x} size={size:08x} type=60001000 protect=00000004 region=00000000 nonce={nonce}")
+        if inspect:
+            wanted.append(f"MW3_STARTUP_STOP:before_commit=1 nonce={nonce}")
+        else:
+            wanted.extend([f"MW3_STARTUP_COMMIT_CALL:nonce={nonce}",
+                           f"MW3_STARTUP_COMMIT_RETURN:status=00000000 base={address:08x} size={size:08x} nonce={nonce}",
+                           f"MW3_STARTUP_COMMIT_CHECK_PASS:bytes={size:08x} pages={size // 4096} zero=1 neighbours=1 tail_reserved=1 nonce={nonce}"])
+            if case == "startup-bad-oracle":
+                reason = "intentional startup commit oracle mismatch"
+                wanted.append(f"MW3_STARTUP_MUTATION:{case} nonce={nonce}")
+            else:
+                wanted.append(f"MW3_STARTUP_HEAP_CHECK_PASS:markers=1 links=8 global=1 nonce={nonce}")
+                if case in ("startup-bad-heap", "startup-incomplete", "startup-late"):
+                    wanted.append(f"MW3_STARTUP_MUTATION:{case} nonce={nonce}")
+                if case == "startup-bad-heap":
+                    reason = "intentional startup heap oracle mismatch"
+                elif case != "startup-late":
+                    wanted.append(f"MW3_STARTUP_STOP:service=KeGetCurrentProcessType lr={selected['next_lr']:08x} before_call=1 nonce={nonce}")
+    events = [line for line in lines if line.startswith(("MW3_ALLOCATION_", "MW3_STARTUP_"))]
+    if events != wanted:
+        return False
+    if any(i >= lines.index(wanted[0]) for i, line in enumerate(lines)
+           if line.startswith(("MW3_HEADER_", "MW3_MODULE_HEADER_AUDIT_"))):
+        return False
+    lifecycle = [i for i, line in enumerate(lines) if line.startswith("MW3_LIFECYCLE_")]
+    if lifecycle and min(lifecycle) <= lines.index(wanted[-1]):
+        return False
+    rejects = re.findall(r"^MW3_LIFECYCLE_REJECT:(.*)$", text, re.MULTILINE)
+    if case == "startup-late":
+        return code == -999 and not lifecycle
+    if rejects != ([reason] if reason else []):
+        return False
+    return recovered(code, text, 87 if reason else 86, complete=case != "startup-incomplete")
+
+
+def classify_startup_inspect(case, code, text, nonce, first, selected):
+    return classify_startup(case, code, text, nonce, first, selected, inspect=True)
 
 
 def inspect_contract(path, expected_sha256, role, identity, metadata, generation_sha256):
@@ -217,7 +359,7 @@ def classify(case, code, text):
     return rejects == [reason] and metadata_checked and "MW3_HEADER_QUERY_PASS:" not in text
 
 
-def controlled_traps(metadata, prefix, expected_count, allocation_guard=False):
+def controlled_traps(metadata, prefix, expected_count, allocation_guard=False, startup=False):
     source, address = audit.guarded_traps(metadata, prefix, expected_count)
     expression = re.compile(
         r'extern "C" void __imp__(\w+)\(PPCContext& ctx, u8\*\) \{ [^\n]+std::_Exit\(86\); \}')
@@ -231,7 +373,8 @@ def controlled_traps(metadata, prefix, expected_count, allocation_guard=False):
     source = expression.sub(replace, source)
     if len(changed) != expected_count - 1 or "std::_Exit" in source:
         raise ValueError("unrecognized audited import-stop template")
-    declaration = 'extern "C" [[noreturn]] void StopUnreviewedImport(const char*,PPCContext&);\n'
+    declaration = ('extern "C" void StopUnreviewedImport(const char*,PPCContext&);\n' if startup
+                   else 'extern "C" [[noreturn]] void StopUnreviewedImport(const char*,PPCContext&);\n')
     first, remainder = source.split("\n", 1)
     source = first + "\n" + declaration + remainder
     if allocation_guard:
@@ -254,15 +397,16 @@ def main():
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--role", choices=("sp", "mp"), required=True)
     parser.add_argument("--sdk-profile", choices=("stop", "xma", "memory-imports"), default="stop")
-    parser.add_argument("--checkpoint", choices=("header", "allocation-inspect", "allocation"), default="header")
+    parser.add_argument("--checkpoint", choices=("header", "allocation-inspect", "allocation", "startup-inspect", "startup"), default="header")
     parser.add_argument("--expected-allocation-contract-sha256")
-    parser.add_argument("--cases", nargs="+", choices=ALLOCATION_CASES)
+    parser.add_argument("--expected-startup-contract-sha256")
+    parser.add_argument("--cases", nargs="+", choices=tuple(dict.fromkeys((*ALLOCATION_CASES, *STARTUP_CASES))))
     parser.add_argument("--generation", type=Path, help="immutable generation receipt, required on Windows")
     parser.add_argument("--expected-generation-sha256")
     parser.add_argument("--sanitizers", action="store_true")
     args = parser.parse_args()
     if args.cases is None:
-        args.cases = ALLOCATION_CASES if args.checkpoint == "allocation" else CASES
+        args.cases = STARTUP_CASES if args.checkpoint == "startup" else ALLOCATION_CASES if args.checkpoint == "allocation" else CASES
     verifier = {"xma": xma, "stop": stop, "memory-imports": memory_imports}[args.sdk_profile]
     output = None
     report = dict(schema_version=1, status="IN_PROGRESS", playable=False, guest_executed=False,
@@ -284,14 +428,17 @@ def main():
         identity = common.verify(owned, json.loads(common.DEFAULT.read_text()))
         if len(set(args.cases)) != len(args.cases):
             raise ValueError("duplicate lifecycle case")
-        if args.checkpoint != "allocation" and any(case not in CASES for case in args.cases):
-            raise ValueError("allocation mutation requires the allocation checkpoint")
+        allowed = STARTUP_CASES if args.checkpoint == "startup" else ALLOCATION_CASES if args.checkpoint == "allocation" else CASES
+        if any(case not in allowed for case in args.cases):
+            raise ValueError("mutation requires its reviewed checkpoint")
         if args.checkpoint != "header" and (args.sdk_profile != "memory-imports" or not args.generation):
             raise ValueError("allocation inspection requires explicit repaired SDK and generation")
         if args.checkpoint != "header":
             for task in ("046", "091"):
                 if json.loads((ROOT / f"tasks/MW3-{task}.json").read_text())["status"] != "done":
                     raise ValueError("unfinished allocation contract/repair dependency")
+            if args.checkpoint.startswith("startup") and json.loads((ROOT / "tasks/MW3-092.json").read_text())["status"] != "done":
+                raise ValueError("unfinished first-allocation dependency")
         if verifier is memory_imports:
             sdk, evidence = verifier.verify_prepared(args.root.resolve(), args.sdk_report, allow_sanitized=args.sanitizers)
         else:
@@ -321,7 +468,7 @@ def main():
             raise ValueError("unreviewed analysis metadata")
         prefix = "mw3_" + args.role
         traps, address = controlled_traps(json.loads(metadata.read_text()), prefix, analysis[args.role]["function_imports"],
-                                          allocation_guard=args.checkpoint == "allocation")
+                                          allocation_guard=args.checkpoint in ("allocation", "startup"), startup=args.checkpoint.startswith("startup"))
         definitions = f"#pragma once\n#define MW3_MODULE_HANDLE_IMPORT {hex(address)}u\n"
         selected = None
         if args.checkpoint != "header":
@@ -333,7 +480,7 @@ def main():
             definitions += (f"#define MW3_ALLOCATION_VALUES 1\n#define MW3_ALLOCATION_INITIAL_BASE {hex(selected['initial_base'])}u\n"
                             f"#define MW3_ALLOCATION_INITIAL_SIZE {hex(selected['initial_size'])}u\n"
                             f"#define MW3_ALLOCATION_REGION {hex(selected['region'])}u\n")
-            if args.checkpoint == "allocation":
+            if args.checkpoint in ("allocation", "startup-inspect", "startup"):
                 limit = json.loads(ALLOCATION_CONTRACT.read_text())["max_requested_bytes"]
                 definitions += f"#define MW3_ALLOCATION_EXECUTE 1\n#define MW3_ALLOCATION_LIMIT {limit}u\n"
                 private_header = args.root.resolve() / "sources/rexglue-memory-imports/src/kernel/test_access.h"
@@ -341,6 +488,19 @@ def main():
                 definitions += '#define MW3_SDK_TEST_ACCESS_HEADER "' + private_header.as_posix() + '"\n'
             report["supporting_sources"][str(ALLOCATION_CONTRACT.relative_to(ROOT))] = common.sha(ALLOCATION_CONTRACT)
             report["allocation_contract_sha256"] = common.sha(ALLOCATION_CONTRACT)
+        startup_selected = None
+        if args.checkpoint.startswith("startup"):
+            startup_selected, startup_limit = inspect_startup(STARTUP_CONTRACT, args.expected_startup_contract_sha256,
+                args.role, selected, json.loads(metadata.read_text()), common.sha(args.generation))
+            definitions += f"#define MW3_STARTUP 1\n#define MW3_STARTUP_LIMIT {startup_limit}u\n"
+            for name, key in (("COMMIT_LR", "commit_lr"), ("GLOBAL_BASE", "global_base"),
+                              ("GLOBAL_ADDRESS", "global_address"), ("GLOBAL_VALUE", "global_value"), ("NEXT_LR", "next_lr"),
+                              ("SIZE", "commit_size"), ("HINT", "hint"), ("FLAGS", "flags"), ("EXTRA", "extra"), ("FIELD", "field")):
+                definitions += f"#define MW3_STARTUP_{name} {hex(startup_selected[key])}u\n"
+            if args.checkpoint == "startup":
+                definitions += "#define MW3_STARTUP_EXECUTE 1\n"
+            report["startup_contract_sha256"] = common.sha(STARTUP_CONTRACT)
+            report["supporting_sources"][str(STARTUP_CONTRACT.relative_to(ROOT))] = common.sha(STARTUP_CONTRACT)
         output = probe_output(args.output_root, owned, args.root.resolve(), sdk, args.sdk_report, args.metadata, args.generation)
         output.mkdir(parents=True)
         print(json.dumps(dict(output=str(output))), flush=True)
@@ -348,6 +508,8 @@ def main():
         shutil.copy2(__file__, output / "maintained-driver.py")
         if selected:
             shutil.copy2(ALLOCATION_CONTRACT, output / "allocation-contract.json")
+        if startup_selected:
+            shutil.copy2(STARTUP_CONTRACT, output / "startup-contract.json")
         if generation is None:
             common.generate(output, sdk, owned, recipe)
             payload = output / "payload"
@@ -433,12 +595,14 @@ def main():
             with (lane / "run.log").open("wb") as log:
                 try:
                     code = subprocess.run(command, cwd=execution, env=child, stdout=log, stderr=subprocess.STDOUT,
-                                          timeout=5 if case == "allocation-late" else 30).returncode
+                                          timeout=5 if case in ("allocation-late", "startup-late") else 30).returncode
                 except subprocess.TimeoutExpired:
                     code = -999
             text = (lane / "run.log").read_text(errors="replace")
             if args.checkpoint == "header":
                 accepted = classify(case, code, text)
+            elif args.checkpoint.startswith("startup"):
+                accepted = classify_startup(case, code, text, nonce, selected, startup_selected, inspect=args.checkpoint == "startup-inspect")
             elif args.checkpoint == "allocation-inspect":
                 accepted = classify_allocation(case, code, text, nonce, selected, inspect=True)
             else:
@@ -474,6 +638,8 @@ def main():
             raise ValueError("private trap/data/generation identity changed")
         if "sdk_private_header" in report and common.sha(Path(report["sdk_private_header"]["path"])) != report["sdk_private_header"]["sha256"]:
             raise ValueError("private SDK diagnostic header changed")
+        if startup_selected and common.sha(output / "startup-contract.json") != report["startup_contract_sha256"]:
+            raise ValueError("private startup contract changed")
         common.verify(owned, json.loads(common.DEFAULT.read_text()))
         if common.snapshot(payload) != generation["files"]:
             raise ValueError("generated payload changed")
