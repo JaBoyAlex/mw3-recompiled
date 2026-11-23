@@ -1,0 +1,34 @@
+{
+  "id": "MW3-093",
+  "title": "Advance owned-title startup through the initial reserve/commit pair",
+  "phase": 2,
+  "area": "startup-continuation",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": [
+    "MW3-092"
+  ],
+  "paths": [
+    "runtime/lifecycle",
+    "tools/verify_kernel_gate.py",
+    "tests/lifecycle",
+    "config/runtime/title-startup.json",
+    "docs/engine/title-startup.md",
+    "docs/engine/first-frame-plan.md",
+    "docs/STATUS.md"
+  ],
+  "goal": "Reuse the verified selected SDK to return from the audited first allocation, capture and admit the following bounded commit call, execute the reviewed heap-initialization path and stop at the next unadmitted service; preserve existing checkpoints and prioritize actual boot progress.",
+  "acceptance": [
+    "Bind exact executable/metadata/generation/compiler/SDK identities; independently audit original post-allocation PPC, branch targets, memory accesses, second-call setup and next diagnostic boundary before admitting each additional operation",
+    "Add explicit staged continuation inspection and execution modes with exact caller/value contracts, allocation/call/byte/deadline budgets, complete in/out and neighbouring-byte checks, and the original verified kernel export; keep unknown functions/indirect branches diagnostic and never use successful stubs or edit generated guest code",
+    "Validate reserve-to-commit output, allocation geometry, committed edge/access/accounting and unchanged unrelated state against an independent selected-fork oracle; audit executed title data accesses and capture the actual next service/caller without invoking it",
+    "Demonstrate bounded actual SP/MP startup progress with stopped-thread/runtime/mapping recovery on native Windows/Linux and supported sanitizer profiles; retain the historical header and first-allocation behaviors as explicit regressions",
+    "Reject changed identities, caller/argument/binding/pointer/result contracts, stale/reordered/incomplete/late evidence; preserve failures and split any demonstrated SDK defect; publish source-only evidence and keep first-frame/menu/playable gates incomplete"
+  ],
+  "validation": [
+    "Use focused Windows Campaign probes for development feedback, then repeated SP/MP acceptance and meaningful negative controls on supported native/host/core profiles with at most two build workers and one GPU-heavy suite per machine",
+    "Run public protocol/configuration/output-isolation tests, python tools/check.py and relevant supported platform/sanitizer checks; separately re-audit artifacts, actual loaded libraries and immutable input/generation/config/source identities",
+    "Report exact commands, observed next boundary, counts/hashes, retained failures/skips, resource budgets, performance impact and self-review; do not equate a passing probe or synthetic renderer with a playable test"
+  ],
+  "size": "bounded first reserve/commit startup segment and next-service stop; no new renderer, broad service allowlist or gameplay implementation"
+}

@@ -1,6 +1,10 @@
 # mw3-recompiled agent contract
 
-Read [STATUS](docs/STATUS.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [contribution workflow](CONTRIBUTING.md) before choosing work. This is MW3 **2011**, Xbox 360 Rev 1 as supplied by the owner, targeting native Windows PC. Private native Windows/Linux probes execute bounded SP/MP startup through one audited header service to guarded NtAllocateVirtualMemory; no playable boot is verified. PC game files are optional. "1.1", disc revision, XEX version and title update are different identities; do not conflate them.
+Read [STATUS](docs/STATUS.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [contribution workflow](CONTRIBUTING.md) before choosing work. This is MW3 **2011**, Xbox 360 Rev 1 as supplied by the owner, targeting native Windows PC. Private native Windows/Linux probes execute bounded SP/MP startup through the audited header service and one verified allocation, then stop before translated title execution resumes; no playable boot is verified. PC game files are optional. "1.1", disc revision, XEX version and title update are different identities; do not conflate them.
+
+## Immediate boot priority
+
+Prioritize a visible Windows Campaign boot and then one controllable scene using the existing selected SDK and compatible MW2 components. Reuse implemented services and the compatibility graphics backend; repair demonstrated MW3 mismatches rather than rebuilding a generic runtime. Keep original modes and split-screen as product requirements. Use focused bounded probes while developing, then the required supported regression/sanitizer/platform matrix at a completed integration boundary. Unknown imports still fail diagnostically. Time-box exploratory work and report actual boot milestones/blockers; no calendar estimate or passing test count establishes playability.
 
 ## Decide and measure
 

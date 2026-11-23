@@ -21,6 +21,12 @@ After 009, kernel milestone 010 is split into scoped tasks 036–041. Header-ser
 
 If the bakeoff shows MW2 adaptation costs more than a shared runtime, choose the shared runtime. If a native rendering seam yields no net quality/performance/maintenance benefit, keep the compatibility backend. If vendor/Steam rights cannot be obtained, state the gap and seek an owner decision on product scope instead of mislabeling a substitute as the requested feature.
 
+## Immediate boot-first integration
+
+Owner direction, 2026-11-23: prioritize a visible Windows Campaign boot and one controllable scene. The first allocation checkpoint092 is complete; child093 advances the existing SDK through the initial reserve/commit segment. Extend bounded startup toward content and the existing compatibility renderer, fixing actual incompatibilities. Preserve SP/MP and original split-screen requirements while using focused Campaign probes for development. Full supported checks remain acceptance requirements.
+
+A short exploratory work budget is not a promised playable date. Report the last actual title boundary/frame and concrete remaining blockers. The earlier conversational month range was unsupported and is not a project schedule. Review [candidate acceleration tools](research/boot-acceleration.md) at a concrete integration need; no framework pivot or performance claim follows from documentation alone.
+
 ## Deferred community interoperability consideration
 
 The owner identified possible long-term interoperability with existing MW3 multiplayer communities, particularly **Plutonium IW5** and **XLink Kai**, with **Open-IW5** as a potential technical reference. This is future product context, not a change to current priorities or an added release requirement.
