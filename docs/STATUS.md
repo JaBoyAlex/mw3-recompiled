@@ -8,44 +8,53 @@ See [boot-first integration and tools](research/boot-acceleration.md).
 
 ## Current verified boundary
 
-MW3-046 allocation-import contracts are accepted with the MW3-091 selected-SDK
-repair. MW3-092 is merged in [PR140](https://github.com/JaBoyAlex/mw3-recompiled/pull/140)
-at `2d1ac5764b4bea20ea8e1d0d00b2265c38a9151a`. Both exact owned SP/MP modules
-execute the audited header query and one original kernel allocation, checking
-a 1 MiB reserve-only region, then stop before translated title code resumes.
-There is no observed next service, menu, frame or gameplay from that checkpoint.
+[MW3-093 / PR143](https://github.com/JaBoyAlex/mw3-recompiled/pull/143) advances
+both exact owned SP/MP modules through the audited header service, initial
+1 MiB reservation, following 64 KiB commit and title heap initialization.
+Execution stops **before calling `KeGetCurrentProcessType`**, at independently
+audited SP/MP callers. There is no rendered frame, menu or playable boot.
+The existing MW3-091 selected SDK supplies the real allocation export; no new
+SDK repair, imported data variable, renderer or successful stub is added.
 
-The [allocation report](engine/title-allocation.md) records 246 isolated process
-cases across 28 independently audited runs: 120 allocation, 70 read-only
-inspection and 56 original-header regressions, with 246 unique nonces and
-60 actual calls including intentional post-call controls. Native Windows/Linux,
-supported host sanitizers and Linux participating-kernel sanitizers pass.
-Windows kernel sanitizers are unsupported; Linux/WSL shares the Windows machine.
-Generated guest code and retained native dependencies are outside parts of
-instrumentation. Self-review only; no independent reviewer is claimed.
+The [continuation report](engine/title-startup.md) records 206 isolated process
+cases across 22 separately audited runs: 150 continuation, 48 historical
+first-allocation, four header-only and four continuation-inspection cases,
+with 206 unique nonces and 198 actual allocation calls including deliberate
+post-call controls. Native Windows/Linux, supported host sanitizers and Linux
+participating-kernel sanitizers pass. Intentional deadline controls establish
+their valid baseline and make no recovery claim; all other cases check mapping
+release and host-thread counts. Pre-launch binding controls do not launch a
+guest thread. Historical regressions here use the selected memory-imports SDK
+on native hosts; prior 092 sanitizer/original-XMA evidence is retained separately.
 
 Public local Windows Release and Linux Release ASan/UBSan checks each pass
-327 Python tests plus parser CTest 1/1, with 8/2 explicit platform skips. The
-final [exact-head CI run](https://github.com/JaBoyAlex/mw3-recompiled/actions/runs/45127118417)
-passes all five Windows/Linux Debug/Release and sanitizer jobs at reviewed head
-`0cdbdbaf2571cf25f28e31596167e8f8299c4ea5`. Retained failures and limitations
-remain in the subsystem report; a passing probe is not gameplay evidence.
+338 Python tests plus parser CTest 1/1, with 8/2 explicit platform skips.
+Three direct stale-hash CLI controls refuse execution before output. Exact-head
+public CI and review are recorded on the linked PR and are required for merge.
+Windows kernel sanitizers are unsupported; Linux/WSL shares the Windows machine.
+Generated guest code and retained dependencies are outside parts of
+instrumentation. Self-review only; no independent reviewer is claimed.
+
+The previous [MW3-092 allocation checkpoint](engine/title-allocation.md), merged
+in [PR140](https://github.com/JaBoyAlex/mw3-recompiled/pull/140), remains an
+explicit regression and stops before returning from the first reserve. Its
+separate report retains earlier evidence and failures. Passing either bounded
+probe does not establish gameplay or general retail ABI parity.
 
 The source baseline remains MW3 **2011**, Xbox 360 USA/Korea Rev 1, bound to the
 [owned executable manifest](../config/titles/mw3-xbox360-rev1.json). Informal
 "1.1", disc revision, XEX version and title update remain distinct identities.
 PC files are optional. Owner console content is privately prepared by 045:
 218 files, 8,112,921,882 bytes, unchanged ISO and verified executable identities;
-see [content preparation](engine/content-preparation.md). The old minimal owned
-directory still contains only the two XEX files. Full preparation does not
-prove the title has loaded those assets through its runtime.
+see [content preparation](engine/content-preparation.md). This startup probe
+still uses the minimal two-XEX directory; full preparation does not prove
+the title has loaded those assets through its runtime.
 
-MW3-011 remains an unfinished first-frame epic. New child 093 scopes the first
-post-allocation reserve/commit startup segment and next diagnostic stop, using
-existing SDK services. It must be separately published and claimed before
-implementation. Subsequent content/device/rendering integration remains
-unverified and must be split into bounded tasks. No unsupported calendar
-estimate is adopted as a delivery schedule.
+MW3-011 remains an unfinished first-frame epic. The next serial integration
+task must audit and scope the following bounded service segment before claiming
+the shared runtime paths. Reuse existing SDK services toward content/device/
+rendering integration, preserving modes and split-screen requirements. No
+unsupported calendar estimate is adopted as a delivery schedule.
 
 ## Completed foundation and bounded evidence
 

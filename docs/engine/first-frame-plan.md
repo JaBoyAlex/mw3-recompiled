@@ -13,11 +13,11 @@ safety profile. Child [MW3-092](title-allocation.md) executes the audited header
 service and first 1 MiB reserve-only allocation, then stops before returning to
 title code. That explicit checkpoint remains a regression.
 
-Claimed child [MW3-093](title-startup.md) extends the same isolated lifecycle
+Completed child [MW3-093](title-startup.md) extends the same isolated lifecycle
 seam through the following 64 KiB commit and audited heap initialization to
-the next `KeGetCurrentProcessType` call, which is not invoked. Native Windows
-SP/MP development probes reach that boundary; supported acceptance verification
-is still in progress. Its separate inspection mode stops before the commit.
+the next `KeGetCurrentProcessType` call, which is not invoked. SP/MP acceptance
+probes reach that boundary on native hosts and supported sanitizer profiles,
+with separate artifact review. Its inspection mode stops before the commit.
 Neither child completes first-frame epic 011.
 
 Content preparation 045 supplies verified private full console content.
