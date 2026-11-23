@@ -7,8 +7,9 @@ bootstrap 050 and display-query contracts 051 are complete foundations, not
 first-frame evidence. No rendered MW3 frame, menu or playable mode is verified.
 
 MW3-011 remains an epic and must not be claimed as an implementation lane.
-Its next independently testable child is **MW3-092**, the first actual title
-allocation checkpoint. Completing that child cannot complete first-frame 011.
+Its completed independently testable child **MW3-092** verifies the first
+actual title allocation checkpoint; [evidence](title-allocation.md) records
+the exact identities, controls and limits. This does not complete first-frame 011.
 Later startup, content/device services and real rendering must receive their
 own bounded tasks as evidence identifies their interfaces and blockers.
 
@@ -42,3 +43,17 @@ Private profiles, logs, binaries, generated title code and original game inputs
 remain isolated. Windows/Linux and supported sanitizer checks include teardown
 and malformed evidence; WSL on the Windows machine is not independent hardware.
 No benchmark, renderer choice change or binary-distribution right follows.
+
+
+## Handoff after the allocation checkpoint
+
+SP and MP each pass the scoped actual allocation and immediate stop on all
+supported profiles, with the original header boundary retained. No translated
+instruction after that return has executed under this new admission. A next
+lead-owned child must first inspect the original post-call path and its data
+accesses, agree its caller/service/size/deadline contract, then claim the
+reserved lifecycle interface through task-admin before extending execution.
+Keep the one-call checkpoint as a regression while adding the next explicit
+boundary. Do not infer a next import from a service list or mark MW3-011 done
+without actual rendered-title evidence. Content/device services and rendering
+still need their own bounded, independently testable work.

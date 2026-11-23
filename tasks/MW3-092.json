@@ -4,8 +4,11 @@
   "phase": 2,
   "area": "startup-allocation",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-010", "MW3-046"],
+  "status": "done",
+  "depends_on": [
+    "MW3-010",
+    "MW3-046"
+  ],
   "paths": [
     "runtime/lifecycle",
     "tools/verify_kernel_gate.py",
@@ -27,5 +30,17 @@
     "Run the existing bounded header-only title regressions plus public synthetic protocol/configuration/mutation/output-isolation guards and python tools/check.py with relevant supported platform/sanitizer checks",
     "Record exact commands, matched baseline and revised source/compiler/config/SDK/generation/binary/log hashes, resource budgets, skips, retained failures, provenance and self-review; stop and split any new SDK or guest-service defect rather than widening admission"
   ],
-  "size": "bounded first actual allocation call plus immediate diagnostic teardown; later title startup and rendering remain separate"
+  "size": "bounded first actual allocation call plus immediate diagnostic teardown; later title startup and rendering remain separate",
+  "evidence": [
+    "docs/engine/title-allocation.md",
+    "config/runtime/title-allocation.json",
+    "tests/lifecycle/test_allocation.py",
+    "Serialized task-admin claim45115127206 succeeded for issue139 with dependencies10/75 closed before implementation; agreed scope split from first-frame epic011 in PR138",
+    "Original PPC call-site loader/LLVM audit and separate read-only SP/MP captures bind both exact Rev1 executable hashes, ordinal0xcc, callers, argument setup and observed zero-base/1MiB/reserve-only request before admission",
+    "Explicit verified memory-imports allocation checkpoint invokes the original actual kernel once and independently checks endian/status/64KiB geometry, both reserved-only edges, inaccessible spans, title-page accounting and neighbouring bytes, then stops before translated guest return; no generated guest edits or successful stubs",
+    "246 isolated process cases PASS across28 separately audited Windows/Linux native, host-sanitized and supported Linux participating-kernel suites:120 allocation,70 read-only inspection and56 original-XMA header regressions;246 unique nonces and60 actual calls including intentional post-call controls",
+    "Binding/pointer/oracle/incomplete/deadline controls and12 real pre-output identity refusals PASS; a deliberate live driver mutation rejected its development run and is excluded from acceptance; original header classifier AST/CMake unchanged and all artifacts/loaded modules rechecked",
+    "14 focused synthetic lifecycle guards PASS; Windows Release and Linux Release ASanUBSan each327 Python tests with8/2 explicit skips and parserCTest1/1;67-task DAG plus artifact/provenance/diff review pass; exact commands, hashes, retained failures and self-review in report",
+    "Bounded first allocation only: no guest return, next import, unreviewed data-variable admission, rendered frame, menu, playable boot, retail ABI parity, performance benchmark or distribution claim. Windows core sanitizers unsupported; native dependencies, disabled vptr and same-machine WSL limits retained. MW3-011 remains unfinished; self-review only"
+  ]
 }
