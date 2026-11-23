@@ -4,7 +4,7 @@
   "phase": 2,
   "area": "controller-adapter",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "depends_on": [
     "MW3-080",
     "MW3-084",
@@ -33,5 +33,14 @@
     "Test complete output/library/source/receipt checks, changed/wrong routing, malformed or partial results and late children; run python tools/check.py and report actual skips, retained failures, missing physical hardware and performance limits",
     "Confirm physical-controller task MW3-083 remains open and no GPU/title/service or gameplay gate changes; update only this task's completion evidence and subsystem report after exact-head public checks and transparent review"
   ],
-  "size": "bounded actual-SDL adapter with virtual-device evidence; physical device and translated-title acceptance remain separate"
+  "size": "bounded actual-SDL adapter with virtual-device evidence; physical device and translated-title acceptance remain separate",
+  "evidence": [
+    "C++20 SDL-only host adapter reuses pinned GPL MW2 SDL handling with attribution while preserving unchanged MW3-080/087 APIs: sixteen source entries, explicit owner joins/incarnations/sequences, complete control conversion, diagnostic cleanup and bounded owned rumble/lifecycle; no SDK/provider/kernel/guest interfaces change",
+    "Five actual-library profiles PASS: Windows native and host UBSan trap, Linux native, host ASanUBSan with native SDL, and host plus participating SDL ASanUBSan; all use read-only separately sealed MW3-090 repaired SDL profiles and exact loaded module/source/tool/config/binary identities",
+    "135 owned processes: 120 ordinary successes and 15 expected wrong-route/incomplete/deadline rejections; all 24 discovery orders, held first read, fifteen named controls, four independent owners, hotplug/restart, stale routes, actual rumble callbacks, seventeenth-device budget and caller lifetime/event/thread contracts tested",
+    "130 complete typed nonce records reconcile 2110 created/cleaned callbacks, 4130 checked slot reads, 230 stale/wrong-owner rejections, 120 rumble callbacks and 60 motor-stop callbacks; incomplete records contribute no invented counts and deadline children prove valid output alone insufficient",
+    "Public WindowsRelease/LinuxReleaseASanUBSan checks PASS: 298 Python tests each, eight/two existing skips, parser CTest1/1; ten new Python checks include four native conversion CTests with exhaustive axes/triggers, deliberate wrong neutral, argument and protocol/source/output/actual late-child guards",
+    "Separate same-owner artifact audit rehashes all five profiles and current/staged sources, helpers, tools, caches, binaries, libraries/packages/source and all logs; transparent owner self-review, no independent reviewer claim; initial held-trigger/path/development-source failures retained and separately repaired",
+    "No physical hardware or title input acceptance: MW3-083 remains open; no guest service, GPU, mode, playable boot, SDK provider adoption or performance claim. Windows participating SDL sanitizers and independent Linux hardware remain unverified; exact commands/hashes/skips/limits in docs/engine/input-backend.md"
+  ]
 }
