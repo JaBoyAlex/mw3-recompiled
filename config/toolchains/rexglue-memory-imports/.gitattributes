@@ -1,0 +1,2 @@
+# Unified diff context uses one space on otherwise empty lines.
+in-out-words.patch whitespace=-blank-at-eol

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "profile": "memory-imports-v1",
+  "commit": "ebac1cf0d04bab0042a5dd6148b34ab3953e9c0d",
+  "parent_xma_lock_sha256": "3da03a6f845b63d307e11c128ee00c52e1399dc5e7dfc8323a4cbb2f7e4a9b76",
+  "patch_path": "in-out-words.patch",
+  "patch_sha256": "3093f68104f74978dc3efb9f94d16304d0b1474ad95b97983be4e69b95adc531",
+  "source_path": "src/kernel/xboxkrnl/xboxkrnl_memory.cpp",
+  "parent_source_sha256": "273425abd6b0267a82cef5e3c8e940ec62c956f19e5f213c32d8bddcf318dd7a",
+  "derived_source_sha256": "983706d57085a822dc4b27d821ced18af74b63132a8b51d7f67ea19bfecc7a12",
+  "license_sha256": "8e065be1da2ff9a16b1f063d4636d8b67e6a654bb90583ea4332e66ac421bb18",
+  "contract_files": {
+    "include/rex/memory/mapped_ptr.h": "128f3460024f1aeb68ab61ebbfe19dd636e8d42fb9d3de85a05ed42a23d675d2",
+    "include/rex/ppc/call.h": "52bfe314fa5af87d1c6fc685e3e151e583ff0db4c4e8129e244e118757c50309",
+    "include/rex/kernel/guest_memory.h": "1dd4e6fd4c8f9e438c1f73a83b04ec9e6f5ac47b6ba5b30fd1bd294202706467",
+    "src/kernel/guest_memory.cpp": "132117ad061c2785a6fcb8eb86fcf9b36f3ce865ded7e38a692c6753b2f3f89d",
+    "include/rex/kernel/heap.h": "6d2682f7df2eb613f6aa3fb35ed9525e82388307d7dc2f07e48795538f0bf175",
+    "src/kernel/memory.cpp": "1b6522a756aede23e13432154c0f09d3f848ef9790d4c7ab9b626136ed375750",
+    "src/kernel/title_state.h": "c752e0bdc16b0e1ab13f0fa00c9c559ace61ad57e77e0479fd1756fb23d097df"
+  }
+}
