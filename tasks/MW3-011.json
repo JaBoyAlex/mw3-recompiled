@@ -6,7 +6,10 @@
   "depends_on": [
     "MW3-010",
     "MW3-045",
-    "MW3-046"
+    "MW3-046",
+    "MW3-050",
+    "MW3-051",
+    "MW3-092"
   ],
   "paths": [
     "runtime/gpu",
@@ -22,7 +25,7 @@
     "Run synthetic shader/format tests",
     "Capture menu on at least NVIDIA and AMD/Intel hardware"
   ],
-  "size": "epic; split before claiming",
+  "size": "epic; first owned-title allocation checkpoint split as MW3-092; split later startup/rendering work before implementation claims",
   "priority": 0,
   "status": "todo"
 }
