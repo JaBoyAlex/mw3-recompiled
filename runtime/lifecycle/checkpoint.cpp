@@ -11,6 +11,7 @@
 #include <rex/kernel/title_paths.h>
 #include <rex/kernel/title_runtime.h>
 #include <rex/kernel/guest_memory.h>
+#include <rex/kernel/heap.h>
 #include <rex/kernel/types/thread.h>
 #include <rex/kernel/types/xex.h>
 #include <rex/platform/dynlib.h>
@@ -24,6 +25,10 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <thread>
+#ifdef MW3_ALLOCATION_EXECUTE
+#include MW3_SDK_TEST_ACCESS_HEADER
+#endif
 #if REX_PLATFORM_WIN32
 #include <windows.h>
 #else
@@ -32,6 +37,7 @@
 
 bool VerifyProbeImportStops(rex::kernel::TitleRuntime&);
 extern "C" void __imp__RtlImageXexHeaderField(PPCContext&, u8*);
+extern "C" void __imp__NtAllocateVirtualMemory(PPCContext&, u8*);
 namespace k = rex::kernel;
 namespace p = rex::platform;
 namespace {
@@ -49,7 +55,14 @@ thread_local bool guest_callback = false;
 std::unique_ptr<p::Event> checkpoint, never, exited;
 using Function = void (*)(PPCContext&, u8*);
 Function original_header_query = nullptr;
+#ifdef MW3_ALLOCATION_EXECUTE
+Function original_allocation = nullptr;
+#endif
 p::DynamicLibrary kernel_library;
+#ifdef MW3_ALLOCATION_INSPECT
+std::atomic<unsigned> allocation_inputs = 0;
+bool allocation_checked = false, omit_completion = false;
+#endif
 
 void PinCallingThread() {
   auto* thread = k::KernelThread::GetCallingThread();
@@ -74,6 +87,15 @@ u32 LoadWord(u32 address) {
   Require(bool(value), "unreadable guest word");
   return *value;
 }
+#ifdef MW3_ALLOCATION_INSPECT
+u32 LoadRawWord(u32 address) {
+  std::array<std::byte, 4> bytes{};
+  Require(bool(current->GetGuestMemory().CopyFrom(address, bytes)), "allocation word read failed");
+  u32 value = 0;
+  for (auto byte : bytes) value = (value << 8) | std::to_integer<u32>(byte);
+  return value;
+}
+#endif
 void VerifyHeader() {
   auto bytes = current->GetGuestMemory().GetReadOnlySpan(header_address, static_cast<u32>(raw_header.size()));
   Require(bool(bytes), "unreadable guest header");
@@ -116,6 +138,11 @@ void PrepareAudit() {
   original_header_query = kernel_library.GetSymbol<Function>("__imp__RtlImageXexHeaderField");
   Require(original_header_query && original_header_query != &__imp__RtlImageXexHeaderField,
           "SDK header provider missing/interposed");
+#ifdef MW3_ALLOCATION_EXECUTE
+  original_allocation = kernel_library.GetSymbol<Function>("__imp__NtAllocateVirtualMemory");
+  Require(original_allocation && original_allocation != &__imp__NtAllocateVirtualMemory,
+          "SDK allocation provider missing/interposed");
+#endif
   std::fprintf(stderr, "MW3_MODULE_HEADER_AUDIT_PASS:cell=%08x module=%08x header=%08x bytes=%u\n",
                cell_address, module_address, header_address, size);
 }
@@ -140,6 +167,90 @@ bool ReservationReleased(void* address) {
 extern "C" [[noreturn]] void StopUnreviewedImport(const char* name, PPCContext& ctx) {
   guest_callback = true;
   PinCallingThread();
+#ifdef MW3_ALLOCATION_INSPECT
+  if (std::strcmp(name, "NtAllocateVirtualMemory") == 0) {
+    const char* nonce = std::getenv("MW3_ALLOCATION_NONCE");
+    Require(nonce && std::strlen(nonce) == 32, "allocation nonce missing");
+    for (unsigned i = 0; i < 32; ++i)
+      Require((nonce[i] >= '0' && nonce[i] <= '9') || (nonce[i] >= 'a' && nonce[i] <= 'f'), "allocation nonce invalid");
+    std::fprintf(stderr, "MW3_ALLOCATION_ARMED:nonce=%s\n", nonce);
+    Require(++allocation_inputs == 1, "allocation call budget exceeded");
+    if (mode == "allocation-bad-pointer") {
+      std::fprintf(stderr, "MW3_ALLOCATION_MUTATION:allocation-bad-pointer nonce=%s\n", nonce);
+      ctx.r3.u32 ^= 1;
+    }
+    Require(ctx.lr == MW3_ALLOCATION_LR, "allocation caller differs from audited PPC");
+    Require(u64(ctx.r31.u32) + 328 <= 0x100000000ull &&
+            ctx.r3.u32 == ctx.r31.u32 + 80 && ctx.r4.u32 == ctx.r31.u32 + 324,
+            "allocation pointer setup differs from audited PPC");
+    Require(ctx.r5.u32 == 0x60002000u && ctx.r6.u32 == 4 && ctx.r7.u32 == ctx.r27.u32,
+            "allocation value setup differs from audited PPC");
+    auto& memory = current->GetGuestMemory();
+    for (u32 address : {ctx.r3.u32, ctx.r4.u32}) {
+      Require(address && !(address & 3u) && bool(memory.GetReadOnlySpan(address, 4)) &&
+              bool(memory.GetWritableSpan(address, 4)), "allocation word is not mapped read/write");
+    }
+    const u32 base_word = ctx.r3.u32, size_word = ctx.r4.u32;
+    const u32 input_base = LoadRawWord(base_word), input_size = LoadRawWord(size_word);
+#ifdef MW3_ALLOCATION_VALUES
+    Require(input_base == MW3_ALLOCATION_INITIAL_BASE && input_size == MW3_ALLOCATION_INITIAL_SIZE &&
+            ctx.r7.u32 == MW3_ALLOCATION_REGION, "allocation input differs from captured contract");
+#endif
+    std::fprintf(stderr, "MW3_ALLOCATION_INPUT:lr=%08x r1=%08x r31=%08x base_word=%08x size_word=%08x base=%08x size=%08x type=%08x protect=%08x region=%08x nonce=%s\n",
+                 u32(ctx.lr), ctx.r1.u32, ctx.r31.u32, ctx.r3.u32, ctx.r4.u32,
+                 input_base, input_size, ctx.r5.u32, ctx.r6.u32, ctx.r7.u32, nonce);
+#ifdef MW3_ALLOCATION_EXECUTE
+    Require(input_base == 0 && input_size && input_size <= MW3_ALLOCATION_LIMIT &&
+            input_size <= 0x7fffffffu, "allocation reservation exceeds audited budget");
+    std::array<std::byte, 12> base_before{}, size_before{}, after{};
+    Require(bool(memory.CopyFrom(base_word - 4, base_before)) && bool(memory.CopyFrom(size_word - 4, size_before)),
+            "allocation neighbour snapshot failed");
+    auto& space = k::GetAddressSpace(*current);
+    const auto title_pages = space.GetTitlePages();
+    const u32 rounded = u32((u64(input_size) + 65535) & ~u64{65535});
+    std::fprintf(stderr, "MW3_ALLOCATION_CALL:nonce=%s\n", nonce);
+    original_allocation(ctx, static_cast<u8*>(current->GetMembase().GetBase()));
+    const u32 result_base = LoadRawWord(base_word), result_size = LoadRawWord(size_word);
+    std::fprintf(stderr, "MW3_ALLOCATION_RETURN:status=%08x base=%08x size=%08x nonce=%s\n",
+                 ctx.r3.u32, result_base, result_size, nonce);
+    Require(ctx.r3.u32 == 0, "allocation SDK status differs from audited success");
+    auto* heap = space.LookupHeap(result_base);
+    k::HeapAllocation allocation{}, last{};
+    Require(result_base && !(result_base & 65535u) && result_size == rounded &&
+            u64(result_base) + result_size <= 0x100000000ull && heap &&
+            heap->GetHeapType() == k::HeapType::kGuestVirtual && heap->GetPageSize() == 65536 &&
+            heap->QueryRegionInfo(result_base, &allocation) && allocation.allocation_base == result_base &&
+            allocation.allocation_size == rounded && allocation.state == k::kMemoryAllocationReserve &&
+            heap->QueryRegionInfo(result_base + rounded - 1, &last) && last.allocation_base == result_base &&
+            last.allocation_size == rounded && last.state == k::kMemoryAllocationReserve &&
+            !memory.GetReadOnlySpan(result_base, 4) && !memory.GetWritableSpan(result_base, 4) &&
+            !memory.GetReadOnlySpan(result_base + rounded - 4, 4) &&
+            !memory.GetWritableSpan(result_base + rounded - 4, 4) &&
+            title_pages == space.GetTitlePages(), "allocation output differs from independent oracle");
+    for (auto pair : {std::pair{base_word, &base_before}, std::pair{size_word, &size_before}}) {
+      Require(bool(memory.CopyFrom(pair.first - 4, after)), "allocation neighbour recheck failed");
+      for (unsigned i = 0; i < 12; ++i)
+        if (i < 4 || i >= 8) Require(after[i] == (*pair.second)[i], "allocation changed neighbouring bytes");
+    }
+    allocation_checked = true;
+    std::fprintf(stderr, "MW3_ALLOCATION_CHECK_PASS:bytes=%08x reserved=1 committed=0 neighbours=1 nonce=%s\n", rounded, nonce);
+    if (mode == "allocation-bad-oracle") {
+      std::fprintf(stderr, "MW3_ALLOCATION_MUTATION:allocation-bad-oracle nonce=%s\n", nonce);
+      Require(result_size == rounded + 65536, "intentional allocation oracle mismatch");
+    }
+    if (mode == "allocation-late" || mode == "allocation-incomplete") {
+      std::fprintf(stderr, "MW3_ALLOCATION_MUTATION:%s nonce=%s\n", mode.c_str(), nonce);
+      std::fflush(stderr);
+      if (mode == "allocation-late") std::this_thread::sleep_for(std::chrono::seconds(40));
+      else omit_completion = true;
+    }
+    diagnostic = name;
+    diagnostic_code = 86;
+    std::fprintf(stderr, "MW3_ALLOCATION_STOP:before_guest_return=1 nonce=%s\n", nonce);
+    throw rex::ThreadStop{86};
+#endif
+  }
+#endif
   diagnostic = name;
   diagnostic_code = 86;
   std::fprintf(stderr, "MW3_PROBE_UNREVIEWED_IMPORT:%s lr=%llx\n", name, static_cast<unsigned long long>(ctx.lr));
@@ -200,6 +311,13 @@ int RunLifecycle(LifecycleApp& app, const rex::CLIArgList& args) {
   int result = 90;
   void* reservation = nullptr;
   try {
+#ifdef MW3_ALLOCATION_INSPECT
+    const char* nonce = std::getenv("MW3_ALLOCATION_NONCE");
+    Require(nonce && std::strlen(nonce) == 32, "checkpoint nonce missing");
+    for (unsigned i = 0; i < 32; ++i)
+      Require((nonce[i] >= '0' && nonce[i] <= '9') || (nonce[i] >= 'a' && nonce[i] <= 'f'), "checkpoint nonce invalid");
+    std::fprintf(stderr, "MW3_CHECKPOINT_RUN:case=%s nonce=%s\n", mode.c_str(), nonce);
+#endif
     checkpoint = p::Event::CreateManualResetEvent(false);
     never = p::Event::CreateManualResetEvent(false);
     exited = p::Event::CreateManualResetEvent(false);
@@ -226,6 +344,15 @@ int RunLifecycle(LifecycleApp& app, const rex::CLIArgList& args) {
     Require(object->exit_status == diagnostic_code, "diagnostic exit code lost");
     if (mode == "positive") Require(diagnostic && std::strcmp(diagnostic, "NtAllocateVirtualMemory") == 0,
                                     "unexpected startup boundary");
+#ifdef MW3_ALLOCATION_INSPECT
+    if (mode == "positive") {
+#ifdef MW3_ALLOCATION_EXECUTE
+      Require(allocation_inputs == 1 && allocation_checked, "allocation checkpoint missing");
+#else
+      Require(allocation_inputs == 1 && !allocation_checked, "read-only allocation inspection missing");
+#endif
+    }
+#endif
     result = static_cast<int>(diagnostic_code);
     std::fprintf(stderr, "MW3_LIFECYCLE_THREAD_STOPPED:exit=%d queries=%u\n", result, queries.load());
   } catch (const HostFailure&) {
@@ -236,6 +363,9 @@ int RunLifecycle(LifecycleApp& app, const rex::CLIArgList& args) {
   stopped_object = {};
   kernel_library.Close();
   original_header_query = nullptr;
+#ifdef MW3_ALLOCATION_EXECUTE
+  original_allocation = nullptr;
+#endif
   runtime->Unload();
   if (runtime->IsLoaded() || k::GetProcessRuntime() != nullptr) result = 90;
   runtime.reset();
@@ -250,7 +380,10 @@ int RunLifecycle(LifecycleApp& app, const rex::CLIArgList& args) {
   std::fprintf(stderr, "MW3_LIFECYCLE_SHUTDOWN:result=%d threads_before=%llu threads_after=%llu\n",
                shutdown, static_cast<unsigned long long>(threads_before), static_cast<unsigned long long>(threads_after));
   if (shutdown != 0 || threads_before != threads_after) return 90;
-  std::fprintf(stderr, "MW3_LIFECYCLE_COMPLETE:exit=%d\n", result);
+#ifdef MW3_ALLOCATION_INSPECT
+  if (!omit_completion)
+#endif
+    std::fprintf(stderr, "MW3_LIFECYCLE_COMPLETE:exit=%d\n", result);
   return result;
 }
 REX_CONSOLE_APP_MAIN(LifecycleApp, RunLifecycle)

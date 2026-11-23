@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "phase": "first-allocation",
+  "allow_allocation": true,
+  "call_budget": 1,
+  "max_requested_bytes": 16777216,
+  "generation_sha256": "eacf6eed533a3e5a88dae07a68f6080fdd3be9d92bf5e9a8b4104eaf6d1ac52b",
+  "roles": {
+    "sp": {
+      "executable_sha256": "f59be1342c2fc664e2a2e7322d024028a0ca7216d279ed32fef6e114d8c37c30",
+      "metadata_sha256": "ec41aa95971afc908995af454a35583f3708aca0a2a324b4a4bee8c4efdcc388",
+      "lr": 2185646820,
+      "import_address": 2186174076,
+      "ordinal": 204,
+      "base_pointer_r31_offset": 80,
+      "size_pointer_r31_offset": 324,
+      "allocation_type": 1610620928,
+      "protection": 4,
+      "region_source_gpr": 27,
+      "original_callsite_words_sha256": "4b3e19e67699ec4a5757904e0c9073625b225856bfdf8d4d54a45e4ac994dbf8",
+      "independent_llvm_disassembly_sha256": "ca1c10babe260843d411a9ae602aa0bf32d7a0806115ab07038ba800656839bf",
+      "initial_base": 0,
+      "initial_size": 1048576,
+      "region": 0,
+      "precall_capture_manifest_sha256": "593a8b1921f4b7d2695d1e8d335ed7dd9885a0e0ec5a9a2627f047795f4fd529"
+    },
+    "mp": {
+      "executable_sha256": "ba1bc57af4c4f75934a106b3d470559b356252b9e100d98e335bcfd0e574806a",
+      "metadata_sha256": "91258c06e63d15e4f4bd88b73ef70535824347f567c62ea59f44c1dfec3f8031",
+      "lr": 2186178404,
+      "import_address": 2186715412,
+      "ordinal": 204,
+      "base_pointer_r31_offset": 80,
+      "size_pointer_r31_offset": 324,
+      "allocation_type": 1610620928,
+      "protection": 4,
+      "region_source_gpr": 27,
+      "original_callsite_words_sha256": "cd54cd37c829637aefa506d6180cc8b5d18f4d60637fc5a3f2e4b93c93687549",
+      "independent_llvm_disassembly_sha256": "f87329c255f5ea238d44fb3f7cbd1084f6ebd29b0cb24c8d22fa4addc007a47b",
+      "initial_base": 0,
+      "initial_size": 1048576,
+      "region": 0,
+      "precall_capture_manifest_sha256": "86ae4ac101c71ebf1d2ee8aa2f86a0923fa155fb76ff8fe07f9aab390775837e"
+    }
+  }
+}
