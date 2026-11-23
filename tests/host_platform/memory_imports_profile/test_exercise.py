@@ -29,7 +29,7 @@ class OutputIsolation(unittest.TestCase):
             self.assertEqual({p.relative_to(root) for p in root.rglob("*")}, original)
             requested = root / "isolated-contract-runs"
             output = exercise.output_directory(root, sdk, receipt, requested)
-            self.assertEqual(output.parent, requested)
+            self.assertEqual(output.parent, requested.resolve())
             self.assertFalse(output.exists())
 
 

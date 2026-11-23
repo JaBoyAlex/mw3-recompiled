@@ -103,7 +103,14 @@ that difference. The executed C++ callback, CMake input and protocol parser
 remain byte-identical to the retained baseline. Both complete source snapshots
 and their differing raw hashes are retained.
 
-## Verified matrix — 2026-11-22
+The first exact-head CI matrix passes all three Linux jobs but fails both
+Windows jobs on the output-isolation test's comparison of a runner temporary
+8.3 path with its resolved long name. The helper correctly canonicalizes the
+path; only the test's expected path is changed to `requested.resolve()`.
+Runtime, preparation and exercise-driver bytes remain unchanged. Both failed
+job logs are retained; the final commit requires a fresh complete CI matrix.
+
+## Verified matrix â€” 2026-11-22
 
 All **615 actual-kernel processes** pass the strict protocol: 570 ordinary
 successes and 45 correctly rejected wrong-result/incomplete/deadline controls.
