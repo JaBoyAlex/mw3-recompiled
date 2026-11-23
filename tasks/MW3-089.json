@@ -1,0 +1,24 @@
+{
+  "id": "MW3-089",
+  "title": "Implement an ownership-preserving SDL host controller adapter",
+  "phase": 2,
+  "area": "controller-adapter",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-080", "MW3-084", "MW3-085", "MW3-086", "MW3-087", "MW3-088"],
+  "paths": ["runtime/input/backend", "tests/host_platform/input_backend", "tools/test_input_backend.py", "docs/engine/input-backend.md"],
+  "goal": "Provide the separately testable SDL3 host adapter before physical-controller acceptance, reusing suitable pinned MW2 C++ input work while preserving the existing ingress/owner contracts and selected runtime.",
+  "acceptance": [
+    "Implement a C++20 SDL3-only host adapter with bounded owned device records, exact backend version/configuration, explicit owner joins and no player assignment from discovery order; preserve MW3-080/087 APIs and selected SDK/provider code unchanged",
+    "Adapt the suitable MW2 SDL enumeration/open/close, named button/axis and rumble work with exact source/license attribution and documented modifications; no MW2 guest addresses, kernel/PPC layouts, keyboard/script/user-zero fallback or new runtime is adopted",
+    "Demonstrate four distinguishable original virtual devices through the actual pinned SDL library, all discovery orders, complete control normalization, first-read held input, neutral disconnect, reconnect/restart, stale/wrong-owner commands and bounded rumble cleanup without slot/profile theft",
+    "Balance only owned SDL subsystem references and gamepad handles, preserve an existing caller SDL lifetime, bound storage/rumble work, and keep failures diagnostic rather than silently retaining invalid input or manufacturing devices",
+    "Record actual library/source/compiler/config/binary/protocol identities and meaningful negative controls; virtual-device success completes this adapter task only, with physical MW3-083 and guest/title input admission remaining separate"
+  ],
+  "validation": [
+    "Run repeated native Windows/Linux and supported adapter sanitizer profiles against the actual pinned SDL library using owned subprocesses, private outputs and read-only prepared packages; distinguish adapter instrumentation from native SDL coverage",
+    "Test complete output/library/source/receipt checks, changed/wrong routing, malformed or partial results and late children; run python tools/check.py and report actual skips, retained failures, missing physical hardware and performance limits",
+    "Confirm physical-controller task MW3-083 remains open and no GPU/title/service or gameplay gate changes; update only this task's completion evidence and subsystem report after exact-head public checks and transparent review"
+  ],
+  "size": "bounded actual-SDL adapter with virtual-device evidence; physical device and translated-title acceptance remain separate"
+}
