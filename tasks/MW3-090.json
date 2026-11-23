@@ -4,9 +4,18 @@
   "phase": 2,
   "area": "controller-sdl-profile",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-084", "MW3-086", "MW3-088"],
-  "paths": ["config/toolchains/sdl-input", "tools/prepare_sdl_input.py", "tests/host_platform/sdl_input_profile", "docs/engine/sdl-input-profile.md"],
+  "status": "done",
+  "depends_on": [
+    "MW3-084",
+    "MW3-086",
+    "MW3-088"
+  ],
+  "paths": [
+    "config/toolchains/sdl-input",
+    "tools/prepare_sdl_input.py",
+    "tests/host_platform/sdl_input_profile",
+    "docs/engine/sdl-input-profile.md"
+  ],
   "goal": "Repair the actual pinned SDL mapping initialization defect discovered by MW3-089: opening a gamepad overwrites an already observed held trigger with its rest value. Produce a separate verified private SDL profile without changing existing SDKs or manufacturing controller input.",
   "acceptance": [
     "Bind exact SDL submodule source/version, relevant joystick and gamepad declarations, original/derived source hashes, zlib notices and tool/config identities; reproduce the retained actual-library trigger reset before repair",
@@ -20,5 +29,15 @@
     "Validate patch/source/tool/library/package/receipt mutation rejection and output isolation with public game-free guards; run python tools/check.py and relevant platform checks",
     "Review source provenance, retained notices, diagnostic behavior and exact reviewed head; keep SDK/game binaries, raw logs and generated build output private and record self-review if no independent reviewer is available"
   ],
-  "size": "bounded opt-in SDL mapping repair/profile; physical hardware and translated-title adoption remain independent"
+  "size": "bounded opt-in SDL mapping repair/profile; physical hardware and translated-title adoption remain independent",
+  "evidence": [
+    "Opt-in zlib-noticed SDL3.4.14 derivative at exact commit147a8ee32dbf9ac02f3794964490687b6bbda1bc preserves sampled trigger values while retaining recentering/unknown-initial defaults; only SDL_gamepad.c changes across2194 canonical Git files, no shared SDK/source/API or runtime selection changes",
+    "Three sealed profile constructions PASS/exit0: nativeWindows, nativeLinux and participatingSDL/probe LinuxASanUBSan. Matched baseline/repaired source path, compiler/flags/config and unchanged original probe; baseline trigger resets remain observed diagnostic exit1 rather than repaired successes",
+    "27 owned processes: nine original baseline failures, nine repaired ordinary successes, three each wrong-zero/incomplete/deadline rejection controls; 336 serialized raw/mapped/stick/button observations across24 complete nonce records, no invented incomplete rows",
+    "Actual held trigger before firstSDLopen, unchanged updates, second consumer, close/reopen, public mapping replacement, neutral rest, held detach and independent controls/owned cleanup verified; no cache writes or shifted initial stimulus manufacture the pass",
+    "Independent second audit rehashes source Git objects and snapshots, both packages/libraries, actual loaded modules, probes, tools/helpers, compiler/compile-command/cache identities and all27 logs; integer reference checks selected raw/mapped values. Transparent owner self-review, no independent reviewer claim",
+    "Public WindowsRelease and LinuxReleaseASanUBSan:288 Python tests each, eight/two existing skips, parserCTest1/1 each; eleven new synthetic evidence/source/package/receipt/late-child/archive/output guards pass; DAG65 and heuristic/manual provenance/diff checks pass",
+    "Retained CRLF/export/Windows-rooted-path development findings and initial ASanDSO no-undefined link failure; explicit canonical Git export and complete precompile blob checks, sanitizer linkage corrected without hiding instrumentation or changing native service results",
+    "Source unknown-initial branch reviewed but not independently exercised by initialized virtual fixtures; Windows participatingSDL sanitizers, other controller mappings/physical hardware, independentLinux hardware, title/GPU/gameplay/performance and binary-distribution rights remain unverified. Exact commands/hashes/failures/limits in docs/engine/sdl-input-profile.md"
+  ]
 }

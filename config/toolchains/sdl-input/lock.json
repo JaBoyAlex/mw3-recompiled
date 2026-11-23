@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "profile": "sdl-trigger-v1",
+  "url": "https://github.com/libsdl-org/SDL.git",
+  "commit": "147a8ee32dbf9ac02f3794964490687b6bbda1bc",
+  "version": 3004014,
+  "source_relative": "sources/rexglue-xma/thirdparty/sdl3",
+  "source_files": {
+    "src/joystick/SDL_gamepad.c": "4f88ce1abfc0f556a2d92e024eaafd765b9843a7c7c9a0c66882350e72d06335",
+    "src/joystick/SDL_joystick.c": "c0bd86e8c807d460ebcbef4f1059cfe18415dcf72c2799492a7fa34701b42ef1",
+    "src/joystick/SDL_sysjoystick.h": "1c1ae56595cd8c0534036bbd58b2f2f8e4e9d20c1183d6540de860d87722593e",
+    "src/joystick/virtual/SDL_virtualjoystick.c": "47b173ee890352e33e00b1a669d50d5672fa2789340bb8ed5af17a2a7eb8dc8b",
+    "include/SDL3/SDL_gamepad.h": "55350e07e9569d70a25643e578edb53bce60867aebb2a3550b00250033f60a8b",
+    "include/SDL3/SDL_joystick.h": "de936f3314f39bb02aaf3afc758aa3af7cf5cd2152c2265369d7dc5abca1f1bb",
+    "include/SDL3/SDL_version.h": "07830cb7cb8cb86db52eb00c07b95827385c340bc0d667861cbbb89c360678c1",
+    "CMakeLists.txt": "dd47de24dd913f753fe3c87f039ab8d6ca84937aef5122b1b469aa56015c08e3",
+    "LICENSE.txt": "1c040b8271b37e5076359f8fd54240e371114112924d2df81ef87c7d6a1dfdfd"
+  },
+  "changed_file": "src/joystick/SDL_gamepad.c",
+  "derived_source_sha256": "248280818b09b53097565bca1af8aba43d7602cce098ddaf84c63f10cb800d12",
+  "patch_sha256": "d10f46dca0729d468086015e75ba7e5591afc791056ed7983ccbfe225fb77b44",
+  "license_sha256": "1c040b8271b37e5076359f8fd54240e371114112924d2df81ef87c7d6a1dfdfd",
+  "compiler": "20.1.2",
+  "original_changed_bytes": 157245
+}

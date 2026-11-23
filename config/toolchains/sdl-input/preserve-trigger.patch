@@ -1,0 +1,17 @@
+--- a/src/joystick/SDL_gamepad.c
++++ b/src/joystick/SDL_gamepad.c
+@@ -2017,8 +2017,12 @@
+             (binding->output.axis.axis == SDL_GAMEPAD_AXIS_LEFT_TRIGGER ||
+              binding->output.axis.axis == SDL_GAMEPAD_AXIS_RIGHT_TRIGGER)) {
+             if (binding->input.axis.axis < gamepad->joystick->naxes) {
+-                gamepad->joystick->axes[binding->input.axis.axis].value =
+-                    gamepad->joystick->axes[binding->input.axis.axis].zero = (Sint16)binding->input.axis.axis_min;
++                SDL_JoystickAxisInfo *axis = &gamepad->joystick->axes[binding->input.axis.axis];
++                axis->zero = (Sint16)binding->input.axis.axis_min;
++                // MW3 opt-in profile: keep a value sampled before opening/remapping.
++                if (!axis->has_initial_value) {
++                    axis->value = axis->zero;
++                }
+             }
+         }
+     }
