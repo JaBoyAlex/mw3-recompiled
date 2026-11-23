@@ -1,0 +1,95 @@
+--- a/src/kernel/xboxkrnl/xboxkrnl_memory.cpp
++++ b/src/kernel/xboxkrnl/xboxkrnl_memory.cpp
+@@ -22,6 +22,7 @@
+ #include <rex/ppc/hook.h>
+ #include <rex/memory/mapped_ptr.h>
+ #include <rex/kernel/heap.h>
++#include <rex/kernel/guest_memory.h>
+ #include <rex/types.h>
+ #include <rex/kernel/title_runtime.h>
+ #include <rex/kernel/object/kernel_thread.h>
+@@ -66,6 +67,52 @@
+     return false;
+   }
+   return std::popcount(protect & kBaseProtectionBits) == 1;
++}
++
++// These are in/out words. Validate before logging or any typed dereference.
++// Four-byte alignment plus distinct physical offsets excludes partial/aliased overlap.
++bool IsValidMemoryOutputPair(MappedU32 base_ptr, MappedU32 size_ptr) {
++  const u32 base = base_ptr.GetGuestAddress();
++  const u32 size = size_ptr.GetGuestAddress();
++  if (!base || !size || (base & 3u) || (size & 3u) ||
++      base > 0xfffffffcu || size > 0xfffffffcu || base == size) {
++    return false;
++  }
++  auto& state = kernel::GetCurrentState();
++  auto& memory = state.GetGuestMemory();
++  auto* space = state.GetAddressSpace();
++  const u32 physical_base = space->GetPhysicalAddress(base);
++  const u32 physical_size = space->GetPhysicalAddress(size);
++  if (physical_base != UINT32_MAX && physical_base == physical_size) {
++    return false;
++  }
++  const auto valid_word = [&](u32 address, u32 physical) {
++    if (memory.GetReadOnlySpan(address, 4) && memory.GetWritableSpan(address, 4)) {
++      return true;
++    }
++    // An unallocated physical view may alias committed backing in another view.
++    // Never override an explicit reservation/protection in the requested view.
++    if (physical == UINT32_MAX) {
++      return false;
++    }
++    kernel::HeapAllocation view{};
++    auto* heap = space->LookupHeap(address);
++    if (!heap || !heap->QueryRegionInfo(address, &view) || view.state != 0) {
++      return false;
++    }
++    u32 protect = 0;
++    constexpr u32 required = kernel::kMemoryProtectRead | kernel::kMemoryProtectWrite;
++    if (!space->GetPhysicalHeap()->QueryProtect(physical, &protect) ||
++        (protect & required) != required) {
++      return false;
++    }
++    size_t length = 0;
++    auto access = rex::memory::PageAccess::kNoAccess;
++    return rex::memory::QueryProtect(space->TranslateVirtual(address), length, access) &&
++           length >= 4 && (access == rex::memory::PageAccess::kReadWrite ||
++                           access == rex::memory::PageAccess::kExecuteReadWrite);
++  };
++  return valid_word(base, physical_base) && valid_word(size, physical_size);
+ }
+ 
+ bool IsValidFreeType(u32 free_type) {
+@@ -120,6 +167,9 @@
+  */
+ u32 NtAllocateVirtualMemory_entry(MappedU32 base_addr_ptr, MappedU32 region_size_ptr,
+                                   u32 alloc_type, u32 protect_bits, u32 region_type) {
++  if (!IsValidMemoryOutputPair(base_addr_ptr, region_size_ptr)) {
++    return X_STATUS_INVALID_PARAMETER;
++  }
+   u32 input_base = base_addr_ptr ? static_cast<u32>(*base_addr_ptr) : 0;
+   u32 input_size = region_size_ptr ? static_cast<u32>(*region_size_ptr) : 0;
+   REXKRNL_TRACE(
+@@ -162,9 +212,8 @@
+ 
+   u32 adjusted_base = *base_addr_ptr - (*base_addr_ptr % page_size);
+   // Titles can pass negative sizes.
+-  u32 adjusted_size = static_cast<i32>(*region_size_ptr) < 0
+-                          ? -static_cast<i32>(region_size_ptr.GetValue())
+-                          : region_size_ptr.GetValue();
++  const u32 size_bits = region_size_ptr.GetValue();
++  u32 adjusted_size = (size_bits & 0x80000000u) ? u32{0} - size_bits : size_bits;
+   // Without a base address the allocation granularity is 64 KB, otherwise the heap page size.
+   adjusted_size =
+       rex::RoundUpNonZero(adjusted_size, adjusted_base ? page_size : kernel::kPageSize64KiB);
+@@ -272,6 +321,9 @@
+ 
+ u32 NtFreeVirtualMemory_entry(MappedU32 base_addr_ptr, MappedU32 region_size_ptr, u32 free_type,
+                               u32 region_type) {
++  if (!IsValidMemoryOutputPair(base_addr_ptr, region_size_ptr)) {
++    return X_STATUS_INVALID_PARAMETER;
++  }
+   if (!IsValidMemoryRegionType(region_type) || !IsValidFreeType(free_type)) {
+     return X_STATUS_INVALID_PARAMETER;
+   }

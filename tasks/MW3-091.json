@@ -4,8 +4,13 @@
   "phase": 2,
   "area": "memory-import-profile",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-039", "MW3-042", "MW3-043", "MW3-044"],
+  "status": "done",
+  "depends_on": [
+    "MW3-039",
+    "MW3-042",
+    "MW3-043",
+    "MW3-044"
+  ],
   "paths": [
     "config/toolchains/rexglue-memory-imports",
     "tools/prepare_runtime_memory_imports.py",
@@ -25,5 +30,14 @@
     "Reject changed source, patch, parent, compiler, library/package and preparation receipts and overlapping outputs; verify all unaffected package files and original parent sources remain byte-identical",
     "Run python tools/check.py and relevant supported platform/sanitizer checks; record exact commands, skips, provenance review, self-review and unresolved behavior; no title execution, new startup service, retail ABI certification or performance claim"
   ],
-  "size": "bounded isolated allocation/free entry repair and verified SDK profile; MW3-046 remains the separate full import-ABI consumer"
+  "size": "bounded isolated allocation/free entry repair and verified SDK profile; MW3-046 remains the separate full import-ABI consumer",
+  "evidence": [
+    "docs/engine/memory-imports-profile.md",
+    "Exact opt-in selected-kernel derivative validates both allocation/free in/out words before typed access or trace reads, rejects physical alias overlap, preserves valid aliases and computes signed-size magnitude with unsigned subtraction; global thunks and startup allowlist unchanged",
+    "Three isolated verified Windows/Linux native and participating-kernel Linux ASan/UBSan preparations replace only rexkernel in exact XMA parent packages; original source/package identities retained and checked",
+    "615 actual-kernel processes across five profiles and three repetitions: 570 ordinary passes and 45 correctly rejected result/incomplete/deadline controls; 615 distinct nonces, all loaded kernels/source/compiler/binary/compile-command/log identities audited; matched 205-process failing baseline retained",
+    "36 real artifact/receipt mutation controls and eight public synthetic preparation/output-isolation guards PASS; changed files restored and original parent identities reverified",
+    "Windows Release and Linux Release ASan/UBSan public checks PASS: 313 Python tests each with eight/two explicit skips, parser CTest1/1 each; 66-task DAG and heuristic/manual provenance/diff review pass",
+    "Self-review only. Windows participating-kernel sanitizers unsupported; Linux XAM/system dependencies native and vptr checks disabled. WSL shares Windows hardware. No retail ABI, general race-freedom, title execution, gameplay, performance or binary-release claim. MW3-046 adoption remains separate"
+  ]
 }
