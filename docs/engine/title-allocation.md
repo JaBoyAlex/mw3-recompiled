@@ -236,6 +236,12 @@ no shipping renderer, framework choice or gameplay policy.
 
 ## Limits and review
 
+Initial exact-head CI run `45126657829` passed all three Linux jobs but failed
+both Windows jobs in the output-isolation fixture: the runner's short temp
+alias was compared with the guard's canonical long path. The fixture now
+resolves the expected path as well. Runtime admission, source/config hashes,
+all output-overlap refusals and the 246-case title evidence are unchanged.
+
 The first public Windows check passed 307 tests with 13 skips, but CMake/CTest
 were absent from PATH for native Python fixtures. Supplying `--cmake` and
 `--ctest` selects the top-level commands only. The final Windows run also puts

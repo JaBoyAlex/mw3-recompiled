@@ -89,7 +89,7 @@ class AllocationContractGuards(unittest.TestCase):
                     with self.subTest(requested=requested), self.assertRaises(ValueError):
                         driver.probe_output(requested, owned, root, sdk, receipt, metadata, gen / "generation.json")
             output = driver.probe_output(root / "private-output", owned, root, sdk, receipt, metadata, gen / "generation.json")
-            self.assertEqual(output.parent, root / "private-output")
+            self.assertEqual(output.parent, (root / "private-output").resolve())
             self.assertFalse(output.exists())
 
 
