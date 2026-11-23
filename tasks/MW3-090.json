@@ -1,0 +1,24 @@
+{
+  "id": "MW3-090",
+  "title": "Preserve sampled SDL trigger state when loading a gamepad mapping",
+  "phase": 2,
+  "area": "controller-sdl-profile",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-084", "MW3-086", "MW3-088"],
+  "paths": ["config/toolchains/sdl-input", "tools/prepare_sdl_input.py", "tests/host_platform/sdl_input_profile", "docs/engine/sdl-input-profile.md"],
+  "goal": "Repair the actual pinned SDL mapping initialization defect discovered by MW3-089: opening a gamepad overwrites an already observed held trigger with its rest value. Produce a separate verified private SDL profile without changing existing SDKs or manufacturing controller input.",
+  "acceptance": [
+    "Bind exact SDL submodule source/version, relevant joystick and gamepad declarations, original/derived source hashes, zlib notices and tool/config identities; reproduce the retained actual-library trigger reset before repair",
+    "Keep the trigger rest point for recentering and unknown initial state, while preserving an already sampled axis value during gamepad mapping initialization; inspect initialized/uninitialized axis semantics and change no guest or SDK provider API",
+    "Build and package the reviewed SDL derivative in private isolated source/output/profile directories on native Windows/Linux with supported participating-library sanitizer coverage; never modify shared sources, existing SDKs, user content or another lane's processes",
+    "Use original actual-SDL virtual-device tests for held trigger opening, unchanged polling, centered/unheld state, multiple consumers, reopen/remap and independent controls, with balanced owned cleanup and exact loaded-library identities; preserve baseline failures and meaningful result/partial/deadline controls",
+    "Publish a strict profile/preparation verifier and public evidence summary with exact hashes and explicit native-third-party, sanitizer, physical-hardware and title limitations; this opt-in profile does not change runtime selection or pass physical MW3-083 or guest input gates"
+  ],
+  "validation": [
+    "Run repeated native Windows/Linux profile tests and supported host/participating SDL ASan/UBSan coverage; distinguish ordinary repaired passes, original baseline failure, invalid controls and incomplete evidence",
+    "Validate patch/source/tool/library/package/receipt mutation rejection and output isolation with public game-free guards; run python tools/check.py and relevant platform checks",
+    "Review source provenance, retained notices, diagnostic behavior and exact reviewed head; keep SDK/game binaries, raw logs and generated build output private and record self-review if no independent reviewer is available"
+  ],
+  "size": "bounded opt-in SDL mapping repair/profile; physical hardware and translated-title adoption remain independent"
+}
