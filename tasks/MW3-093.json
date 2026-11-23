@@ -4,7 +4,7 @@
   "phase": 2,
   "area": "startup-continuation",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "depends_on": [
     "MW3-092"
   ],
@@ -30,5 +30,17 @@
     "Run public protocol/configuration/output-isolation tests, python tools/check.py and relevant supported platform/sanitizer checks; separately re-audit artifacts, actual loaded libraries and immutable input/generation/config/source identities",
     "Report exact commands, observed next boundary, counts/hashes, retained failures/skips, resource budgets, performance impact and self-review; do not equate a passing probe or synthetic renderer with a playable test"
   ],
-  "size": "bounded first reserve/commit startup segment and next-service stop; no new renderer, broad service allowlist or gameplay implementation"
+  "size": "bounded first reserve/commit startup segment and next-service stop; no new renderer, broad service allowlist or gameplay implementation",
+  "evidence": [
+    "docs/engine/title-startup.md",
+    "config/runtime/title-startup.json",
+    "tests/lifecycle/test_startup.py",
+    "Scope published in PR141; serialized task-admin claim 45131803693 succeeded for issue 142 with dependency 139 closed before implementation",
+    "Original XEX loader/branch audit and independent LLVM 18 reader bind separate SP/MP code/data windows; separately audited precall captures bind the actual following 64 KiB commit and context before admission; initial incorrect MP displacement attempt is retained and excluded",
+    "Explicit startup-inspect and startup modes reuse the original MW3-091 selected-SDK export; two allocation calls, exact caller/frame/context/in-out/neighbour/state/access/zero-fill/title-page checks and title-written heap markers/links reach KeGetCurrentProcessType without invoking it; generated guest code unchanged",
+    "206 isolated cases PASS across 22 separately audited runs: 150 startup, 48 native historical first-allocation, 4 native header and 4 native continuation-inspection; 206 unique nonces, 198 actual allocation-export calls including intentional controls; native Windows/Linux, supported host and Linux participating-kernel sanitizer profiles",
+    "Actual wrong caller/pointer/value/binding/result/heap/incomplete/deadline controls and 3 pre-output stale generation/contract CLI refusals pass; source/config/generation/preparation/compiler/compiled artifacts/actual loaded kernel/log identities separately re-audited; historical Python classifiers/contracts unchanged",
+    "25 focused lifecycle tests include 11 new original synthetic startup guards; full local Windows Release and Linux Release ASan/UBSan checks each pass 338 Python plus CTest 1/1 with 8/2 explicit platform skips; exact-head public CI and self-review required for PR143 merge",
+    "Two-worker serial heavy builds; no gameplay performance result; Windows kernel sanitizers unsupported; WSL same physical machine; generated guest and retained dependencies outside parts of instrumentation; no independent reviewer, frame, menu, content-loading, split-screen parity or playable boot claim; first-frame011 unfinished"
+  ]
 }
