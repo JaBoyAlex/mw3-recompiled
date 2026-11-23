@@ -143,7 +143,9 @@ class SdlProfileEvidenceTests(unittest.TestCase):
     def test_prepared_receipt_reconciles_packages_sources_logs_and_tools(self):
         # Non-executable, original fixture trees exercise the verifier, not SDL.
         with tempfile.TemporaryDirectory() as folder:
-            root=Path(folder);out=root/'profile';stage=out/'source';stage.mkdir(parents=True)
+            # Hosted Windows TEMP may contain an 8.3 alias; match the producer's
+            # resolved output identity rather than the temporary path spelling.
+            root=Path(folder).resolve();out=root/'profile';stage=out/'source';stage.mkdir(parents=True)
             before=b'original';after=b'reviewed derivative';unchanged=b'unchanged'
             (stage/'mapping.c').write_bytes(after);(stage/'other.c').write_bytes(unchanged)
             blob=lambda data:hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()

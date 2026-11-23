@@ -151,6 +151,11 @@ instance's identified preparation process tree was stopped; other lanes were
 not changed or terminated. Final profiles use identical frozen maintained
 producer/probe/config bytes and pass their post-build checks.
 
+The first hosted Windows jobs exposed an 8.3 TEMP-path alias in a synthetic
+receipt fixture. The fixture now resolves its output path just as the producer
+does. The production package-path verifier remains strict; this test-only fix
+does not change or regenerate the sealed SDL libraries.
+
 ## Reproduction and public validation
 
 ```text
