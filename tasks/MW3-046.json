@@ -28,10 +28,11 @@
   ],
   "size": "bounded ABI contracts; split SDK repairs",
   "priority": 0,
-  "status": "blocked",
+  "status": "todo",
   "evidence": [
     "docs/engine/startup-memory.md",
     "tests/startup_memory/contracts.cpp",
-    "tests/startup_memory/test_results.py"
+    "tests/startup_memory/test_results.py",
+    "Lead blocker resolution: MW3-091 merged in PR135 (297d742); the verified allocation-import safety derivative is complete. MW3-046 is ready for a serialized claim and explicit consumer adoption, with acceptance still incomplete."
   ]
 }
