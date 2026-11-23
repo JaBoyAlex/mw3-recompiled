@@ -3,8 +3,17 @@
   "title": "Audit and exercise the selected kernel's allocation import ABI",
   "phase": 2,
   "area": "memory-api",
-  "depends_on": ["MW3-039", "MW3-042", "MW3-044"],
-  "paths": ["tests/startup_memory", "tools/test_startup_memory.py", "docs/engine/startup-memory.md"],
+  "depends_on": [
+    "MW3-039",
+    "MW3-042",
+    "MW3-044",
+    "MW3-091"
+  ],
+  "paths": [
+    "tests/startup_memory",
+    "tools/test_startup_memory.py",
+    "docs/engine/startup-memory.md"
+  ],
   "goal": "Test the actual NtAllocateVirtualMemory/NtFreeVirtualMemory import boundary before the lead admits the next guarded startup service; direct address-space tests do not establish the import ABI.",
   "acceptance": [
     "Bind exact SDK, prototype, export binding and compiler identities; review implemented behavior and independent source/contract evidence before choosing expectations, marking missing retail evidence explicitly",
@@ -19,5 +28,10 @@
   ],
   "size": "bounded ABI contracts; split SDK repairs",
   "priority": 0,
-  "status": "todo"
+  "status": "blocked",
+  "evidence": [
+    "docs/engine/startup-memory.md",
+    "tests/startup_memory/contracts.cpp",
+    "tests/startup_memory/test_results.py"
+  ]
 }
