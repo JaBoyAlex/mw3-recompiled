@@ -33,6 +33,6 @@
     "docs/engine/startup-memory.md",
     "tests/startup_memory/contracts.cpp",
     "tests/startup_memory/test_results.py",
-    "Lead blocker resolution: MW3-091 merged in PR135 (297d742), with the verified memory-imports-v1 repair and retained baseline/615-process evidence. MW3-046 is ready for a serialized claim and separate explicit consumer adoption; its acceptance is not yet complete."
+    "Lead blocker resolution: MW3-091 merged in PR135 (297d742); the verified allocation-import safety derivative is complete. MW3-046 is ready for a serialized claim and explicit consumer adoption, with acceptance still incomplete."
   ]
 }
