@@ -1,0 +1,29 @@
+{
+  "id": "MW3-091",
+  "title": "Guard allocation-import in/out words and signed-size conversion",
+  "phase": 2,
+  "area": "memory-import-profile",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-039", "MW3-042", "MW3-043", "MW3-044"],
+  "paths": [
+    "config/toolchains/rexglue-memory-imports",
+    "tools/prepare_runtime_memory_imports.py",
+    "tests/host_platform/memory_imports_profile",
+    "docs/engine/memory-imports-profile.md"
+  ],
+  "goal": "Produce a separately verified selected-kernel derivative for the actual unsafe pointer and signed-minimum behavior retained by MW3-046, without modifying existing sources/SDKs, shared argument-thunk APIs or the guest startup allowlist.",
+  "acceptance": [
+    "Bind the exact selected SDK/XMA parent composition, mapped-pointer thunk, checked guest-memory access, heap policies and retained actual-library baseline failures before editing; preserve BSD/Xenia notices and distinguish selected-fork policy from unavailable retail-console parity",
+    "Validate both allocation/free in/out words for null, complete nonwrapping mapped readable/writable range and required alignment before any typed dereference, trace read or memory mutation; preserve valid physical aliases and reject overlapping output words diagnostically",
+    "Compute the magnitude of negative 32-bit allocation sizes without signed-minimum negation overflow; retain ordinary reserve/commit/decommit/release, endian outputs, failure immutability, neighbouring bytes and allocation/resource recovery",
+    "Build private native Windows/Linux and supported participating-kernel ASan/UBSan profiles from isolated exact derived sources, replacing only the declared kernel library in a verified parent package while leaving original SDK/source/build outputs unchanged",
+    "Use original actual-kernel callbacks, exact loaded-module identities and meaningful wrong-result/incomplete/deadline controls; supply a strict preparation verifier, synthetic mutation/isolation guards and a source-only public report before MW3-046 can complete adoption"
+  ],
+  "validation": [
+    "Retain matched baseline failures and run repeated repaired positive/negative import cases with exact source/compiler/config/binary/package/receipt/log identities; distinguish host-only and participating-kernel sanitizer coverage and unsupported Windows core instrumentation",
+    "Reject changed source, patch, parent, compiler, library/package and preparation receipts and overlapping outputs; verify all unaffected package files and original parent sources remain byte-identical",
+    "Run python tools/check.py and relevant supported platform/sanitizer checks; record exact commands, skips, provenance review, self-review and unresolved behavior; no title execution, new startup service, retail ABI certification or performance claim"
+  ],
+  "size": "bounded isolated allocation/free entry repair and verified SDK profile; MW3-046 remains the separate full import-ABI consumer"
+}
