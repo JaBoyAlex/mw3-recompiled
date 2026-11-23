@@ -4,9 +4,17 @@
   "phase": 2,
   "area": "gpu-display-api",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-037", "MW3-039", "MW3-044"],
-  "paths": ["tests/gpu_display", "tools/test_gpu_display.py", "docs/engine/gpu-display.md"],
+  "status": "done",
+  "depends_on": [
+    "MW3-037",
+    "MW3-039",
+    "MW3-044"
+  ],
+  "paths": [
+    "tests/gpu_display",
+    "tools/test_gpu_display.py",
+    "docs/engine/gpu-display.md"
+  ],
   "goal": "Exercise actual selected-kernel display-query exports through original synthetic guest callbacks before any GPU service admission, separating observed query ABI behavior from unbacked display/engine controls and unknown retail semantics.",
   "acceptance": [
     "Bind exact approved lifecycle-repaired SDK/source, export ordinal/name/function-module, prototype/layout and compiler identities; inspect the pinned implementation and define independent byte-level serialization/canary expectations with retail and alternate-mode unknowns explicit",
@@ -19,5 +27,14 @@
     "Run meaningful positive/negative protocol, receipt/source/library/result checks and public platform suites; preserve failed attempts and explicit missing console-reference, alternative-mode and graphics/debug-layer evidence",
     "Measure comparable query/dispatch and teardown distributions over at least three independent processes, with timer/instrumentation/cache limits and unknown weighted MW3 architecture scores; this audit alone passes no title, GPU service, first-frame or gameplay gate"
   ],
-  "size": "bounded game-free display-query ABI audit with retained defects; separate tasks required for SDK repairs, mode injection, GPU service admission or title adoption"
+  "size": "bounded game-free display-query ABI audit with retained defects; separate tasks required for SDK repairs, mode injection, GPU service admission or title adoption",
+  "evidence": [
+    "Original actual-export display-query audit completes INCONCLUSIVE/exit 1 on five local Windows/Linux native, host sanitizer and participating-core profiles; declared default policy passes, console compatibility and invalid-output containment remain unpassed",
+    "65 owned subprocesses: 25 ordinary successes with 3200 serialized observations, 25 retained boundary observations, 15 exact wrong-result/incomplete/deadline rejection controls; real SDK guest-thread PCR/TLS, output endian/extent/canary, flags, preserved GPR and bounded owned cleanup checks",
+    "All five sealed manifests independently re-read against 341 artifact entries, current original source/driver/helper/declaration/tool hashes, exact binaries/compile commands, plans, nonce-bound records and actual kernel/base module bytes; no SDK kernel objects compiled or source/package mutation",
+    "Retains Windows access violations, Linux null/guard/read-only faults, Linux near-4-GiB returns and core-sanitized misalignment diagnostic without converting any invalid-boundary return/termination into compatibility; adjacent success-valued mode/engine no-ops classified from pinned source only",
+    "Three independent repeated processes per profile provide per-service wrapper-dispatch distributions and separate startup-to-launch/real teardown timings; timer quantization, cache/instrumentation/date/WSL limits retained and weighted MW3 architecture scores unknown",
+    "Fresh public Windows Release and Linux Release ASan/UBSan checks: 277 Python tests per host, eight Windows/two Linux existing skips, parser CTest 1/1 each; all twelve new synthetic protocol/receipt/library/late-child guards pass, task DAG 62 and repository heuristic pass",
+    "Owner self-review only; original GPL host code and public evidence summary, private SDKs/binaries/raw logs retained outside Git. No retail console reference, alternate mode, independent Linux hardware, Windows SDK/core sanitizer, GPU/debug-layer/frame/title/gameplay evidence; no service or gate admission. Exact commands/hashes/limitations in docs/engine/gpu-display.md"
+  ]
 }
