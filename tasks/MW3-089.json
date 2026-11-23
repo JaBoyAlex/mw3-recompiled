@@ -5,8 +5,21 @@
   "area": "controller-adapter",
   "priority": 0,
   "status": "todo",
-  "depends_on": ["MW3-080", "MW3-084", "MW3-085", "MW3-086", "MW3-087", "MW3-088"],
-  "paths": ["runtime/input/backend", "tests/host_platform/input_backend", "tools/test_input_backend.py", "docs/engine/input-backend.md"],
+  "depends_on": [
+    "MW3-080",
+    "MW3-084",
+    "MW3-085",
+    "MW3-086",
+    "MW3-087",
+    "MW3-088",
+    "MW3-090"
+  ],
+  "paths": [
+    "runtime/input/backend",
+    "tests/host_platform/input_backend",
+    "tools/test_input_backend.py",
+    "docs/engine/input-backend.md"
+  ],
   "goal": "Provide the separately testable SDL3 host adapter before physical-controller acceptance, reusing suitable pinned MW2 C++ input work while preserving the existing ingress/owner contracts and selected runtime.",
   "acceptance": [
     "Implement a C++20 SDL3-only host adapter with bounded owned device records, exact backend version/configuration, explicit owner joins and no player assignment from discovery order; preserve MW3-080/087 APIs and selected SDK/provider code unchanged",
