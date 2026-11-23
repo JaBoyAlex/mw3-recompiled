@@ -28,11 +28,16 @@
   ],
   "size": "bounded ABI contracts; split SDK repairs",
   "priority": 0,
-  "status": "todo",
+  "status": "done",
   "evidence": [
     "docs/engine/startup-memory.md",
     "tests/startup_memory/contracts.cpp",
     "tests/startup_memory/test_results.py",
-    "Lead blocker resolution: MW3-091 merged in PR135 (297d742); the verified allocation-import safety derivative is complete. MW3-046 is ready for a serialized claim and explicit consumer adoption, with acceptance still incomplete."
+    "MW3-091 dependency resolved in PR135; lead unblock recorded in PR136 and serialized claim45113147849 succeeded before the separate consumer adoption",
+    "Explicit memory-imports-v1 consumer adoption with no verifier fallback; original xma-packet-v1 default retained for baseline reproduction, selected verifier/profile and immutable input/output guards recorded",
+    "205 actual-kernel processes PASS:190 ordinary and15 result/incomplete/deadline controls across nativeWindows/Linux, Windows hostUBSan, Linux hostASanUBSan and participating-kernel LinuxASanUBSan;205 distinct nonces and all artifacts/loaded kernels audited",
+    "Original C++/CMake and classifier function ASTs unchanged; paired exact parentSDK/compiler/instrumentation baseline retained with83 genuine failures, no success-valued stubs or weakened rejection checks",
+    "Six real wrong-profile/tampered-receipt refusals and11 focused protocol/profile/isolation tests PASS; public Windows/LinuxRelease317 Python tests each with8/2 explicit skips, parserCTest1/1 each;66-task DAG and provenance/diff checks pass",
+    "Scoped game-free selected-fork contract acceptance only. No actual MW3 call, startup allowlist, retail ABI, general race-freedom, performance or gameplay claim. Windows core sanitizers unsupported; native XAM/system libraries and disabled vptr checks retained. Self-review only. Full commands/hashes/limits in docs/engine/startup-memory.md"
   ]
 }

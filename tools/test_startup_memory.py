@@ -11,7 +11,8 @@ import subprocess
 import sys
 import uuid
 
-import prepare_runtime_xma as profile
+import prepare_runtime_xma as xma_profile
+import prepare_runtime_memory_imports as memory_profile
 import recompile as common
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,6 +25,25 @@ REJECTIONS = ("alloc-zero-size", "alloc-type", "alloc-protection", "alloc-region
 MUTATIONS = ("mutation-result", "mutation-incomplete", "mutation-late")
 CASES = (*POSITIVE, "negative-intmin", *POINTERS, *REJECTIONS, *MUTATIONS)
 DIAGNOSTICS = ("Sanitizer", "runtime error:", "crash report", "exception:")
+
+
+def sdk_verifier(name):
+    profiles = {"xma-packet-v1": xma_profile, "memory-imports-v1": memory_profile}
+    if name not in profiles:
+        raise ValueError("unreviewed allocation-import SDK profile")
+    return profiles[name]
+
+
+def output_directory(root, sdk, receipt, requested):
+    output = common.private_cache(requested, ROOT / "game")
+    protected = [sdk, receipt.parent, SOURCE, ROOT / "tools", ROOT / "config"]
+    protected.extend(root / name for name in (
+        "sources", "build", "install", "memory-preparations", "stop-preparations",
+        "xma-preparations", "memory-imports-preparations"))
+    if any(output.is_relative_to(path.resolve()) or path.resolve().is_relative_to(output)
+           for path in protected):
+        raise ValueError("allocation-import output overlaps source or SDK preparation")
+    return output / uuid.uuid4().hex
 
 
 def steps(case):
@@ -112,17 +132,21 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("root", "sdk-report", "output-root"):
         parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--sdk-profile", choices=("xma-packet-v1", "memory-imports-v1"),
+                        default="xma-packet-v1", help="explicit reviewed SDK; no fallback between profiles")
     parser.add_argument("--sanitizers", action="store_true")
     parser.add_argument("--cases", nargs="+", choices=CASES, default=CASES)
     args = parser.parse_args()
+    profile = sdk_verifier(args.sdk_profile)
     output = None
     report = dict(schema_version=1, status="IN_PROGRESS", game_free=True, translated_guest_executed=False,
-                  script_sha256=common.sha(__file__), host_sanitizers=args.sanitizers, results=[])
+                  script_sha256=common.sha(__file__), sdk_profile=args.sdk_profile,
+                  sdk_verifier_sha256=common.sha(profile.__file__), host_sanitizers=args.sanitizers, results=[])
     try:
         if len(set(args.cases)) != len(args.cases):
             raise ValueError("duplicate case selection")
         sdk, evidence = profile.verify_prepared(args.root.resolve(), args.sdk_report, allow_sanitized=args.sanitizers)
-        output = common.private_cache(args.output_root, ROOT / "game") / uuid.uuid4().hex
+        output = output_directory(args.root.resolve(), sdk, args.sdk_report, args.output_root)
         output.mkdir(parents=True)
         print(json.dumps(dict(output=str(output))), flush=True)
         shutil.copytree(SOURCE, output / "maintained-source", ignore=shutil.ignore_patterns("__pycache__"))
@@ -201,6 +225,7 @@ def main():
         if (after != evidence or common.sha(binary) != report["binary_sha256"]
                 or common.sha(args.sdk_report) != report["sdk_report_sha256"]
                 or common.snapshot(output / "maintained-source") != sources
+                or common.sha(profile.__file__) != report["sdk_verifier_sha256"]
                 or common.sha(__file__) != report["script_sha256"]):
             raise ValueError("SDK, source or executed artifact changed")
         report["status"] = "PASS" if all(row["status"] == "PASS" for row in report["results"]) else "FAIL"

@@ -1,7 +1,9 @@
 # Allocation-import ABI investigation
 
-MW3-046 is **blocked on MW3-091**, the separately scoped allocation-import repair. No allocation import has been admitted into owned MW3
-startup. Direct address-space tests and a successful binding do not establish
+MW3-046 passes its scoped actual-kernel allocation-import contracts using the
+explicitly selected [MW3-091 safety profile](memory-imports-profile.md).
+No allocation import has been admitted into owned MW3 startup.
+Direct address-space tests and a successful binding do not establish
 the ABI or failure behavior of an export.
 
 The first original fixture invokes the selected SDK's actual kernel export
@@ -88,7 +90,7 @@ assumptions about the SDK allocator translation unit, Windows Optimus helper
 and copied DLL location were corrected before artifact auditing; original
 failure logs are retained.
 
-## Final retained baseline � 2026-11-22
+## Final retained baseline — 2026-11-22
 
 The final producer runs **205 actual-kernel processes**, 41 per profile. These
 are retained baseline failures, not acceptance of the SDK. All loaded kernel
@@ -147,7 +149,7 @@ All 41 selections and exact per-attempt configure/build/run commands are
 retained privately. Public positive/negative protocol checks require no SDK:
 `python -m unittest discover -s tests/startup_memory -v` (7 tests pass).
 
-## Public verification
+## Retained baseline public verification
 
 `python tools/check.py --config Release` passes on native Windows: 305 Python
 tests with 8 explicit skips, and the native parser CTest passes. Skips cover
@@ -160,7 +162,7 @@ the Windows public build uses MSVC 19.44.35229.0 and SDK 10.0.26100.0.
 These public checks exercise original game-free code and retained-result
 rejection logic. They do not turn the failing actual-kernel matrix green.
 
-## Repair handoff
+## Retained repair handoff (before adoption)
 
 MW3-091 is a bounded, separate SDK derivative. It must check both in/out words
 before trace reads, typed dereferences or mutation; reject null, alignment,
@@ -185,3 +187,102 @@ original GPL-3.0-only code; it calls the private selected BSD-licensed SDK
 without copying SDK implementation or proprietary content. SDK-facing fixture
 builds use its required C++23 headers; the fixture uses C++20 language features.
 Self-review only; no independent review is represented.
+
+## Verified repair adoption — 2026-11-22
+
+MW3-091 completed the isolated SDK repair in PR135. Lead unblock PR136 records
+that dependency resolution; its successful serialized claim is task-admin run
+45113147849. This separate consumer change explicitly selects and verifies
+`memory-imports-v1`, preserves `xma-packet-v1` as the historical default, and
+never retries another verifier after a receipt failure. A repaired receipt
+without its explicit profile selection is rejected. The selected verifier's
+byte hash and profile label are recorded and rechecked with the SDK/package.
+
+All **205 actual-kernel consumer processes pass**: 190 ordinary passes and 15
+correctly rejected wrong-result/incomplete/deadline controls. Each of five
+profiles runs all 41 cases, including the twelve-scenario repeated-order case.
+All 205 per-process nonces are distinct. The original C++ callback and CMake
+inputs are byte-identical to the retained failing baseline; `steps`,
+`calls_match`, `classify` and `mutation_rejected` are AST-identical. The CLI,
+profile verification and output-isolation code change; rejection rules are
+not weakened. No kernel source or package is changed by this consumer.
+
+| Profile | Ordinary passes | Rejected controls | Unexpected failures |
+| --- | ---: | ---: | ---: |
+| Windows native | 38 | 3 | 0 |
+| Windows host UBSan traps | 38 | 3 | 0 |
+| Linux native | 38 | 3 | 0 |
+| Linux host ASan/UBSan | 38 | 3 | 0 |
+| Linux participating kernel ASan/UBSan | 38 | 3 | 0 |
+
+A second artifact audit rehashes every actual loaded kernel, probe binary,
+compile-command record, source snapshot and run log, then revalidates the
+current preparation, compiler and complete SDK package. Its matched baseline
+uses the exact original XMA package as parent, the same compiler and matching
+host instrumentation. The new uncompiled Python profile tests are not guest
+or kernel code. All old baseline failures and earlier development attempts
+remain retained, not relabeled as passing negative tests.
+
+The fresh consumer driver SHA-256 is
+`bbcaee5b1bc53e53e7722049011ddd556d5d74148664b3aae530df0dc8730592`.
+Original C++ SHA-256 remains
+`73e7d4be8445eca261fea1369ee53b1cac0d9b82d7d92bd26a20d120b6abd7ef`.
+Per-profile artifact identities (SHA-256):
+
+| Profile | Manifest | Actual kernel | Probe binary |
+| --- | --- | --- | --- |
+| Windows native | `6c3048f11ab44a80761d4b28f25472aff62fd8a077592293ec3599bf1c4715ef` | `aaa93ebbfa3706ae54ac5aaae33931651abf79d4b976299cd2164c48224f3d92` | `7f8fb9b6867596d073fd925b5c978adde6afd4b3281eaaab1c837578d2af9688` |
+| Windows host UBSan traps | `4cbbb7f0093475326c61f91f74bcab8df1c89dc4f8062fa53efc0571ed275d09` | `aaa93ebbfa3706ae54ac5aaae33931651abf79d4b976299cd2164c48224f3d92` | `62ba11930e6752d4dd9db7b6f337feb796d0ba53ee59d401c70e29491967cbf0` |
+| Linux native | `c5b94c35f3ae05dbddbd5ed76c6bf0129d7b02cd67154d9664858f6615dc9e65` | `828fc85eabd1c07bfa32dadf92ee2a6547a44444fde945a9384b9ae56169139b` | `7686a44766be5b8e4b3e62748334dc0a9257c710a34873b5e8fea23efb090ead` |
+| Linux host ASan/UBSan | `a551ce126138e1ef435f2553e0a0e7982e468a79575cbafc3e7d2a4cafd05b6c` | `828fc85eabd1c07bfa32dadf92ee2a6547a44444fde945a9384b9ae56169139b` | `4e62c36c5228ec49ecd517c02b3381be14cc784ec07caa04ce35aee2e4906dd2` |
+| Linux participating kernel ASan/UBSan | `011ca934c4bf3218cfb6192a1ca797f93bcd47716c4add8172a1119b88ef119a` | `ef88723255d88a31f092eff0a169782b8bca8611442330e7588058838adfdce6` | `255e7665d6d63d4479cb3118bb71883c6bb3ef5df946419978af5f01d98d6ace` |
+
+Private retained run IDs: `windows-native:609060abd772403a973b542a8c55d751`, `windows-host:04d148d282d44a1eafc4b728c4c456cb`, `linux-native:64f4bdae842946079a9f2a3a4bbc9cbd`, `linux-host:2e986f3094b142e2998b54f4a39cb62a`, `linux-core:9069a584ed204f9bbfb7e99f7d2e0365`.
+
+Six real receipt-refusal CLI processes pass (three per native host): repair
+selection with an original-parent receipt, default/baseline selection with a
+repair receipt, and a changed repair-lock receipt all exit 2 before creating
+their requested output directory. Eleven public protocol/profile/isolation
+tests pass, including four new synthetic guards. Rejected output roots include
+both SDK preparation families, selected receipt/package, source/build/install
+caches and maintained inputs. Accepted roots are canonicalized, including
+Windows short-name aliases. No input directory is used as writable output.
+
+Reproduce repaired acceptance on each native host, then with host sanitizers
+and the matching Linux participating-kernel receipt:
+
+```sh
+python tools/test_startup_memory.py --root "$SDK_CACHE" --sdk-report "$VERIFIED_REPAIR_REPORT" --sdk-profile memory-imports-v1 --output-root "$PRIVATE_RUNS"
+python tools/test_startup_memory.py --root "$SDK_CACHE" --sdk-report "$VERIFIED_REPAIR_REPORT" --sdk-profile memory-imports-v1 --output-root "$PRIVATE_RUNS" --sanitizers
+python -m unittest discover -s tests/startup_memory -v
+python tools/check.py --config Release
+CXX=clang++-18 python3 tools/check.py --config Release --sanitizers
+python tools/project.py validate
+python tools/check_repository.py
+git diff --check
+```
+
+Windows Release: 317 Python tests, eight explicit FIFO/LLVM/symlink skips,
+parser CTest 1/1 PASS (Python 3.12.14, MSVC 19.44). Linux Release ASan/UBSan:
+317 tests, two Windows-junction skips, parser CTest 1/1 PASS (Python 3.12.3,
+Clang 18.1.3). The private kernel/probe profiles use matched Clang 20.1.2.
+The 66-task DAG and heuristic/manual provenance/diff checks pass. The retained
+report's single legacy Windows-1252 dash is normalized to UTF-8; hashes and
+historical results are unchanged. Only this task's JSON is completed.
+
+The old XMA default intentionally reproduces failures; matching its historical
+tests is not current acceptance. Windows participating-kernel sanitizers remain
+unsupported; host traps do not instrument native SDK libraries. Linux kernel
+coverage retains native XAM/system dependencies and disabled vptr checks.
+Linux/WSL uses the same machine as Windows, not independent hardware. No
+generated guest code participates in these game-free callback cases.
+
+This passes the scoped selected-fork contract gate, not retail-console ABI
+parity or every memory service. No MW3 allocation call or later startup import
+is admitted here. Concurrent mutation and self-unmapping output buffers remain
+outside this bounded fixture. Follow with a separately claimed, hash-bound
+actual-title allocation/call-site checkpoint before advancing first-frame 011.
+No gameplay or performance claim follows; this consumer changes no shipping
+runtime policy. Self-review only; no independent reviewer claimed. Existing
+BSD/Xenia notices and GPL tooling provenance remain unchanged; no SDKs, game
+bytes, translated title code, private logs or binaries are published.
