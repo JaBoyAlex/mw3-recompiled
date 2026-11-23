@@ -1,0 +1,24 @@
+{
+  "id": "MW3-088",
+  "title": "Map reusable MW2 host code to concrete MW3 component boundaries",
+  "phase": 2,
+  "area": "upstream-reuse",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-003", "MW3-008", "MW3-030", "MW3-031"],
+  "paths": ["docs/research/mw2-reuse.md", "config/reuse/mw2-components.json"],
+  "goal": "Apply the owner's request to maximize compatible reuse from PaulCombal/mw2-recompiled by identifying existing reuse and concrete C++/tool candidates at exact source identities, without repeating failed whole-runtime adaptation or adding unused copied code.",
+  "acceptance": [
+    "Verify the current public upstream revision against the existing pin and license identity; distinguish root project licensing from third-party/generated/game/SDK and binary-distribution rights",
+    "Inspect and hash representative C++ host utilities, configuration/diagnostics, input/audio/files, renderer/cache/prewarm, analysis/toolchain and networking/security/install components; record actual dependencies, disposition and the MW3 seam or task needed before each adoption",
+    "Identify existing disc-reader adaptation and private MW2-derived host-tool use accurately; preserve tested MW3 runtime/layout/termination failures without treating them as a rejection of all independent MW2 code",
+    "Publish a prioritized, actionable reuse manifest and report that prefer compatible upstream implementations when a real MW3 consumer exists; retain notices, MW3 executable identity, bounded tests and separate shared-interface scope for actual ports",
+    "Keep source inspection separate from executed integration/performance evidence; change no runtime/SDK, guest addresses, main-lane reservation, renderer choice, service gate, launcher or production service"
+  ],
+  "validation": [
+    "Reconcile each recorded file hash and source link with the clean pinned checkout, current upstream HEAD and root license; validate unique component IDs and referenced MW3 tasks/paths",
+    "Run python tools/check.py and metadata/diff/provenance checks; no new parser/runtime execution, game benchmark, GPU suite or external service claim follows from this research-only change",
+    "Record owner self-review or actual independent review, explicit unresolved provenance/integration limits and evidence required for each subsequent scoped port"
+  ],
+  "size": "bounded source-reuse inventory and adoption priorities; actual component ports remain independently scoped implementations"
+}
