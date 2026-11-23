@@ -4,9 +4,17 @@
   "phase": 2,
   "area": "upstream-reuse",
   "priority": 0,
-  "status": "todo",
-  "depends_on": ["MW3-003", "MW3-008", "MW3-030", "MW3-031"],
-  "paths": ["docs/research/mw2-reuse.md", "config/reuse/mw2-components.json"],
+  "status": "done",
+  "depends_on": [
+    "MW3-003",
+    "MW3-008",
+    "MW3-030",
+    "MW3-031"
+  ],
+  "paths": [
+    "docs/research/mw2-reuse.md",
+    "config/reuse/mw2-components.json"
+  ],
   "goal": "Apply the owner's request to maximize compatible reuse from PaulCombal/mw2-recompiled by identifying existing reuse and concrete C++/tool candidates at exact source identities, without repeating failed whole-runtime adaptation or adding unused copied code.",
   "acceptance": [
     "Verify the current public upstream revision against the existing pin and license identity; distinguish root project licensing from third-party/generated/game/SDK and binary-distribution rights",
@@ -20,5 +28,14 @@
     "Run python tools/check.py and metadata/diff/provenance checks; no new parser/runtime execution, game benchmark, GPU suite or external service claim follows from this research-only change",
     "Record owner self-review or actual independent review, explicit unresolved provenance/integration limits and evidence required for each subsequent scoped port"
   ],
-  "size": "bounded source-reuse inventory and adoption priorities; actual component ports remain independently scoped implementations"
+  "size": "bounded source-reuse inventory and adoption priorities; actual component ports remain independently scoped implementations",
+  "evidence": [
+    "Owner-requested maximal compatible reuse policy and concrete adoption map for 16 MW2 areas, 55 hash-bound upstream files including 46 C++ headers/implementations; exact dependencies, consumer task boundaries and per-port negative/platform/provenance tests recorded",
+    "Current public PaulCombal/mw2-recompiled HEAD equals existing b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b pin; clean checkout and root GPL license hash verified. Existing adapted disc reader and private patched analyzer/translator experiment distinguished from the unselected whole runtime",
+    "Prioritizes SDL physical-device pieces for MW3-083 and independent parser-hardening leads for MW3-020, plus portable metrics/configuration/process helpers and later shader/cache/recording components at real consumers; no unused source or second kernel/renderer is added",
+    "Source observations retain necessary adaptations: content hashes instead of shader-marker file size/time, complete settings validation/redaction, owned process deadlines and explicit controller owners. MW2 guest addresses, parser applicability, performance and runtime layout are never assumed for MW3",
+    "Second review rehashes all 55 files, verifies immutable URLs, unique component IDs and referenced tasks; altered source hash, duplicate component and missing-task controls are rejected. Windows Release public checks: 277 Python tests, eight existing skips, parser CTest 1/1, task DAG 63, artifact heuristic and diff check pass",
+    "Separate scope PR 123, serialized claim 45091269566 at 89375fe081a2613ea167ba83dc1f6fb83205cab1 and owner issue 124 assignment precede implementation. Owner self-review only; source inspection only, no newly integrated upstream implementation, SDK/title/GPU execution or performance result",
+    "Exact public source manifest/report in config/reuse/mw2-components.json and docs/research/mw2-reuse.md. File/transitive provenance, actual scoped ports/hardware tests and game-linked release rights remain separate; main MW3-046/shared interfaces, PC optionality and all service/gameplay gates unchanged"
+  ]
 }

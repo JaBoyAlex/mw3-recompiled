@@ -1,0 +1,715 @@
+{
+  "schema": 1,
+  "task": "MW3-088",
+  "checked": "2026-11-22",
+  "evidence_class": "source_inspection_and_existing_project_evidence",
+  "owner_policy": "Prefer maximum compatible reuse of upstream own-project C++ and tools at a real MW3 consumer, preserving notices and validating exact MW3 semantics. Do not add unused copied code or mix runtimes.",
+  "upstream": {
+    "url": "https://github.com/PaulCombal/mw2-recompiled",
+    "branch": "master",
+    "commit": "b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b",
+    "remote_head": "b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b",
+    "clean_checkout": true,
+    "root_license": "GPL-3.0-only",
+    "license_sha256": {
+      "LICENSE": "230184f60bae2feaf244f10a8bac053c8ff33a183bcc365b4d8b876d2b7f4809"
+    }
+  },
+  "new_upstream_code_integrated": false,
+  "title_executed": false,
+  "sdk_changed": false,
+  "performance_measured": false,
+  "review": "owner self-review; targeted interfaces, implementations, dependencies and existing MW3 evidence; not complete forensic provenance or distribution clearance",
+  "source_file_count": 55,
+  "cpp_file_count": 46,
+  "components": [
+    {
+      "id": "disc-reader",
+      "title": "Owned-disc parsing and C++ source abstraction",
+      "disposition": "already_adapted",
+      "priority": 0,
+      "source_files": [
+        {
+          "path": "tools/xdvdfs.py",
+          "sha256": "0f6b4718201edb161699372ead551e63c81f11d672f0fd808ac5d6cfdd474e50",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/tools/xdvdfs.py"
+        },
+        {
+          "path": "launcher/disc.h",
+          "sha256": "1fed290d56694e15d29658f99404c05d059489823a703e0bb4516f4e5f2b4e97",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/launcher/disc.h"
+        },
+        {
+          "path": "launcher/disc.cpp",
+          "sha256": "3883aa0dfa4d52d2612ee8b8acee55d48867015d8e23abae4983108f9eebef32",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/launcher/disc.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-002",
+        "MW3-045",
+        "MW3-028"
+      ],
+      "dependencies": [
+        "Python stdlib for existing adapter",
+        "C++20 filesystem/streams for launcher candidate"
+      ],
+      "source_observation": "tools/disc.py explicitly attributes the Python XDVDFS partition/directory adaptation. The C++ launcher Source interface reads ISO or folder content and offers UTF-8 path conversion.",
+      "reuse_plan": "Keep the reviewed bounded Python adapter in use. Prefer adapting the existing C++ Source/UTF-8 implementation when MW3-028 has a native installer consumer; do not add a duplicate reader now.",
+      "required_validation": [
+        "Retain malformed extent/name/cycle and extraction-root tests",
+        "add partial reads, Unicode paths, overflow and original-input immutability for any C++ port",
+        "preserve independent MW3 disc/executable hashes"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "private-toolchain",
+      "title": "Existing MW2-derived analyzer/translator experiment",
+      "disposition": "private_tooling_in_use",
+      "priority": 0,
+      "source_files": [
+        {
+          "path": "patches/xenonrecomp-mw2.patch",
+          "sha256": "81107cb2e484185fbabebe3d4c6e318dfd40fcac32dff8a76bab84797acb577e",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/patches/xenonrecomp-mw2.patch"
+        },
+        {
+          "path": "tools/analyze.py",
+          "sha256": "28ce3876901c09d060d9363f0e451738b6ef0f8ac247b6ba29176e577603579a",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/tools/analyze.py"
+        },
+        {
+          "path": "tools/fixbounds.py",
+          "sha256": "aaeabb6136f11f6fba0ac0cf99b12e959f2f96e6f2e59b3c3972e1a11078998b",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/tools/fixbounds.py"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-006",
+        "MW3-007",
+        "MW3-008",
+        "MW3-009"
+      ],
+      "dependencies": [
+        "Pinned XenonRecomp/XenonAnalyse source",
+        "C++ compiler and derived tool receipts",
+        "original MW3 analysis/configuration"
+      ],
+      "source_observation": "experiments/runtime-bakeoff/mw2_tools.py verifies and applies the pinned MW2 host-tool patch privately. Analysis remains useful; MW2 title generation failed preflight, so this is not the selected title runtime.",
+      "reuse_plan": "Reuse the measured analyzer and individually reviewed generic compiler fixes. Keep MW3 switch tables/configuration and the selected generator isolated; do not import fixbounds results or PPC contexts from MW2.",
+      "required_validation": [
+        "Check source/patch/compiler/config identity and held-out original PPC cases",
+        "retain 377 SP/436 MP boundary errors and failed runtime contracts",
+        "regenerate title code rather than maintaining generated output"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "address-analysis",
+      "title": "Cross-reference and object-access analysis leads",
+      "disposition": "requires_scoped_port",
+      "priority": 1,
+      "source_files": [
+        {
+          "path": "tools/xref.py",
+          "sha256": "09da84d2610d2738cc7bc94a255cdca3d42b683447e2adae73ca6d35c9103627",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/tools/xref.py"
+        },
+        {
+          "path": "tools/strings_in.py",
+          "sha256": "4d4199048d9ed19b016473779e26a5c668e347359424e4ce444c22547428d233",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/tools/strings_in.py"
+        },
+        {
+          "path": "tools/resource_audit.py",
+          "sha256": "1285c0c3a3f40c841cd4cfc5a2e69f83a3270279e7455abe6885d2ce3277a35b",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/tools/resource_audit.py"
+        },
+        {
+          "path": "tools/title.py",
+          "sha256": "8b12ca6fff7c450f93c8ddc552e1bd43cc6a805871ae0d6a3576745ce1b76d85",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/tools/title.py"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-007",
+        "MW3-011",
+        "MW3-023"
+      ],
+      "dependencies": [
+        "Python stdlib",
+        "title image/text/function metadata",
+        "MW2-specific title.py and D3D classification helpers"
+      ],
+      "source_observation": "xref/strings_in scan PPC address materialization; resource_audit follows object-argument uses through functions. The scripts import title-specific metadata and heuristic instruction scans.",
+      "reuse_plan": "Adapt the generic analyses to verified MW3 metadata and bounded reads when a rendering/resource seam is investigated. Preserve heuristic/unknown labels; do not copy MW2 ranges, function ownership or inferred object layouts.",
+      "required_validation": [
+        "Use original instruction fixtures for clobbers, near-end scans and malformed ranges",
+        "bind executable hash and tool/config versions",
+        "independently confirm candidate references on MW3"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "plain-key-hash",
+      "title": "Small C++ hash for padding-free word keys",
+      "disposition": "requires_scoped_port",
+      "priority": 2,
+      "source_files": [
+        {
+          "path": "runtime/words_hash.h",
+          "sha256": "eaba1c7ec97c88548d96ad8fe40850a32f46f59cfe2e5b4330c3ba9b81544f78",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/words_hash.h"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-023"
+      ],
+      "dependencies": [
+        "C++ standard library only",
+        "real padding-free in-memory cache key consumer"
+      ],
+      "source_observation": "WordsHash uses memcpy word reads and requires unique object representations with a static assertion. It returns size_t from native word hashing.",
+      "reuse_plan": "Prefer this implementation if a measured MW3 hot-path unordered-key consumer needs it. Keep it a non-cryptographic process-local hash, not a stable asset/receipt identity; add no unused utility solely to increase copied code.",
+      "required_validation": [
+        "Test equality/hash consistency, tail sizes, padding rejection and collision handling",
+        "measure the actual consumer against its baseline",
+        "do not replace SHA-256 provenance or assume cross-endian stable serialization"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "host-settings",
+      "title": "C++ environment and local settings helpers",
+      "disposition": "requires_scoped_port",
+      "priority": 2,
+      "source_files": [
+        {
+          "path": "runtime/env.h",
+          "sha256": "10f7f30a4b9df413097eabf29ff8202e41e52e0e160b755c28b4d17d6de9810b",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/env.h"
+        },
+        {
+          "path": "runtime/settings.h",
+          "sha256": "5d4bb23ce136176c175a4e5f9fdb649d275e0eb7573d6ece7456fbcec3d14879",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/settings.h"
+        },
+        {
+          "path": "runtime/settings.cpp",
+          "sha256": "eb42e77e643bd9aea52cc3db2057903bd5ef8725c46f3836d1a4c14c056e15f2",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/settings.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-028",
+        "MW3-029"
+      ],
+      "dependencies": [
+        "C++ stdlib/filesystem",
+        "host launcher policy",
+        "Windows/POSIX environment functions"
+      ],
+      "source_observation": "Settings imports MW2-prefixed entries without replacing existing environment values and hides PASSWORD names in its returned log. Number/Real use strtoull/strtod without end-pointer/range checks.",
+      "reuse_plan": "Reuse the precedence/loading structure for a real MW3 host launcher, with an explicit option allowlist, bounded file/line/value sizes, complete numeric validation and redaction for every supported secret type. Keep test lanes isolated.",
+      "required_validation": [
+        "Reject malformed/overflow/nonfinite numbers and unknown names",
+        "test empty/preexisting variables, CRLF, duplicate entries and setter failure",
+        "verify token/password redaction and no cross-profile mutation"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "host-metrics",
+      "title": "Native Windows/Linux metrics and run reporting",
+      "disposition": "requires_scoped_port",
+      "priority": 1,
+      "source_files": [
+        {
+          "path": "runtime/platform.h",
+          "sha256": "3757c4e288fb956cc41343b1ed06a8aad1d27553002c9bb354c20c5411e3c169",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/platform.h"
+        },
+        {
+          "path": "runtime/platform.cpp",
+          "sha256": "b7d36a476f9ad502e812d84082cd522fa848df396992bed51a6b78888b544f39",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/platform.cpp"
+        },
+        {
+          "path": "runtime/report.h",
+          "sha256": "4678650ffd88b998b2c494663695248bc74e764a8d4f05f84de648015c24e486",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/report.h"
+        },
+        {
+          "path": "runtime/report.cpp",
+          "sha256": "10b66ec2e745fc85d4692e59fc6e7e3ea9abe8a3656b32eba46e38218006853c",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/report.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-005",
+        "MW3-013",
+        "MW3-032"
+      ],
+      "dependencies": [
+        "Host platform APIs and system libraries",
+        "report/log/environment policy",
+        "renderer play/frame boundaries"
+      ],
+      "source_observation": "Platform exposes thread/process clocks and system/process memory readings. Report separates world-frame intervals from loading and records compiler/cache/CPU/GPU work categories.",
+      "reuse_plan": "Prefer the platform sampling implementation for a real native collector after agreeing its narrow interface. Adapt report data to the existing benchmark schema and verify play/frame boundaries on MW3; do not invent samples before first boot.",
+      "required_validation": [
+        "Check units, monotonic/counter-reset behavior and ended-thread handles",
+        "map supported/unknown fields honestly on Windows/Linux",
+        "measure collector overhead and emit independent per-process provenance"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "physical-input",
+      "title": "SDL physical-device diagnostics and rumble leads",
+      "disposition": "requires_scoped_port",
+      "priority": 1,
+      "source_files": [
+        {
+          "path": "runtime/kernel/input.cpp",
+          "sha256": "89ed00f59eac2eae4b644ca8882d1c4b7382b854821ae94b5f43c286a8c07fc9",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/kernel/input.cpp"
+        },
+        {
+          "path": "runtime/signin.cpp",
+          "sha256": "297f5f6f1ed2bd5c657fedb3655200b4fc450c9dcdd41e5492ec261aaf51df17",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/signin.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-083",
+        "MW3-012"
+      ],
+      "dependencies": [
+        "SDL3",
+        "MW2 PPC guest/kernel ABI",
+        "guide/signin/friends/player/renderer policy"
+      ],
+      "source_observation": "The input module enumerates SDL devices, synchronizes open/close and rumble, and serializes guest input. It includes substantial MW2 guest and UI/online policy coupling.",
+      "reuse_plan": "Use isolated SDL discovery/mapping/rumble pieces as the first reference for MW3-083. Feed observations through the accepted MW3-087 ingress and explicit MW3-080 owners; retain the repaired selected provider instead of replacing its reviewed sampling with a second kernel.",
+      "required_validation": [
+        "Exercise actual owned controllers, unplug/replug, held controls, raw-ID reuse and rumble cancellation",
+        "preserve all four owners and reject stale/late readings",
+        "keep virtual-only tests distinct and defer guest admission"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "host-audio",
+      "title": "SDL output and XMA ownership reference",
+      "disposition": "reference_requires_mw3_evidence",
+      "priority": 2,
+      "source_files": [
+        {
+          "path": "runtime/kernel/audio.cpp",
+          "sha256": "5501cd040423da930ecb2bf437a9071f08ab51c766223009449bc6efef091fa2",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/kernel/audio.cpp"
+        },
+        {
+          "path": "runtime/apu/audio.cpp",
+          "sha256": "c3aedd9138fbddd3e74adf99639099dc37130c74db0012000ba1d08f99023e71",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/apu/audio.cpp"
+        },
+        {
+          "path": "runtime/apu/xma.cpp",
+          "sha256": "60b96b2944d1f696c9ba37abf70646f455307fdbfd97c20d7c6fdc3d5f9275ac",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/apu/xma.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-082",
+        "MW3-012",
+        "MW3-062"
+      ],
+      "dependencies": [
+        "SDL3 audio and codec dependencies",
+        "MW2 PPC context/guest memory/callbacks",
+        "host thread lifecycle"
+      ],
+      "source_observation": "Kernel exports hand guest callbacks/render frames to the audio implementation; XMA context ownership lives in its separate decoder path. This is coupled to MW2 memory and callback models.",
+      "reuse_plan": "Reuse format/pacing/cleanup insights and isolated portable algorithms only when selected-provider output work has a matching seam. Preserve the already audited MW3-062 host ownership gate and selected XMA lifecycle repair.",
+      "required_validation": [
+        "Verify actual device output and title callback/sample format on MW3",
+        "recheck queue bounds, stale IDs, underruns, teardown and sanitizer/codec coverage",
+        "do not count a silent/headless success as playback"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "files-and-profiles",
+      "title": "Read-only content and writable save boundaries",
+      "disposition": "reference_requires_mw3_evidence",
+      "priority": 2,
+      "source_files": [
+        {
+          "path": "runtime/kernel/files.cpp",
+          "sha256": "cd421e835378f544bbc1e83c878b65c47397e4d7885bca055dc5a9ed27607067",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/kernel/files.cpp"
+        },
+        {
+          "path": "runtime/kernel/content.cpp",
+          "sha256": "82101a6c6b0a6e902b8dfd54b248605210297480abe26c383719f394c7794368",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/kernel/content.cpp"
+        },
+        {
+          "path": "runtime/kernel/profile.cpp",
+          "sha256": "448e61210a0e512ff9640ff8955063aca195c06adcafe9701fc7f2fec766846e",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/kernel/profile.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-081",
+        "MW3-012",
+        "MW3-060"
+      ],
+      "dependencies": [
+        "MW2 PPC/kernel objects and content mounts",
+        "host filesystem case/path behavior",
+        "guest profile structures"
+      ],
+      "source_observation": "files.cpp separates read-only disc content from mounted writable packages, resolves guest paths and owns file handles/delete-on-close. Object and mount types belong to the MW2 runtime.",
+      "reuse_plan": "Reuse path and case-handling techniques or tests behind the selected runtime/storage boundary once agreed. Retain MW3-060 mount evidence and transactional MW3-081 requirements; never mix the two runtimes object tables.",
+      "required_validation": [
+        "Test traversal, drive aliases, Unicode/case collisions, symlink/reparse escape, save isolation and crash recovery",
+        "bind actual MW3 guest layouts",
+        "use only disposable owned profiles"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "shader-prewarm",
+      "title": "Shader cache marker and launcher prewarm structure",
+      "disposition": "requires_scoped_port",
+      "priority": 2,
+      "source_files": [
+        {
+          "path": "runtime/gpu/vulkan/shader_marker.h",
+          "sha256": "e52c6d5d831c87c54d5c4efcc597361dbd9c571956b2dd4334e5b8a56eea2d9e",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/shader_marker.h"
+        },
+        {
+          "path": "runtime/gpu/vulkan/shader_marker.cpp",
+          "sha256": "e7db1e4b6f85d1b212725fd93f5f31c3b899798125b2ca192bef33e34d167705",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/shader_marker.cpp"
+        },
+        {
+          "path": "launcher/precompile.h",
+          "sha256": "b46c58765f7877db39ec12b74cbe0586100407d16aeb2864557747ea71e07859",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/launcher/precompile.h"
+        },
+        {
+          "path": "launcher/precompile.cpp",
+          "sha256": "8e2de7299bc6c912f9d8aa74dda044bc5d651bae3310805982159d3a25cc9c5c",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/launcher/precompile.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-011",
+        "MW3-023",
+        "MW3-028"
+      ],
+      "dependencies": [
+        "Vulkan device/cache identity",
+        "MW2 shader-build/pipeline/fastfile structures",
+        "launcher process lifecycle"
+      ],
+      "source_observation": "The marker includes build/device/driver/cache UUID and scale. Game-file entries use name, size and modification time; SameTarget deliberately removes file lines before comparison.",
+      "reuse_plan": "Reuse invalidate-before-build and device/driver matching design when a real MW3 shader consumer exists. Replace size/time-only content identity with exact executable/content/translator/config hashes and backend/device compatibility. Scope backend-specific code separately.",
+      "required_validation": [
+        "Change content without changing name/size/time and require invalidation",
+        "reject partial/stale/corrupt cache and mismatched scale/device/driver",
+        "compare cold and warm behavior with bounded prewarm workers"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "spirv-builder",
+      "title": "C++ SPIR-V emitter and shader translator leads",
+      "disposition": "requires_scoped_port",
+      "priority": 3,
+      "source_files": [
+        {
+          "path": "runtime/gpu/vulkan/spirv.h",
+          "sha256": "70a80b7d3828edefdf74b67cae6ef39cf7b743ad1163a3fd85748d75d0b25ddf",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/spirv.h"
+        },
+        {
+          "path": "runtime/gpu/vulkan/spirv.cpp",
+          "sha256": "8c7b906dd7a1b70b947f493974542a42ec9069dfacd1669670ab4f1632350c8f",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/spirv.cpp"
+        },
+        {
+          "path": "runtime/gpu/vulkan/shader_translator.cpp",
+          "sha256": "2844ecc1c775619e4d1c3fd97fe5642e149a7bf871774aefeeb1c4a78846b217",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/shader_translator.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-006",
+        "MW3-011",
+        "MW3-023"
+      ],
+      "dependencies": [
+        "C++ stdlib for emitter",
+        "MW2 bindings/xenos_ucode semantics for translator",
+        "SPIR-V validation/driver support"
+      ],
+      "source_observation": "The small emitter builds SPIR-V sections and IDs; the translator additionally depends on its own bindings and Xenos instruction model. Source availability is not shader conformance.",
+      "reuse_plan": "Prefer the isolated emitter if a justified offline or backend consumer needs it. Compare selected shader tools before adopting translator portions; do not bring in a second renderer or MW2 binding layouts solely because they are C++.",
+      "required_validation": [
+        "Run independent SPIR-V validation, malformed/held-out shader cases and real MW3 visual differentials",
+        "bind shader/translator/config/device identity",
+        "record unsupported instructions instead of success stubs"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "gpu-recording",
+      "title": "Vulkan timestamp and threaded recorder patterns",
+      "disposition": "reference_requires_mw3_evidence",
+      "priority": 3,
+      "source_files": [
+        {
+          "path": "runtime/gpu/vulkan/gpu_time.h",
+          "sha256": "f4cd21c0b4267cb79ab8ff0a37854df8e649035fbcd0149fe7b1f51851e2068e",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/gpu_time.h"
+        },
+        {
+          "path": "runtime/gpu/vulkan/gpu_time.cpp",
+          "sha256": "3be5cfef21fea42ab4f154c93b4827583fb295ecf90c04b4f631ecfce2fddec3",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/gpu_time.cpp"
+        },
+        {
+          "path": "runtime/gpu/vulkan/recorder.h",
+          "sha256": "79d27e5eddd650f574d03d82c47cf3d8efdd1424f20c158aa6da1a4f1a12197a",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/recorder.h"
+        },
+        {
+          "path": "runtime/gpu/vulkan/recorder.cpp",
+          "sha256": "fc1d043cb073b4cddfd57a3e92671e42af8e29438d1c34d35c4526ee89785877",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/gpu/vulkan/recorder.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-023",
+        "MW3-026",
+        "MW3-027"
+      ],
+      "dependencies": [
+        "Vulkan queue/query/fence support",
+        "existing MW2 frame/renderer ordering and resource lifetimes"
+      ],
+      "source_observation": "GPU time wraps submissions with deferred timestamp reads. The recorder copies calls to another thread and requires resources to outlive queued use and destruction to wait for its position.",
+      "reuse_plan": "Reuse measured timestamp/ownership techniques after faithful first frame and a selected-backend seam exist. Keep one coherent renderer and verify lifetimes before considering a separate recorder thread.",
+      "required_validation": [
+        "Check timestamp support/wrap/availability and CPU-GPU attribution",
+        "stress shutdown, in-flight object destruction and all viewport counts",
+        "benchmark equal-quality MW3 frames and latency before optimization claims"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "session-admission",
+      "title": "LAN/Steam transport and invite validation reference",
+      "disposition": "reference_requires_mw3_evidence",
+      "priority": 3,
+      "source_files": [
+        {
+          "path": "runtime/online/service.cpp",
+          "sha256": "8e3b96f74b7a646b0785c842060e22a03f0db8c0c2bb5200f1b063302657f15e",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/online/service.cpp"
+        },
+        {
+          "path": "runtime/online/steam.cpp",
+          "sha256": "91e5eae63e494b85f079c343db390dba2884c41f48f24f422448d08fef259743",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/online/steam.cpp"
+        },
+        {
+          "path": "runtime/online/lan.cpp",
+          "sha256": "0d9d46f4b28326d8aa329a3681f8eaaad72f9d80cfd80d45c08e5ef28d16c44a",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/online/lan.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-019",
+        "MW3-020",
+        "MW3-021",
+        "MW3-022"
+      ],
+      "dependencies": [
+        "Steam authorization/SDK terms for Steam branch",
+        "MW2 console/session/signin/version policy",
+        "platform sockets"
+      ],
+      "source_observation": "Service checks an exact connect-line grammar before invoking its console path. Steam code documents an AppID480 default and its own lobby/discovery behavior.",
+      "reuse_plan": "Reuse bounded parsing/transport techniques only behind the MW3 admission contract after authorization. Use structured authenticated private invites; no borrowed AppID, unauthenticated console strings or production connections are adopted.",
+      "required_validation": [
+        "Test invalid grammar, authorization, sender/session/version binding and late callbacks offline",
+        "independently audit MW3 packet limits",
+        "require actual authorized two-household relay evidence for SDR/CGNAT claims"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "packet-hardening",
+      "title": "Title parser-hardening regression leads",
+      "disposition": "reference_requires_mw3_evidence",
+      "priority": 1,
+      "source_files": [
+        {
+          "path": "docs/security.md",
+          "sha256": "a004252f6aa3274f603e7be688724ccaa5081993b834140660fffb2c6561847e",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/docs/security.md"
+        },
+        {
+          "path": "runtime/joinparty_overflow.cpp",
+          "sha256": "f7676800744bfd61cc30964ed0f3b62846d4038b5691014638505f7fa1d81cf9",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/joinparty_overflow.cpp"
+        },
+        {
+          "path": "runtime/huffman_overflow.cpp",
+          "sha256": "5e49fa1e01e070a972ed4efca2c90111b15a4b84cac3892bbf9ac2e66197951d",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/huffman_overflow.cpp"
+        },
+        {
+          "path": "runtime/client_packet_sender.cpp",
+          "sha256": "90cc25e48a8ad75a8ddbfa89959cc3aff6ccdb9b81b524dba05bc362a4e21ace",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/client_packet_sender.cpp"
+        },
+        {
+          "path": "runtime/map_name_command.cpp",
+          "sha256": "f6ec28858d75d0540dfcf9781549a05a77c338d5329134be81dc71070f29b420",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/map_name_command.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-020"
+      ],
+      "dependencies": [
+        "MW2 title-specific symbols/structure offsets/limits",
+        "guest parser semantics and sender admission"
+      ],
+      "source_observation": "The project documents and implements bounds, sender-validation, command-string and format-string hardening for its title. Hooks bind MW2 title functions and field layouts.",
+      "reuse_plan": "Make this the initial checklist for the independent MW3 parser audit. Reuse the defensive algorithm or original synthetic test idea after deriving MW3 structures/limits; never transfer MW2 hook addresses, client ceilings or CVE applicability as proof.",
+      "required_validation": [
+        "Confirm each defect or absence on exact MW3 executables",
+        "use valid/invalid/truncated/overflow regression cases before parser entry",
+        "test offline with sanitizers and no production service exposure"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "installer-processes",
+      "title": "C++ child launch and package/install orchestration",
+      "disposition": "requires_scoped_port",
+      "priority": 2,
+      "source_files": [
+        {
+          "path": "runtime/install/spawn.h",
+          "sha256": "c76e9039c5b82e04dc498799580fc7f9fed02574eb7591a37a952f5ccccd6ee0",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/install/spawn.h"
+        },
+        {
+          "path": "runtime/install/spawn.cpp",
+          "sha256": "9b77832b1360f2158d27a4439bebe8fa2913436baa0604fbe63258a6d5665ed6",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/install/spawn.cpp"
+        },
+        {
+          "path": "runtime/install/install.h",
+          "sha256": "1c185ac0ec8f4310788f612412a3a961dda3a63477ab81209860283ff1f0128a",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/install/install.h"
+        },
+        {
+          "path": "runtime/install/install.cpp",
+          "sha256": "50df31540f47adefeffb065bd03a73af58e110467701b6ac690a06e16a80f7d0",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/install/install.cpp"
+        },
+        {
+          "path": "launcher/package.h",
+          "sha256": "f50d3f693ccecb814718ac8f85b84056c4ee38f054f428daa0a56e21e5816e8a",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/launcher/package.h"
+        },
+        {
+          "path": "launcher/package.cpp",
+          "sha256": "17bd055f1296d85cded0dcbe9f6f336abc1b592f00effa1f5adfab10da51a5c1",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/launcher/package.cpp"
+        },
+        {
+          "path": "launcher/setup.cpp",
+          "sha256": "6ba7f22948f72503d1a0641740e1d1a697070b7e53b81917299019e343b8a130",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/launcher/setup.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-028",
+        "MW3-029"
+      ],
+      "dependencies": [
+        "SDL3 process API",
+        "MW2 executable/update/version assumptions",
+        "package/codec/license and release policy"
+      ],
+      "source_observation": "Spawn uses SDL argument/environment properties and handles missing inherited Windows streams. Package code reads update containers; install/setup orchestrate MW2-specific content and launch behavior.",
+      "reuse_plan": "Prefer the portable spawn and read-only source/package abstractions when installer work is unblocked. Add owned process deadlines/exit handling, private output/profile roots and transactional updates. Replace title-specific inputs/URLs/version policy; defer launcher-specific work to packaging as ROADMAP requires.",
+      "required_validation": [
+        "Test Unicode/space/argument paths, missing streams, timeouts and failed children",
+        "verify package bounds/corruption and immutable originals",
+        "require hash-bound MW3 install/rollback/recovery and license/release manifest review"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    },
+    {
+      "id": "whole-runtime",
+      "title": "Memory/context/thread model remains unselected",
+      "disposition": "not_adopt_runtime",
+      "priority": 3,
+      "source_files": [
+        {
+          "path": "runtime/guest.h",
+          "sha256": "3faa82214d662704eeb0295a871c0ff71ab556d9411359f5909516194159d50a",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/guest.h"
+        },
+        {
+          "path": "runtime/guest_memory.cpp",
+          "sha256": "a09c476bee471f91f1db5d661970a80a6f2ff216fb59aa79921443ea0758eaf2",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/guest_memory.cpp"
+        },
+        {
+          "path": "runtime/kernel/threads.cpp",
+          "sha256": "46b28bfa242315d17db7e0654b0b8ab13e48195549af249516deea901df985e6",
+          "url": "https://github.com/PaulCombal/mw2-recompiled/blob/b3aa7d8ef184de8ec1f0d2fe7fa0e19a4c92b68b/runtime/kernel/threads.cpp"
+        }
+      ],
+      "consumer_tasks": [
+        "MW3-008",
+        "MW3-010",
+        "MW3-046"
+      ],
+      "dependencies": [
+        "Complete MW2 PPC context/memory/kernel/scheduler model",
+        "title-specific layout and generated bindings"
+      ],
+      "source_observation": "The prior actual MW3 bakeoff found conflicting fixed heap/function-table layouts and termination returning to its callback; title generation failed before any MW2-runtime MW3 title execution.",
+      "reuse_plan": "Preserve comparison evidence and the selected repaired ReXGlue runtime. Reuse independent components above without mixing memory layouts, PPC contexts or schedulers. A future full-runtime pivot requires a separately agreed new bakeoff, not this reuse inventory.",
+      "required_validation": [
+        "Resolve prior correctness failures and demonstrate an identical MW3 slice before reconsideration",
+        "preserve exact title/tool/license identities and migration costs",
+        "never claim unmeasured speed or clear a title gate from source inspection"
+      ],
+      "license_basis": "Upstream root GPL-3.0-only own-project grant; preserve applicable notices and perform file/transitive review before a port. No game/generated-code/SDK or game-linked binary grant inferred."
+    }
+  ],
+  "exclusions": [
+    "Generated/decompiled game code and game bytes",
+    "Console keys and SDK/DRM/anti-cheat bypasses",
+    "Proprietary Steam/NVIDIA SDK contents or unauthorized service use",
+    "PC custom-map converter and its distinct notices/third-party tables; MW3 PC game files remain optional",
+    "Changes to any other lane or shared interface; actual ports require separate agreed scopes"
+  ]
+}
