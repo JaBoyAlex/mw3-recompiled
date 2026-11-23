@@ -1,0 +1,31 @@
+{
+  "id": "MW3-092",
+  "title": "Audit and execute the first owned-title allocation checkpoint",
+  "phase": 2,
+  "area": "startup-allocation",
+  "priority": 0,
+  "status": "todo",
+  "depends_on": ["MW3-010", "MW3-046"],
+  "paths": [
+    "runtime/lifecycle",
+    "tools/verify_kernel_gate.py",
+    "tests/lifecycle",
+    "config/runtime/title-allocation.json",
+    "docs/engine/title-allocation.md",
+    "docs/engine/first-frame-plan.md"
+  ],
+  "goal": "Bind and validate the first actual SP/MP NtAllocateVirtualMemory call through the verified memory-imports-v1 kernel, then stop and tear down before resuming further unreviewed title execution; preserve the historical header-only checkpoint.",
+  "acceptance": [
+    "Before admission, bind both exact owned executable hashes, metadata/generation/compiler/SDK identities, import name/ordinal/thunk and caller return address; independently inspect original PPC argument setup and a bounded read-only pre-call capture, keeping translated code and traces private",
+    "Add an explicit allocation checkpoint requiring the verified repaired SDK, exact per-role call-site/argument contract and one-call/size budgets; validate complete readable/writable in/out words and neighbouring snapshots before invoking the original actual kernel export, without success stubs or generated guest-source edits",
+    "Independently check actual status, endian output geometry, relevant committed edge/state and unchanged neighbouring bytes against the audited selected-fork contract; stop before returning to translated code after the admitted call, with all other imports guarded and no claim about subsequent startup or unreviewed data variables",
+    "Verify owned thread stop metadata, handle/thread/runtime recovery, unload and mapping release on Windows/Linux and supported host/participating-kernel sanitizer profiles; preserve explicitly selected header-only behavior and its negative/interrupt regressions",
+    "Reject changed build/call-site/receipt/package/source/config/binding/pointer/result identities and incomplete/late evidence; retain real negative controls, exact loaded-module/log/binary identities and a source-only report without marking first-frame, gameplay or retail ABI parity complete"
+  ],
+  "validation": [
+    "Run repeated isolated SP/MP first-call checkpoints and meaningful binding/pointer/oracle/incomplete/deadline controls on native Windows/Linux and supported host/core profiles, with no simultaneous GPU-heavy suite and at most two build workers",
+    "Run the existing bounded header-only title regressions plus public synthetic protocol/configuration/mutation/output-isolation guards and python tools/check.py with relevant supported platform/sanitizer checks",
+    "Record exact commands, matched baseline and revised source/compiler/config/SDK/generation/binary/log hashes, resource budgets, skips, retained failures, provenance and self-review; stop and split any new SDK or guest-service defect rather than widening admission"
+  ],
+  "size": "bounded first actual allocation call plus immediate diagnostic teardown; later title startup and rendering remain separate"
+}
